@@ -15,5 +15,4 @@ data class Activity(
     val audioUrl: String?,
     val animationUrl: String?,
     val totalDurationSeconds: Long,
-) {
-}
+)

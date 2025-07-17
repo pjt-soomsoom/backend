@@ -7,8 +7,8 @@ enum class Role {
 class User private constructor(
     val id: Long?,
     val account: Account,
-    val role: Role
-){
+    val role: Role,
+) {
 
     companion object {
 
@@ -36,7 +36,7 @@ class User private constructor(
             )
         }
 
-        fun createAdmin(username: String, password: String) : User {
+        fun createAdmin(username: String, password: String): User {
             return User(
                 id = null,
                 account = Account.IdPassword(username, password),

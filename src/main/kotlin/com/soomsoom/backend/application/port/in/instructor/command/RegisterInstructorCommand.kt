@@ -4,6 +4,4 @@ data class RegisterInstructorCommand(
     val name: String,
     val profileImageUrl: String?,
     val bio: String?,
-) {
-
-}
+)

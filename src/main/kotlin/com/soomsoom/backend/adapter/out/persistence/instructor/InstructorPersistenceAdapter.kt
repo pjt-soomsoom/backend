@@ -9,14 +9,14 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class InstructorPersistenceAdapter(
-    private val instructorJpaRepository: InstructorJpaRepository
-): InstructorPort {
+    private val instructorJpaRepository: InstructorJpaRepository,
+) : InstructorPort {
     override fun findById(id: Long): Instructor? {
         return instructorJpaRepository.findByIdOrNull(id)?.toDomain()
     }
 
     override fun findAll(): List<Instructor> {
-        return instructorJpaRepository.findAll().map {it.toDomain()}
+        return instructorJpaRepository.findAll().map { it.toDomain() }
     }
 
     override fun save(instructor: Instructor): Instructor {

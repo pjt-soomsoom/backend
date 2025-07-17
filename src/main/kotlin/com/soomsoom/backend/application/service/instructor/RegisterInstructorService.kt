@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class RegisterInstructorService(
-    private val instructorPort: InstructorPort
-): RegisterInstructorUseCase{
+    private val instructorPort: InstructorPort,
+) : RegisterInstructorUseCase {
 
     override fun register(command: RegisterInstructorCommand): Instructor {
         return Instructor(null, command.name, command.profileImageUrl, command.bio)

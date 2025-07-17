@@ -5,10 +5,11 @@ import com.soomsoom.backend.application.port.`in`.instructor.command.RegisterIns
 data class RegisterInstructorRequest(
     val name: String,
     val profileImageUrl: String?,
-    val bio: String?
+    val bio: String?,
 )
 
 fun RegisterInstructorRequest.toCommand() = RegisterInstructorCommand(
-    name, profileImageUrl, bio
+    name,
+    profileImageUrl,
+    bio
 )
-

@@ -8,12 +8,12 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class UserPersistenceAdapter(
-    private val userJpaRepository: UserJpaRepository
+    private val userJpaRepository: UserJpaRepository,
 ) : UserPort {
     override fun save(user: User): User {
         val entity = UserJpaEntity.from(user)
         val savedEntity = userJpaRepository.save(entity)
-        return savedEntity.toDomain();
+        return savedEntity.toDomain()
     }
 
     override fun findByDeviceId(deviceId: String): User? {

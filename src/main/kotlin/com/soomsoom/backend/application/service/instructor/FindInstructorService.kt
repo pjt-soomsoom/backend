@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class FindInstructorService(
-    private val instructorPort: InstructorPort
-): FindInstructorUseCase {
+    private val instructorPort: InstructorPort,
+) : FindInstructorUseCase {
     override fun findById(command: FindInstructorCommand): Instructor? {
         return instructorPort.findById(command.id) ?: throw (NotFoundException())
     }

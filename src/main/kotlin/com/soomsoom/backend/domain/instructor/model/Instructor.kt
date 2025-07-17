@@ -4,6 +4,5 @@ data class Instructor(
     val id: Long?,
     val name: String,
     val profileImageUrl: String?,
-    val bio: String?
-) {
-}
+    val bio: String?,
+)

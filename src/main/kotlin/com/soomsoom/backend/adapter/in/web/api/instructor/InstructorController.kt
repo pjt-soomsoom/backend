@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class InstructorController(
-    private val registerInstructorUseCase: RegisterInstructorUseCase
+    private val registerInstructorUseCase: RegisterInstructorUseCase,
 ) {
 
     @PostMapping("/instructors")
-    fun register (
-        @RequestBody request: RegisterInstructorRequest
+    fun register(
+        @RequestBody request: RegisterInstructorRequest,
     ): RegisterInstructorResponse {
         return RegisterInstructorResponse.from(registerInstructorUseCase.register(request.toCommand()))
     }
