@@ -7,4 +7,6 @@ interface UserPort {
     fun save(user: User): User
 
     fun findByDeviceId(deviceId: String): User?
+
+    fun findById(userId: Long): User?
 }
