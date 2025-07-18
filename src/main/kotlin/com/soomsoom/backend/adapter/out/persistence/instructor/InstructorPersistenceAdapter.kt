@@ -21,7 +21,7 @@ class InstructorPersistenceAdapter(
 
     override fun save(instructor: Instructor): Instructor {
         val entity = InstructorJpaEntity.from(instructor)
-        val savedEntity = instructorJpaRepository.save(entity)
-        return savedEntity.toDomain()
+        return instructorJpaRepository.save(entity)
+            .let(InstructorJpaEntity::toDomain)
     }
 }

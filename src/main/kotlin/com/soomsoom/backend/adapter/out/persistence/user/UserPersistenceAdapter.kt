@@ -12,8 +12,8 @@ class UserPersistenceAdapter(
 ) : UserPort {
     override fun save(user: User): User {
         val entity = UserJpaEntity.from(user)
-        val savedEntity = userJpaRepository.save(entity)
-        return savedEntity.toDomain()
+        return userJpaRepository.save(entity)
+            .let(UserJpaEntity::toDomain)
     }
 
     override fun findByDeviceId(deviceId: String): User? {
