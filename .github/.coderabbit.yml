@@ -13,6 +13,7 @@ summarize:
         Each point should be a single, clear sentence.
         All your responses must be in Korean.
 
+
 # PR 제목 자동 생성 기능 설정
 auto_title:
     # PR 본문에 '@coderabbitai 제목' 이라고 코멘트를 달면 제목 생성을 트리거합니다.
