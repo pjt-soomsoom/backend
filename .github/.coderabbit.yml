@@ -149,9 +149,12 @@ reviews:
 chat:
     auto_reply: true
 tools:
+    # 마크다운 파일의 문법을 검사합니다.
     markdownlint:
         enabled: true
+    # YAML 파일의 문법을 검사합니다.
     yamllint:
         enabled: true
+    # 코드에 민감한 정보(API 키 등)가 하드코딩되었는지 검사합니다.
     gitleaks:
         enabled: true
