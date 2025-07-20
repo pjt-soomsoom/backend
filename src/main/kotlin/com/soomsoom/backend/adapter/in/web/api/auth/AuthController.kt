@@ -24,7 +24,7 @@ class AuthController(
     @ResponseStatus(HttpStatus.OK)
     fun adminLogin(
         @RequestBody request: AdminLoginRequest,
-    ) : TokenInfo {
+    ): TokenInfo {
         println("controller")
         return adminLoginUseCase.adminLogin(request.toCommand())
     }
@@ -33,7 +33,7 @@ class AuthController(
     @ResponseStatus(HttpStatus.CREATED)
     fun adminSignUp(
         @RequestBody request: AdminSignUpRequest,
-    ) : TokenInfo {
+    ): TokenInfo {
         return adminSignUpUserCase.adminSignUp(request.toCommand())
     }
 }

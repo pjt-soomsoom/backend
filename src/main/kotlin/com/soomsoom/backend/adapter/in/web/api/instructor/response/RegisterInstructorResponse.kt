@@ -1,4 +1,4 @@
-package com.soomsoom.backend.adapter.`in`.web.api.instructor.request
+package com.soomsoom.backend.adapter.`in`.web.api.instructor.response
 
 import com.soomsoom.backend.domain.instructor.model.Instructor
 
