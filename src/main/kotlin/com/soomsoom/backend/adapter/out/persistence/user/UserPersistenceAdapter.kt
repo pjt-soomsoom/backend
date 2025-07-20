@@ -19,4 +19,14 @@ class UserPersistenceAdapter(
     override fun findByDeviceId(deviceId: String): User? {
         return userJpaRepository.findByDeviceId(deviceId)?.toDomain()
     }
+
+    override fun findById(userId: Long): User? {
+        return userJpaRepository.findById(userId)
+            .map { it.toDomain() }
+            .orElse(null)
+    }
+
+    override fun findByUsername(username: String): User? {
+        return userJpaRepository.findByUsername(username)?.toDomain()
+    }
 }
