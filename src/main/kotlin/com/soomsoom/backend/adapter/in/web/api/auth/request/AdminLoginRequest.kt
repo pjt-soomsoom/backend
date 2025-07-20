@@ -9,5 +9,5 @@ data class AdminLoginRequest(
 
 fun AdminLoginRequest.toCommand() = AdminLoginCommand(
     username,
-    password,
+    password
 )

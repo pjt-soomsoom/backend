@@ -19,6 +19,6 @@ class CustomUserDetailsService(
                 ?: throw UsernameNotFoundException("해당 유저를 찾을 수 없습니다: $username")
             )
 
-        return CustomUserDetails(user);
+        return CustomUserDetails(user)
     }
 }
