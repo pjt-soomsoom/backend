@@ -20,6 +20,12 @@ class AuthController(
     private val adminSignUpUserCase: AdminSignUpUseCase,
 ) {
 
+    /**
+     * 관리자 로그인을 처리하고 인증 토큰 정보를 반환합니다.
+     *
+     * @param request 관리자 로그인 요청 데이터.
+     * @return 인증에 성공한 관리자의 토큰 정보.
+     */
     @PostMapping("/admin/login")
     @ResponseStatus(HttpStatus.OK)
     fun adminLogin(
@@ -29,6 +35,12 @@ class AuthController(
         return adminLoginUseCase.adminLogin(request.toCommand())
     }
 
+    /**
+     * 관리자 회원가입 요청을 처리하고 인증 토큰 정보를 반환합니다.
+     *
+     * @param request 관리자 회원가입 요청 데이터.
+     * @return 생성된 관리자 계정의 인증 토큰 정보.
+     */
     @PostMapping("/admin/sign-up")
     @ResponseStatus(HttpStatus.CREATED)
     fun adminSignUp(

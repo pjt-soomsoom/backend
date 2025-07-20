@@ -19,6 +19,13 @@ class AdminLoginService(
     private val jwtTokenProvider: JwtTokenProvider,
     private val authenticationManagerBuilder: AuthenticationManagerBuilder,
 ) : AdminLoginUseCase {
+    /**
+     * 관리자 로그인을 처리하고 JWT 토큰을 반환합니다.
+     *
+     * @param command 로그인에 필요한 관리자 계정 정보가 포함된 명령 객체입니다.
+     * @return 인증에 성공하면 JWT 토큰 정보를 반환합니다.
+     * @throws UsernameNotFoundException 해당 사용자명을 가진 사용자가 존재하지 않을 경우 발생합니다.
+     */
     override fun adminLogin(command: AdminLoginCommand): TokenInfo {
         val authenticationToken = UsernamePasswordAuthenticationToken(command.username, command.password)
         println(command.password)

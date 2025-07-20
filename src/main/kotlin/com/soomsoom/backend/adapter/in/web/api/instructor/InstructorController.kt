@@ -15,6 +15,12 @@ class InstructorController(
     private val registerInstructorUseCase: RegisterInstructorUseCase,
 ) {
 
+    /**
+     * 새로운 강사를 등록하고 등록된 강사 정보를 반환합니다.
+     *
+     * @param request 등록할 강사 정보가 담긴 요청 객체
+     * @return 등록된 강사 정보를 포함한 응답 객체
+     */
     @PostMapping("/instructors")
     @ResponseStatus(HttpStatus.CREATED)
     fun register(

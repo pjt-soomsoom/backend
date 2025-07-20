@@ -12,6 +12,13 @@ class CustomUserDetailsService(
     private val userPort: UserPort,
 ) : UserDetailsService {
 
+    /**
+     * 주어진 사용자 이름으로 사용자를 조회하여 인증 정보를 반환합니다.
+     *
+     * @param username 조회할 사용자의 이름.
+     * @return 조회된 사용자의 인증 정보.
+     * @throws UsernameNotFoundException 사용자를 찾을 수 없는 경우 발생합니다.
+     */
     @Transactional(readOnly = true)
     override fun loadUserByUsername(username: String): UserDetails {
         val user = (

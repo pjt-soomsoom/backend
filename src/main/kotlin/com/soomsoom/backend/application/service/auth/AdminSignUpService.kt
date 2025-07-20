@@ -17,6 +17,15 @@ class AdminSignUpService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
 ) : AdminSignUpUseCase {
+    /**
+     * 관리자 계정을 신규로 등록하고 JWT 토큰을 반환합니다.
+     *
+     * 주어진 사용자명으로 이미 계정이 존재하면 예외를 발생시킵니다.
+     *
+     * @param command 관리자 회원가입에 필요한 사용자명과 비밀번호 정보를 담은 명령 객체
+     * @return 생성된 관리자 계정에 대한 JWT 토큰 정보
+     * @throws IllegalStateException 이미 존재하는 사용자명일 경우 발생
+     */
     override fun adminSignUp(command: AdminSignUpCommand): TokenInfo {
         userPort.findByUsername(command.username)?.let {
             throw IllegalStateException("이미 존재하는 계정 이름")
