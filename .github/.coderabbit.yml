@@ -1,6 +1,3 @@
-# 저장소 루트 또는 .github/ 폴더에 위치시킵니다.
-# 파일명: .coderabbit.yml
-
 # ----------------------------------------------------------------------------------
 # 기본 설정: 리뷰 언어 및 PR 요약/제목 자동 생성 등 편의 기능을 설정합니다.
 # ----------------------------------------------------------------------------------
@@ -28,12 +25,7 @@ reviews:
     # 리뷰의 톤을 설정합니다. 'chill'은 친근하고 교육적인 톤을 권장합니다.
     profile: chill
 
-    # 리뷰가 끝난 후 PR에 'Changes requested' 상태를 자동으로 남길지 여부입니다.
-    request_changes_workflow: true
-
-    # 리뷰 마지막에 AI가 창작한 시를 추가하는 재미있는 기능입니다.
-    poem: true
-
+    high_level_summary: true
     # 리뷰에서 제외할 파일 경로를 지정합니다.
     path_filters:
         - "!**/resources/**"
@@ -66,9 +58,9 @@ reviews:
 
         - path: "**/adapter/out/persistence/**/*.kt" # 영속성 계층
           instructions: |
-              Focus on performance and proper data mapping.
-              1.  Look for potential N+1 query problems and suggest solutions like fetch joins or DTO projections.
-              2.  Ensure that JPA entities are correctly mapped to and from domain models. The persistence adapter is the boundary for this conversion.
+            Focus on performance and proper data mapping.
+            1.  Look for potential N+1 query problems and suggest solutions like fetch joins or DTO projections.
+            2.  Ensure that JPA entities are correctly mapped to and from domain models. The persistence adapter is the boundary for this conversion.
 
     # ★★★ AI 리뷰어의 페르소나 및 전역 리뷰 지침 ★★★
     # 모든 파일에 공통으로 적용되는 핵심 리뷰 규칙입니다.
@@ -103,11 +95,16 @@ reviews:
         **[Security]**
         1.  **Sensitive Data Logging:** Warn if you find code that might log sensitive information like passwords, personal details, or API keys.
 
-# ----------------------------------------------------------------------------------
-# 채팅 기능 설정: PR 코멘트로 AI와 대화하는 기능을 활성화합니다.
-# ----------------------------------------------------------------------------------
+auto_review:
+    enabled: true
+    auto_incremental_review: true
+    ignore_title_keywords: [ ]
+    labels: [ ]
+    drafts: false
+    base_branches: [ ]
 chat:
     auto_reply: true
+poem: true
 
 # ----------------------------------------------------------------------------------
 # 외부 도구 연동: 필요에 따라 외부 린터를 활성화할 수 있습니다.
