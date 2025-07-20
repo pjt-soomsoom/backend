@@ -18,7 +18,7 @@ auto_title:
   placeholder: "@coderabbitai 제목"
 
 # 라인별 코드 리뷰를 생성할 때의 지침 (가장 중요!)
-review:
+reviews:
   # 리뷰의 톤을 설정합니다. 'chill'은 친근하고 교육적인 톤을 권장합니다.
   profile: chill
 
