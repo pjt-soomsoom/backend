@@ -9,7 +9,7 @@ ignore:
 # PR의 전체적인 요약을 생성할 때의 지침
 summarize:
     instructions: |
-      Summarize the core changes of this PR in five main bullet points.
+      Summarize the core changes of this PR
       Each point should be a single, clear sentence.
       All your responses must be in Korean.
 
