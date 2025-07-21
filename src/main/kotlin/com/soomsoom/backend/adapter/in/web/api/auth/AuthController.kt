@@ -24,7 +24,8 @@ class AuthController(
     @PostMapping("/admin/login")
     @ResponseStatus(HttpStatus.OK)
     fun adminLogin(
-        @Valid @RequestBody request: AdminLoginRequest,
+        @Valid @RequestBody
+        request: AdminLoginRequest,
     ): TokenInfo {
         return adminLoginUseCase.adminLogin(request.toCommand())
     }
@@ -32,7 +33,8 @@ class AuthController(
     @PostMapping("/admin/sign-up")
     @ResponseStatus(HttpStatus.CREATED)
     fun adminSignUp(
-        @Valid @RequestBody request: AdminSignUpRequest,
+        @Valid @RequestBody
+        request: AdminSignUpRequest,
     ): TokenInfo {
         return adminSignUpUseCase.adminSignUp(request.toCommand())
     }

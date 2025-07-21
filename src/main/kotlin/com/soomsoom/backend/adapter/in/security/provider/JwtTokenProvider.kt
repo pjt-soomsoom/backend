@@ -20,7 +20,7 @@ import javax.crypto.SecretKey
 class JwtTokenProvider(
     @Value("\${jwt.secret}") private val secretKey: String,
     @Value("\${jwt.access.expiration}") private val accessTokenExpiration: Long,
-): TokenGeneratorPort {
+) : TokenGeneratorPort {
     private val key: SecretKey
 
     init {

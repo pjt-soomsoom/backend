@@ -10,7 +10,7 @@ data class AdminSignUpRequest(
     val username: String,
 
     @field:NotBlank(message = "password는 필수입니다.")
-    @field:Size(min = 5, message ="password는 5글자 이상이어야 합니다.")
+    @field:Size(min = 5, message = "password는 5글자 이상이어야 합니다.")
     val password: String,
 )
 
