@@ -25,7 +25,6 @@ class AuthController(
     fun adminLogin(
         @RequestBody request: AdminLoginRequest,
     ): TokenInfo {
-        println("controller")
         return adminLoginUseCase.adminLogin(request.toCommand())
     }
 
