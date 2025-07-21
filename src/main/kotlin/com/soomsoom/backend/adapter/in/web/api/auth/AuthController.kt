@@ -6,6 +6,7 @@ import com.soomsoom.backend.adapter.`in`.web.api.auth.request.toCommand
 import com.soomsoom.backend.application.port.`in`.auth.TokenInfo
 import com.soomsoom.backend.application.port.`in`.auth.usecase.AdminLoginUseCase
 import com.soomsoom.backend.application.port.`in`.auth.usecase.AdminSignUpUseCase
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -23,7 +24,7 @@ class AuthController(
     @PostMapping("/admin/login")
     @ResponseStatus(HttpStatus.OK)
     fun adminLogin(
-        @RequestBody request: AdminLoginRequest,
+        @Valid @RequestBody request: AdminLoginRequest,
     ): TokenInfo {
         return adminLoginUseCase.adminLogin(request.toCommand())
     }
@@ -31,7 +32,7 @@ class AuthController(
     @PostMapping("/admin/sign-up")
     @ResponseStatus(HttpStatus.CREATED)
     fun adminSignUp(
-        @RequestBody request: AdminSignUpRequest,
+        @Valid @RequestBody request: AdminSignUpRequest,
     ): TokenInfo {
         return adminSignUpUseCase.adminSignUp(request.toCommand())
     }
