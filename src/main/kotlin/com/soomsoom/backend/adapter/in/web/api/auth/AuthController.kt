@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/auth")
 class AuthController(
     private val adminLoginUseCase: AdminLoginUseCase,
-    private val adminSignUpUserCase: AdminSignUpUseCase,
+    private val adminSignUpUseCase: AdminSignUpUseCase,
 ) {
 
     @PostMapping("/admin/login")
@@ -34,6 +34,6 @@ class AuthController(
     fun adminSignUp(
         @RequestBody request: AdminSignUpRequest,
     ): TokenInfo {
-        return adminSignUpUserCase.adminSignUp(request.toCommand())
+        return adminSignUpUseCase.adminSignUp(request.toCommand())
     }
 }
