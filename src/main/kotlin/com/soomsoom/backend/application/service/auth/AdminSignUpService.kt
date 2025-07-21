@@ -25,7 +25,6 @@ class AdminSignUpService(
 
         return passwordEncoder.encode(command.password)
             .let { encodedPassword ->
-                println(encodedPassword)
                 User.createAdmin(command.username, encodedPassword)
             }
             .let(userPort::save)
