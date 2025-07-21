@@ -9,4 +9,6 @@ interface UserPort {
     fun findByDeviceId(deviceId: String): User?
 
     fun findById(userId: Long): User?
+
+    fun findByUsername(username: String): User?
 }

@@ -1,5 +1,6 @@
 package com.soomsoom.backend.adapter.`in`.security.provider
 
+import com.soomsoom.backend.application.port.out.auth.TokenGeneratorPort
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
@@ -19,7 +20,7 @@ import javax.crypto.SecretKey
 class JwtTokenProvider(
     @Value("\${jwt.secret}") private val secretKey: String,
     @Value("\${jwt.access.expiration}") private val accessTokenExpiration: Long,
-) {
+) : TokenGeneratorPort {
     private val key: SecretKey
 
     init {
@@ -31,7 +32,7 @@ class JwtTokenProvider(
      * 인증 객체로 액세스 토큰 생성
      */
 
-    fun generateToken(authentication: Authentication): String {
+    override fun generateToken(authentication: Authentication): String {
         val authorities = authentication.authorities.joinToString(",") { it.authority }
         val now = Date()
         val validity = Date(now.time + accessTokenExpiration)
