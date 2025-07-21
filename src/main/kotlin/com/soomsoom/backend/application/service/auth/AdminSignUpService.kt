@@ -1,6 +1,5 @@
 package com.soomsoom.backend.application.service.auth
 
-import com.soomsoom.backend.adapter.`in`.security.provider.JwtTokenProvider
 import com.soomsoom.backend.application.port.`in`.auth.TokenInfo
 import com.soomsoom.backend.application.port.`in`.auth.command.AdminSignUpCommand
 import com.soomsoom.backend.application.port.`in`.auth.usecase.AdminSignUpUseCase

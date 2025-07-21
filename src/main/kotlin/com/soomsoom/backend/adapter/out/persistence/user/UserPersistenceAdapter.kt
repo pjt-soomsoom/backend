@@ -22,8 +22,8 @@ class UserPersistenceAdapter(
 
     override fun findById(userId: Long): User? {
         return userJpaRepository.findById(userId)
-            .map { it.toDomain() }
             .orElse(null)
+            ?.toDomain()
     }
 
     override fun findByUsername(username: String): User? {
