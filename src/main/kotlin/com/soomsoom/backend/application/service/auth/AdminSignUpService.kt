@@ -4,6 +4,7 @@ import com.soomsoom.backend.adapter.`in`.security.provider.JwtTokenProvider
 import com.soomsoom.backend.application.port.`in`.auth.TokenInfo
 import com.soomsoom.backend.application.port.`in`.auth.command.AdminSignUpCommand
 import com.soomsoom.backend.application.port.`in`.auth.usecase.AdminSignUpUseCase
+import com.soomsoom.backend.application.port.out.auth.TokenGeneratorPort
 import com.soomsoom.backend.application.port.out.user.UserPort
 import com.soomsoom.backend.domain.user.model.User
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service
 class AdminSignUpService(
     private val userPort: UserPort,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtTokenProvider: JwtTokenProvider,
+    private val tokenGeneratorPort: TokenGeneratorPort,
 ) : AdminSignUpUseCase {
     override fun adminSignUp(command: AdminSignUpCommand): TokenInfo {
         userPort.findByUsername(command.username)?.let {
@@ -37,7 +38,7 @@ class AdminSignUpService(
                 )
                 UsernamePasswordAuthenticationToken(principal, "", authorities)
             }
-            .let(jwtTokenProvider::generateToken)
+            .let(tokenGeneratorPort::generateToken)
             .let { TokenInfo(it) }
     }
 }
