@@ -23,4 +23,11 @@ abstract class BaseTimeEntity {
 
     @Column
     var deletedAt: LocalDateTime? = null
+
+    fun delete() {
+        deletedAt = LocalDateTime.now()
+    }
+
+    val isDeleted: Boolean
+        get() = deletedAt != null
 }
