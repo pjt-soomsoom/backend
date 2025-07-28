@@ -1,5 +1,6 @@
 package com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity
 
+import com.soomsoom.backend.common.entity.BaseTimeEntity
 import com.soomsoom.backend.domain.instructor.model.Instructor
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -16,7 +17,7 @@ class InstructorJpaEntity(
     var name: String,
     var profileImageUrl: String?,
     var bio: String?,
-) {
+) : BaseTimeEntity() {
 
     // 도메인 객체를 DB 엔티티로 변환
     companion object {
