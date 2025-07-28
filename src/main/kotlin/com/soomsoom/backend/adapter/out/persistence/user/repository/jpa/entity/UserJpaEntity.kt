@@ -1,5 +1,6 @@
 package com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.entity
 
+import com.soomsoom.backend.common.entity.BaseTimeEntity
 import com.soomsoom.backend.domain.user.model.Account
 import com.soomsoom.backend.domain.user.model.Role
 import com.soomsoom.backend.domain.user.model.User
@@ -29,12 +30,13 @@ class UserJpaEntity(
     var socialProvider: String?,
     var socialId: String?,
 
+    @Column(unique = true)
     var username: String?,
     var password: String?,
 
     @Enumerated(EnumType.STRING)
     val role: Role,
-) {
+) : BaseTimeEntity() {
     enum class AccountType {
         ANONYMOUS, SOCIAL, ID_PASSWORD
     }

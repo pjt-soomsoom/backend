@@ -5,10 +5,11 @@ import com.soomsoom.backend.application.port.`in`.auth.command.AdminLoginCommand
 import com.soomsoom.backend.application.port.`in`.auth.usecase.AdminLoginUseCase
 import com.soomsoom.backend.application.port.out.auth.TokenGeneratorPort
 import com.soomsoom.backend.application.port.out.user.UserPort
+import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.user.UserErrorCode
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -33,6 +34,6 @@ class AdminLoginService(
             }
             ?.let(tokenGeneratorPort::generateToken)
             ?.let { TokenInfo(it) }
-            ?: throw UsernameNotFoundException("User not found with username: ${authResult.name}")
+            ?: throw SoomSoomException(UserErrorCode.USER_USERNAME_OR_PASSWORD_MISMATCH)
     }
 }

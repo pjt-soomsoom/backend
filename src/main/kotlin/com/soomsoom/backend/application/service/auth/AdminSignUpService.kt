@@ -5,6 +5,8 @@ import com.soomsoom.backend.application.port.`in`.auth.command.AdminSignUpComman
 import com.soomsoom.backend.application.port.`in`.auth.usecase.AdminSignUpUseCase
 import com.soomsoom.backend.application.port.out.auth.TokenGeneratorPort
 import com.soomsoom.backend.application.port.out.user.UserPort
+import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.user.UserErrorCode
 import com.soomsoom.backend.domain.user.model.User
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -21,7 +23,7 @@ class AdminSignUpService(
 ) : AdminSignUpUseCase {
     override fun adminSignUp(command: AdminSignUpCommand): TokenInfo {
         userPort.findByUsername(command.username)?.let {
-            throw IllegalStateException("이미 존재하는 계정 이름")
+            throw SoomSoomException(UserErrorCode.USER_ALREADY_EXISTS)
         }
 
         return passwordEncoder.encode(command.password)
