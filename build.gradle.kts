@@ -32,6 +32,10 @@ dependencies {
     // validation
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    // aws 의존성 추가
+    implementation(platform("software.amazon.awssdk:bom:2.20.45"))
+    implementation("software.amazon.awssdk:s3")
+
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
