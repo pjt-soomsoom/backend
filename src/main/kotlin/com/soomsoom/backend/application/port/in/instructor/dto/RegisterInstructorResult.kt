@@ -6,14 +6,14 @@ import com.soomsoom.backend.domain.instructor.model.Instructor
 
 data class RegisterInstructorResult(
     val instructorId: Long,
-    val preSignedUrl: String,
-    val fileKey: String,
+    val preSignedUrl: String?,
+    val fileKey: String?,
 ) {
     companion object {
         fun from(
             instructor: Instructor,
-            preSignedUrl: String,
-            fileKey: String,
+            preSignedUrl: String?,
+            fileKey: String?,
         ): RegisterInstructorResult {
             return RegisterInstructorResult(
                 instructorId = instructor.id ?: throw SoomSoomException(
