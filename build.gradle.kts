@@ -58,6 +58,8 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mysql")
+
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
 
 kotlin {
