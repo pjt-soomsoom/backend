@@ -53,6 +53,11 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.10")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.springframework.security:spring-security-test")
+
+    testImplementation("io.kotest.extensions:kotest-extensions-testcontainers:2.0.2")
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mysql")
 }
 
 kotlin {
