@@ -32,14 +32,14 @@ class InstructorJpaEntity(
             return InstructorJpaEntity(
                 instructor.id ?: 0L,
                 instructor.name,
-                instructor.profileImageUrl,
-                instructor.bio
+                instructor.bio,
+                instructor.profileImageUrl
             )
         }
     }
 
     fun toDomain(): Instructor {
-        return Instructor(this.id, this.name, this.profileImageUrl, this.bio)
+        return Instructor(this.id, this.name, this.bio, this.profileImageUrl)
     }
 
     fun update(instructor: Instructor) {
