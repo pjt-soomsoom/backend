@@ -7,11 +7,11 @@ import jakarta.validation.constraints.Size
 data class AdminSignUpRequest(
     @field:NotBlank(message = "username은 필수입니다.")
     @field:Size(min = 5, message = "username은 5글자 이상이어야 합니다.")
-    val username: String,
+    val username: String?,
 
     @field:NotBlank(message = "password는 필수입니다.")
     @field:Size(min = 5, message = "password는 5글자 이상이어야 합니다.")
-    val password: String,
+    val password: String?,
 )
 
-fun AdminSignUpRequest.toCommand() = AdminSignUpCommand(username, password)
+fun AdminSignUpRequest.toCommand() = AdminSignUpCommand(username!!, password!!)

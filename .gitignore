@@ -137,8 +137,11 @@ cmake-build-*/
 # File-based project format
 *.iws
 
-# IntelliJ
-out/
+# ★★★ 핵심 수정 ★★★
+# IntelliJ의 컴파일 출력 폴더인 'out/'을 무시합니다.
+# 맨 앞에 '/'를 붙여, 프로젝트 최상위 경로에 있는 out 폴더만 대상으로 지정합니다.
+# 이렇게 하면 'src/main/kotlin/.../adapter/out' 같은 소스 코드 패키지는 무시되지 않습니다.
+/out/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
