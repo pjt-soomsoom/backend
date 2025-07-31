@@ -32,6 +32,10 @@ dependencies {
     // validation
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    // aws 의존성 추가
+    implementation(platform("software.amazon.awssdk:bom:2.20.45"))
+    implementation("software.amazon.awssdk:s3")
+
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -46,8 +50,16 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.6.2")
     testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("io.mockk:mockk:1.13.10")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.springframework.security:spring-security-test")
+
+    testImplementation("io.kotest.extensions:kotest-extensions-testcontainers:2.0.2")
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mysql")
+
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
 
 kotlin {
