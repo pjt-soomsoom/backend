@@ -1,4 +1,4 @@
-package com.soomsoom.backend.adapter.out.s3.type
+package com.soomsoom.backend.domain.user
 
 enum class FileDomain {
     INSTRUCTORS,

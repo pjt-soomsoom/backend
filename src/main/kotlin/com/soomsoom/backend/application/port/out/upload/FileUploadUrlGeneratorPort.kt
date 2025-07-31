@@ -1,7 +1,7 @@
 package com.soomsoom.backend.application.port.out.upload
 
-import com.soomsoom.backend.adapter.out.s3.type.FileCategory
-import com.soomsoom.backend.adapter.out.s3.type.FileDomain
+import com.soomsoom.backend.domain.user.FileCategory
+import com.soomsoom.backend.domain.user.FileDomain
 import com.soomsoom.backend.application.port.out.upload.dto.FileUploadUrl
 
 interface FileUploadUrlGeneratorPort {

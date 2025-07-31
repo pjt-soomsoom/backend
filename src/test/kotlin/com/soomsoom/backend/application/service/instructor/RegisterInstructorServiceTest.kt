@@ -1,7 +1,7 @@
 package com.soomsoom.backend.application.service.instructor
 
-import com.soomsoom.backend.adapter.out.s3.type.FileCategory
-import com.soomsoom.backend.adapter.out.s3.type.FileDomain
+import com.soomsoom.backend.domain.user.FileCategory
+import com.soomsoom.backend.domain.user.FileDomain
 import com.soomsoom.backend.application.port.`in`.instructor.command.CompleteImageUploadCommand
 import com.soomsoom.backend.application.port.`in`.instructor.command.RegisterInstructorCommand
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
