@@ -17,7 +17,7 @@ class CustomUserDetailsService(
     override fun loadUserByUsername(username: String): UserDetails {
         val user = (
             userPort.findByUsername(username)
-                ?: throw SoomSoomException(UserErrorCode.USER_USERNAME_OR_PASSWORD_MISMATCH)
+                ?: throw SoomSoomException(UserErrorCode.USERNAME_OR_PASSWORD_MISMATCH)
             )
 
         return CustomUserDetails(user)

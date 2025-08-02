@@ -24,7 +24,7 @@ class Instructor(
 
     fun updateInfo(name: String, bio: String?) {
         if (name.isBlank()) {
-            throw SoomSoomException(InstructorErrorCode.INSTRUCTOR_NAME_CANNOT_BE_BLANK)
+            throw SoomSoomException(InstructorErrorCode.NAME_CANNOT_BE_BLANK)
         }
         this.name = name
         this.bio = bio

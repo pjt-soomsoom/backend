@@ -30,11 +30,11 @@ class InstructorTest : BehaviorSpec({
             val newName = ""
             val newBio = "소개만 변경"
 
-            Then("SoomSoomException(InstructorErrorCode.INSTRUCTOR_NAME_CANNOT_BE_BLANK) 예외가 발생해야 한다") {
+            Then("SoomSoomException(InstructorErrorCode.NAME_CANNOT_BE_BLANK) 예외가 발생해야 한다") {
                 val exception = shouldThrow<SoomSoomException> {
                     instructor.updateInfo(newName, newBio)
                 }
-                exception.errorCode shouldBe InstructorErrorCode.INSTRUCTOR_NAME_CANNOT_BE_BLANK
+                exception.errorCode shouldBe InstructorErrorCode.NAME_CANNOT_BE_BLANK
             }
         }
 

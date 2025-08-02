@@ -9,9 +9,10 @@ enum class UserErrorCode(
     private val httpStatus: HttpStatus,
     private val messageKey: String,
 ) : ErrorCode {
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "user.not-found"),
-    USER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "user.already-exists"),
-    USER_USERNAME_OR_PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "user.username-or-password.mismatch"),
+    NOT_FOUND(HttpStatus.NOT_FOUND, "user.not-found"),
+    ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "user.already-exists"),
+    USERNAME_OR_PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "user.username-or-password.mismatch"),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "user.access-denied"),
     ;
 
     override val status: HttpStatus

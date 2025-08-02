@@ -26,7 +26,7 @@ class InstructorPersistenceAdapter(
             instructorJpaRepository.save(InstructorJpaEntity.from(instructor)).toDomain()
         } else {
             val entity = instructorJpaRepository.findByIdOrNull(instructor.id)
-                ?: throw SoomSoomException(InstructorErrorCode.INSTRUCTOR_NOT_FOUND)
+                ?: throw SoomSoomException(InstructorErrorCode.NOT_FOUND)
             entity.update(instructor)
             entity.toDomain()
         }

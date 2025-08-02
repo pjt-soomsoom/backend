@@ -17,7 +17,7 @@ data class RegisterInstructorResult(
         ): RegisterInstructorResult {
             return RegisterInstructorResult(
                 instructorId = instructor.id ?: throw SoomSoomException(
-                    InstructorErrorCode.INSTRUCTOR_ID_CANNOT_BE_NULL
+                    InstructorErrorCode.ID_CANNOT_BE_NULL
                 ),
                 preSignedUrl = preSignedUrl,
                 fileKey = fileKey
