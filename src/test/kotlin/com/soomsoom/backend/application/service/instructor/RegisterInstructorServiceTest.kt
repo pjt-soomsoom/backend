@@ -1,7 +1,5 @@
 package com.soomsoom.backend.application.service.instructor
 
-import com.soomsoom.backend.domain.user.FileCategory
-import com.soomsoom.backend.domain.user.FileDomain
 import com.soomsoom.backend.application.port.`in`.instructor.command.CompleteImageUploadCommand
 import com.soomsoom.backend.application.port.`in`.instructor.command.RegisterInstructorCommand
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
@@ -10,6 +8,8 @@ import com.soomsoom.backend.application.port.out.upload.FileUploadUrlGeneratorPo
 import com.soomsoom.backend.application.port.out.upload.FileUrlResolverPort
 import com.soomsoom.backend.application.port.out.upload.dto.FileUploadUrl
 import com.soomsoom.backend.domain.instructor.model.Instructor
+import com.soomsoom.backend.domain.user.FileCategory
+import com.soomsoom.backend.domain.user.FileDomain
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
