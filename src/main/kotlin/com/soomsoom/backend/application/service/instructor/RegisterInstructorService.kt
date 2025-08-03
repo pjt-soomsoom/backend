@@ -13,6 +13,7 @@ import com.soomsoom.backend.domain.instructor.InstructorErrorCode
 import com.soomsoom.backend.domain.instructor.model.Instructor
 import com.soomsoom.backend.domain.user.FileCategory
 import com.soomsoom.backend.domain.user.FileDomain
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -24,6 +25,7 @@ class RegisterInstructorService(
     private val fileUrlResolverPort: FileUrlResolverPort,
 ) : RegisterInstructorUseCase {
 
+    @PreAuthorize("instructorAuthorizer.isAdmin(authentication)")
     override fun register(command: RegisterInstructorCommand): RegisterInstructorResult {
         val instructor = Instructor(name = command.name, bio = command.bio)
         val savedInstructor = instructorPort.save(instructor)
