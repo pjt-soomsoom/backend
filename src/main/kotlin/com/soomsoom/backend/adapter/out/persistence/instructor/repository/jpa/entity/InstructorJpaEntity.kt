@@ -61,5 +61,6 @@ class InstructorJpaEntity(
         this.bio = instructor.bio
         this.profileImageUrl = instructor.profileImageUrl
         this.profileImageFileKey = instructor.profileImageFileKey
+        this.deletedAt = instructor.deletedAt
     }
 }
