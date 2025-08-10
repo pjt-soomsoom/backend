@@ -8,12 +8,15 @@ import com.soomsoom.backend.application.port.out.instructor.InstructorPort
 import com.soomsoom.backend.application.port.out.upload.FileDeleterPort
 import com.soomsoom.backend.application.port.out.upload.FileUploadUrlGeneratorPort
 import com.soomsoom.backend.application.port.out.upload.FileUrlResolverPort
+import com.soomsoom.backend.application.port.out.upload.FileValidatorPort
 import com.soomsoom.backend.common.exception.PersistenceErrorCode
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.instructor.InstructorErrorCode
 import com.soomsoom.backend.domain.instructor.model.Instructor
+import com.soomsoom.backend.domain.upload.UploadErrorCode
 import com.soomsoom.backend.domain.user.FileCategory
 import com.soomsoom.backend.domain.user.FileDomain
+import org.apache.tomcat.util.http.fileupload.FileUploadException
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,6 +28,7 @@ class RegisterInstructorService(
     private val fileUploadUrlGeneratorPort: FileUploadUrlGeneratorPort,
     private val fileUrlResolverPort: FileUrlResolverPort,
     private val fileDeleterPort: FileDeleterPort,
+    private val fileValidatorPort: FileValidatorPort,
 ) : RegisterInstructorUseCase {
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -51,6 +55,9 @@ class RegisterInstructorService(
     }
 
     override fun completeImageUpload(command: CompleteImageUploadCommand) {
+        if (!fileValidatorPort.validate(command.fileKey)) {
+            throw SoomSoomException(UploadErrorCode.FILE_KEY_MISMATCH)
+        }
         val instructor = (
             instructorPort.findById(command.instructorId)
                 ?: throw SoomSoomException(InstructorErrorCode.NOT_FOUND)

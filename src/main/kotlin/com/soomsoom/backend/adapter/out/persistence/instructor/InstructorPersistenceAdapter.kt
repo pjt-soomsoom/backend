@@ -33,13 +33,15 @@ class InstructorPersistenceAdapter(
     }
 
     override fun save(instructor: Instructor): Instructor {
-        return if (instructor.id == null) {
-            instructorJpaRepository.save(InstructorJpaEntity.from(instructor)).toDomain()
+        val entityToSave = if (instructor.id == null) {
+            InstructorJpaEntity.from(instructor)
         } else {
-            val entity = instructorJpaRepository.findByIdOrNull(instructor.id)
+            val existingEntity = instructorJpaRepository.findByIdOrNull(instructor.id)
                 ?: throw SoomSoomException(InstructorErrorCode.NOT_FOUND)
-            entity.update(instructor)
-            entity.toDomain()
+            existingEntity.update(instructor)
+            existingEntity
         }
+
+        return instructorJpaRepository.save(entityToSave).toDomain()
     }
 }

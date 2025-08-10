@@ -14,8 +14,10 @@ import com.soomsoom.backend.domain.user.FileCategory
 import com.soomsoom.backend.domain.user.FileDomain
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional
 class UpdateInstructorService(
     private val instructorPort: InstructorPort,
     private val fileUploadUrlGeneratorPort: FileUploadUrlGeneratorPort,
