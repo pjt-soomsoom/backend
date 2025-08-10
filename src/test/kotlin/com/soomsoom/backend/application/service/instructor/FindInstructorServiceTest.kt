@@ -1,9 +1,9 @@
 package com.soomsoom.backend.application.service.instructor
 
-import com.soomsoom.backend.adapter.`in`.web.api.common.DeletionStatus
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.application.port.out.instructor.InstructorPort
 import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.instructor.InstructorErrorCode
 import com.soomsoom.backend.domain.instructor.model.Instructor
 import io.kotest.assertions.throwables.shouldThrow

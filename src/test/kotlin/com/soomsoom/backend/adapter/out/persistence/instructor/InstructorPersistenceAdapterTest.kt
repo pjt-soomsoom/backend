@@ -1,11 +1,11 @@
 package com.soomsoom.backend.adapter.out.persistence.instructor
 
 import com.soomsoom.backend.IntegrationTest
-import com.soomsoom.backend.adapter.`in`.web.api.common.DeletionStatus
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.InstructorJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.InstructorQueryDslRepository
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.InstructorJpaEntity
+import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.instructor.model.Instructor
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe

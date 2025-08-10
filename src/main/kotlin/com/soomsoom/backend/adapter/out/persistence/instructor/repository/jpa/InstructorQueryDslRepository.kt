@@ -2,11 +2,11 @@ package com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa
 
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
-import com.soomsoom.backend.adapter.`in`.web.api.common.DeletionStatus
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.InstructorJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.QInstructorJpaEntity.instructorJpaEntity
 import com.soomsoom.backend.common.utils.QueryDslSortUtil
+import com.soomsoom.backend.domain.common.DeletionStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.support.PageableExecutionUtils

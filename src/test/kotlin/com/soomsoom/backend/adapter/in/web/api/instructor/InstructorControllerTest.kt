@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import com.soomsoom.backend.adapter.`in`.security.config.SecurityConfig
 import com.soomsoom.backend.adapter.`in`.security.provider.JwtTokenProvider
-import com.soomsoom.backend.adapter.`in`.web.api.common.DeletionStatus
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.config.InstructorConfigurer
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.RegisterInstructorRequest
@@ -20,6 +19,7 @@ import com.soomsoom.backend.application.port.`in`.instructor.usecase.SearchInstr
 import com.soomsoom.backend.application.port.`in`.instructor.usecase.UpdateInstructorInfoUseCase
 import com.soomsoom.backend.application.port.`in`.instructor.usecase.UpdateInstructorProfileImageUrlUseCase
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
+import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.fixture.TestUserFixture
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every

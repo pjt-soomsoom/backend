@@ -1,6 +1,5 @@
 package com.soomsoom.backend.adapter.`in`.web.api.instructor
 
-import com.soomsoom.backend.adapter.`in`.web.api.common.DeletionStatus
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.RegisterInstructorRequest
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.UpdateInstructorInfoRequest
@@ -17,6 +16,7 @@ import com.soomsoom.backend.application.port.`in`.instructor.usecase.SearchInstr
 import com.soomsoom.backend.application.port.`in`.instructor.usecase.UpdateInstructorInfoUseCase
 import com.soomsoom.backend.application.port.`in`.instructor.usecase.UpdateInstructorProfileImageUrlUseCase
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
+import com.soomsoom.backend.domain.common.DeletionStatus
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

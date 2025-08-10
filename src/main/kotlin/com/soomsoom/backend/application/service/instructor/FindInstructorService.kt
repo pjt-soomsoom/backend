@@ -1,12 +1,12 @@
 package com.soomsoom.backend.application.service.instructor
 
-import com.soomsoom.backend.adapter.`in`.web.api.common.DeletionStatus
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.application.port.`in`.instructor.dto.FindInstructorResult
 import com.soomsoom.backend.application.port.`in`.instructor.usecase.FindInstructorByIdUseCase
 import com.soomsoom.backend.application.port.`in`.instructor.usecase.SearchInstructorUseCase
 import com.soomsoom.backend.application.port.out.instructor.InstructorPort
 import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.instructor.InstructorErrorCode
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

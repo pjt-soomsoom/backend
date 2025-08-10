@@ -1,12 +1,12 @@
 package com.soomsoom.backend.adapter.out.persistence.instructor
 
-import com.soomsoom.backend.adapter.`in`.web.api.common.DeletionStatus
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.InstructorJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.InstructorQueryDslRepository
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.InstructorJpaEntity
 import com.soomsoom.backend.application.port.out.instructor.InstructorPort
 import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.instructor.InstructorErrorCode
 import com.soomsoom.backend.domain.instructor.model.Instructor
 import org.springframework.data.domain.Page
