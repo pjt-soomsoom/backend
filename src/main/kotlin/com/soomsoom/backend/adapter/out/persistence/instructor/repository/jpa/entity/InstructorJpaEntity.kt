@@ -22,7 +22,10 @@ class InstructorJpaEntity(
     @Column(columnDefinition = "TEXT")
     var bio: String?,
 
+    @Column(columnDefinition = "TEXT")
     var profileImageUrl: String?,
+
+    @Column(columnDefinition = "TEXT")
     var profileImageFileKey: String?,
 
 ) : BaseTimeEntity() {
