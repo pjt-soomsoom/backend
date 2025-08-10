@@ -5,6 +5,8 @@ import com.soomsoom.backend.domain.instructor.InstructorErrorCode
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import java.time.LocalDateTime
 
 class InstructorTest : BehaviorSpec({
     Given("새로운 강사 객체가 주어졌을 때") {
@@ -40,10 +42,65 @@ class InstructorTest : BehaviorSpec({
 
         When("updateProfileImageUrl 메서드를 호출하면") {
             val newImageUrl = "https://new.image.url/profile.jpg"
-            instructor.updateProfileImageUrl(newImageUrl)
+            val newFileKey = "new/profile.jpg"
 
-            Then("프로필 이미지 URL이 성공적으로 변경되어야 한다") {
+            val oldFileKey = instructor.profileImageFileKey
+
+            val returnedOldKey = instructor.updateProfileImageUrl(newImageUrl, newFileKey)
+
+            Then("URL과 파일 키가 변경되고, 이전 파일 키(null)를 반환해야 한다") {
                 instructor.profileImageUrl shouldBe newImageUrl
+                instructor.profileImageFileKey shouldBe newFileKey
+                returnedOldKey shouldBe oldFileKey // oldFileKey는 null이어야 합니다.
+            }
+        }
+    }
+
+    Given("강사 도메인 객체가 주어졌을 때") {
+        val now = LocalDateTime.now()
+
+        When("deletedAt이 null이면") {
+            val instructor = Instructor(
+                id = 1L,
+                name = "활성 강사",
+                bio = "소개",
+                createdAt = now,
+                modifiedAt = now,
+                deletedAt = null
+            )
+            Then("isDeleted는 false여야 한다") {
+                instructor.isDeleted shouldBe false
+            }
+        }
+
+        When("deletedAt에 값이 있으면") {
+            val instructor = Instructor(
+                id = 1L,
+                name = "삭제된 강사",
+                bio = "소개",
+                createdAt = now,
+                modifiedAt = now,
+                deletedAt = now
+            )
+            Then("isDeleted는 true여야 한다") {
+                instructor.isDeleted shouldBe true
+            }
+        }
+    }
+
+    Given("삭제되지 않은 강사 객체가 주어졌을 때") {
+        val instructor = Instructor(
+            id = 1L,
+            name = "삭제될 강사",
+            bio = "이 강사는 곧 삭제됩니다."
+        )
+
+        When("delete 메서드를 호출하면") {
+            instructor.delete()
+
+            Then("isDeleted는 true가 되고 deletedAt 필드에 값이 할당되어야 한다") {
+                instructor.isDeleted shouldBe true
+                instructor.deletedAt shouldNotBe null
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.soomsoom.backend.common.argumentresolvers.pageble
 
 import org.springframework.core.MethodParameter
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.support.WebDataBinderFactory
@@ -11,7 +10,7 @@ import org.springframework.web.method.support.ModelAndViewContainer
 import java.awt.print.Pageable
 
 @Component
-class CustomPageableArgumentResolver : HandlerMethodArgumentResolver{
+class CustomPageableArgumentResolver : HandlerMethodArgumentResolver {
 
     companion object {
         private const val DEFAULT_PAGE_SIZE = 12

@@ -5,6 +5,7 @@ import com.soomsoom.backend.application.port.`in`.instructor.command.RegisterIns
 import com.soomsoom.backend.application.port.`in`.instructor.dto.RegisterInstructorResult
 import com.soomsoom.backend.application.port.`in`.instructor.usecase.RegisterInstructorUseCase
 import com.soomsoom.backend.application.port.out.instructor.InstructorPort
+import com.soomsoom.backend.application.port.out.upload.FileDeleterPort
 import com.soomsoom.backend.application.port.out.upload.FileUploadUrlGeneratorPort
 import com.soomsoom.backend.application.port.out.upload.FileUrlResolverPort
 import com.soomsoom.backend.common.exception.PersistenceErrorCode
@@ -23,9 +24,10 @@ class RegisterInstructorService(
     private val instructorPort: InstructorPort,
     private val fileUploadUrlGeneratorPort: FileUploadUrlGeneratorPort,
     private val fileUrlResolverPort: FileUrlResolverPort,
+    private val fileDeleterPort: FileDeleterPort,
 ) : RegisterInstructorUseCase {
 
-    @PreAuthorize("instructorAuthorizer.isAdmin(authentication)")
+    @PreAuthorize("hasRole('ADMIN')")
     override fun register(command: RegisterInstructorCommand): RegisterInstructorResult {
         val instructor = Instructor(name = command.name, bio = command.bio)
         val savedInstructor = instructorPort.save(instructor)
@@ -56,7 +58,9 @@ class RegisterInstructorService(
 
         val fileUrl = fileUrlResolverPort.resolve(command.fileKey)
 
-        instructor.updateProfileImageUrl(fileUrl)
+        val oldFileKey = instructor.updateProfileImageUrl(url = fileUrl, fileKey = command.fileKey)
+        oldFileKey?.let(fileDeleterPort::delete)
+
         instructorPort.save(instructor)
     }
 }

@@ -4,6 +4,7 @@ import com.soomsoom.backend.application.port.`in`.instructor.command.CompleteIma
 import com.soomsoom.backend.application.port.`in`.instructor.command.RegisterInstructorCommand
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
 import com.soomsoom.backend.application.port.out.instructor.InstructorPort
+import com.soomsoom.backend.application.port.out.upload.FileDeleterPort
 import com.soomsoom.backend.application.port.out.upload.FileUploadUrlGeneratorPort
 import com.soomsoom.backend.application.port.out.upload.FileUrlResolverPort
 import com.soomsoom.backend.application.port.out.upload.dto.FileUploadUrl
@@ -16,17 +17,20 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.time.LocalDateTime
 
 class RegisterInstructorServiceTest : BehaviorSpec({
 
     val instructorPort = mockk<InstructorPort>()
     val fileUploadUrlGeneratorPort = mockk<FileUploadUrlGeneratorPort>()
     val fileUrlResolverPort = mockk<FileUrlResolverPort>()
+    val fileDeleterPort = mockk<FileDeleterPort>()
 
     val registerInstructorService = RegisterInstructorService(
         instructorPort,
         fileUploadUrlGeneratorPort,
-        fileUrlResolverPort
+        fileUrlResolverPort,
+        fileDeleterPort
     )
 
     afterEach {
@@ -43,7 +47,7 @@ class RegisterInstructorServiceTest : BehaviorSpec({
             )
         )
 
-        val savedInstructor = Instructor(1L, name = command.name, bio = command.bio)
+        val savedInstructor = Instructor(1L, name = command.name, bio = command.bio, createdAt = LocalDateTime.now())
         val expectedUploadUrl = FileUploadUrl("https://s3.pre.signed.url/...", "instructors/1/profile/uuid.jpg")
 
         every { instructorPort.save(any()) } returns savedInstructor
@@ -77,7 +81,7 @@ class RegisterInstructorServiceTest : BehaviorSpec({
             profileImageMetadata = null
         )
 
-        val savedInstructor = Instructor(1L, name = command.name, bio = command.bio)
+        val savedInstructor = Instructor(1L, name = command.name, bio = command.bio, createdAt = LocalDateTime.now())
 
         every { instructorPort.save(any()) } returns savedInstructor
 
