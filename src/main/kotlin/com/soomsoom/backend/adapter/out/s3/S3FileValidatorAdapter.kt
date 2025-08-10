@@ -12,7 +12,7 @@ class S3FileValidatorAdapter(
     private val s3Client: S3Client,
     @Value("\${cloud.aws.s3.bucket}")
     private val bucket: String,
-) : FileValidatorPort{
+) : FileValidatorPort {
     override fun validate(fileKey: String): Boolean {
         return try {
             val headObjectRequest = HeadObjectRequest.builder()

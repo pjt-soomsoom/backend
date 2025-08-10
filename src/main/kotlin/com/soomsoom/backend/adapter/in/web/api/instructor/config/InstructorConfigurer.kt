@@ -12,8 +12,8 @@ class InstructorConfigurer : DomainSecurityConfigurer {
         authorize: AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry,
     ) {
         authorize.requestMatchers(HttpMethod.GET, "/instructors/**").permitAll()
-        authorize.requestMatchers(HttpMethod.OPTIONS,"/instructors/**").permitAll()
-        authorize.requestMatchers(HttpMethod.HEAD,"/instructors/**").permitAll()
+        authorize.requestMatchers(HttpMethod.OPTIONS, "/instructors/**").permitAll()
+        authorize.requestMatchers(HttpMethod.HEAD, "/instructors/**").permitAll()
         authorize.requestMatchers(HttpMethod.POST, "/instructors/**").hasRole("ADMIN")
         authorize.requestMatchers(HttpMethod.PUT, "/instructors/**").hasRole("ADMIN")
         authorize.requestMatchers(HttpMethod.DELETE, "/instructors/**").hasRole("ADMIN")

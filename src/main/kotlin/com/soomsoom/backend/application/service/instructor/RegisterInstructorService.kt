@@ -16,7 +16,6 @@ import com.soomsoom.backend.domain.instructor.model.Instructor
 import com.soomsoom.backend.domain.upload.UploadErrorCode
 import com.soomsoom.backend.domain.user.FileCategory
 import com.soomsoom.backend.domain.user.FileDomain
-import org.apache.tomcat.util.http.fileupload.FileUploadException
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
