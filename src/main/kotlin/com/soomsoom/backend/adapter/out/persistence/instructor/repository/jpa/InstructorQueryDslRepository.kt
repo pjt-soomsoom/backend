@@ -40,7 +40,7 @@ class InstructorQueryDslRepository(
     private fun deletionStatusEq(deletionStatus: DeletionStatus): BooleanExpression? {
         return when (deletionStatus) {
             DeletionStatus.ACTIVE -> instructorJpaEntity.deletedAt.isNull
-            DeletionStatus.DELETED -> instructorJpaEntity.deletedAt.isNull
+            DeletionStatus.DELETED -> instructorJpaEntity.deletedAt.isNotNull
             DeletionStatus.ALL -> null
         }
     }
