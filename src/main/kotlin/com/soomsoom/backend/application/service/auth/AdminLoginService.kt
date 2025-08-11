@@ -34,6 +34,6 @@ class AdminLoginService(
             }
             ?.let(tokenGeneratorPort::generateToken)
             ?.let { TokenInfo(it) }
-            ?: throw SoomSoomException(UserErrorCode.USER_USERNAME_OR_PASSWORD_MISMATCH)
+            ?: throw SoomSoomException(UserErrorCode.USERNAME_OR_PASSWORD_MISMATCH)
     }
 }

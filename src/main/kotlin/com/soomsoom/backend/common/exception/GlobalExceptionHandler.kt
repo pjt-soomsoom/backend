@@ -35,7 +35,14 @@ class GlobalExceptionHandler(
     @ExceptionHandler(BadCredentialsException::class)
     fun handleBadCredentialsException(e: BadCredentialsException): ResponseEntity<String> {
         return ResponseEntity
-            .status(UserErrorCode.USER_USERNAME_OR_PASSWORD_MISMATCH.status)
-            .body(UserErrorCode.USER_USERNAME_OR_PASSWORD_MISMATCH.message(messageSource))
+            .status(UserErrorCode.USERNAME_OR_PASSWORD_MISMATCH.status)
+            .body(UserErrorCode.USERNAME_OR_PASSWORD_MISMATCH.message(messageSource))
+    }
+
+    @ExceptionHandler(AccessDeniedException::class)
+    fun handleAccessDeniedException(e: AccessDeniedException): ResponseEntity<String> {
+        return ResponseEntity
+            .status(UserErrorCode.ACCESS_DENIED.status)
+            .body(UserErrorCode.ACCESS_DENIED.message(messageSource))
     }
 }

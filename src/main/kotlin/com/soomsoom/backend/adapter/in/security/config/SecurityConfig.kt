@@ -21,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableMethodSecurity
 class SecurityConfig(
     private val jwtTokenProvider: JwtTokenProvider,
+    private val domainSecurityConfigurer: List<DomainSecurityConfigurer>,
 ) {
 
     @Bean
@@ -30,14 +31,17 @@ class SecurityConfig(
             .cors { it.configurationSource(corsConfigurationSource()) }
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .authorizeHttpRequests { requests ->
-                requests
+            .authorizeHttpRequests { authorize ->
+                authorize
                     .requestMatchers(
                         "/swagger-ui/**",
                         "/auth/admin/login",
                         "/auth/admin/sign-up"
                     ).permitAll()
-                    .anyRequest().authenticated()
+
+                domainSecurityConfigurer.forEach { it.configure(authorize) }
+
+                authorize.anyRequest().authenticated()
             }
             .addFilterBefore(
                 JwtAuthenticationFilter(jwtTokenProvider),

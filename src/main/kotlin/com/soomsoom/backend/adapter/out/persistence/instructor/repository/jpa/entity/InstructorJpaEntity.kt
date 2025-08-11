@@ -22,7 +22,11 @@ class InstructorJpaEntity(
     @Column(columnDefinition = "TEXT")
     var bio: String?,
 
+    @Column(columnDefinition = "TEXT")
     var profileImageUrl: String?,
+
+    @Column(columnDefinition = "TEXT")
+    var profileImageFileKey: String?,
 
 ) : BaseTimeEntity() {
 
@@ -33,18 +37,30 @@ class InstructorJpaEntity(
                 instructor.id ?: 0L,
                 instructor.name,
                 instructor.bio,
-                instructor.profileImageUrl
+                instructor.profileImageUrl,
+                instructor.profileImageFileKey
             )
         }
     }
 
     fun toDomain(): Instructor {
-        return Instructor(this.id, this.name, this.bio, this.profileImageUrl)
+        return Instructor(
+            id = this.id,
+            name = this.name,
+            bio = this.bio,
+            profileImageUrl = this.profileImageUrl,
+            profileImageFileKey = this.profileImageFileKey,
+            createdAt = this.createdAt,
+            modifiedAt = this.modifiedAt,
+            deletedAt = this.deletedAt
+        )
     }
 
     fun update(instructor: Instructor) {
         this.name = instructor.name
         this.bio = instructor.bio
         this.profileImageUrl = instructor.profileImageUrl
+        this.profileImageFileKey = instructor.profileImageFileKey
+        this.deletedAt = instructor.deletedAt
     }
 }
