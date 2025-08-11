@@ -23,7 +23,7 @@ class AdminSignUpService(
 ) : AdminSignUpUseCase {
     override fun adminSignUp(command: AdminSignUpCommand): TokenInfo {
         userPort.findByUsername(command.username)?.let {
-            throw SoomSoomException(UserErrorCode.USER_ALREADY_EXISTS)
+            throw SoomSoomException(UserErrorCode.ALREADY_EXISTS)
         }
 
         return passwordEncoder.encode(command.password)

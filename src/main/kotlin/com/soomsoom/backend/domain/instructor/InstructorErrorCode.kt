@@ -9,9 +9,9 @@ enum class InstructorErrorCode(
     private val httpStatus: HttpStatus,
     private val messageKey: String,
 ) : ErrorCode {
-    INSTRUCTOR_NAME_CANNOT_BE_BLANK(HttpStatus.BAD_REQUEST, "instructor.name-cannot-be-blank"),
-    INSTRUCTOR_ID_CANNOT_BE_NULL(HttpStatus.BAD_REQUEST, "instructor.id-cannot-be-null"),
-    INSTRUCTOR_NOT_FOUND(HttpStatus.NOT_FOUND, "instructor.not-found"),
+    NAME_CANNOT_BE_BLANK(HttpStatus.BAD_REQUEST, "instructor.name-cannot-be-blank"),
+    ID_CANNOT_BE_NULL(HttpStatus.BAD_REQUEST, "instructor.id-cannot-be-null"),
+    NOT_FOUND(HttpStatus.NOT_FOUND, "instructor.not-found"),
     ;
 
     override val status: HttpStatus

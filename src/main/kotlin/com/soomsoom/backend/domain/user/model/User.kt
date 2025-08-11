@@ -1,7 +1,7 @@
 package com.soomsoom.backend.domain.user.model
 
 enum class Role {
-    ROLE_USER, ROLE_ADMIN
+    ROLE_ANONYMOUS, ROLE_USER, ROLE_ADMIN
 }
 
 class User private constructor(
@@ -24,7 +24,7 @@ class User private constructor(
             return User(
                 id = null,
                 account = Account.Anonymous(deviceId),
-                role = Role.ROLE_USER
+                role = Role.ROLE_ANONYMOUS
             )
         }
 

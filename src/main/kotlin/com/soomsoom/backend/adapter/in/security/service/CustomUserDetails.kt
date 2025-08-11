@@ -20,4 +20,6 @@ class CustomUserDetails(
     override fun getUsername(): String {
         return (user.account as Account.IdPassword).username
     }
+
+    val id = user.id
 }
