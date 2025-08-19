@@ -1,10 +1,10 @@
 package com.soomsoom.backend.adapter.out.persistence.instructor
 
 import com.soomsoom.backend.IntegrationTest
-import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.InstructorJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.InstructorQueryDslRepository
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.InstructorJpaEntity
+import com.soomsoom.backend.application.port.`in`.instructor.query.SearchInstructorsCriteria
 import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.instructor.model.Instructor
 import io.kotest.core.spec.style.BehaviorSpec
@@ -95,7 +95,7 @@ class InstructorPersistenceAdapterTest(
         }
 
         When("search를 ACTIVE 필터로 조회하면") {
-            val criteria = InstructorSearchCriteria(deletionStatus = DeletionStatus.ACTIVE)
+            val criteria = SearchInstructorsCriteria(deletionStatus = DeletionStatus.ACTIVE)
             val pageable = PageRequest.of(0, 10)
             val resultPage = instructorPersistenceAdapter.search(criteria, pageable)
 

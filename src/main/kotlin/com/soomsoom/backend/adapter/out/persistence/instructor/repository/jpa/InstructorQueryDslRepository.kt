@@ -2,9 +2,9 @@ package com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa
 
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
-import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.InstructorJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.QInstructorJpaEntity.instructorJpaEntity
+import com.soomsoom.backend.application.port.`in`.instructor.query.SearchInstructorsCriteria
 import com.soomsoom.backend.common.utils.QueryDslSortUtil
 import com.soomsoom.backend.domain.common.DeletionStatus
 import org.springframework.data.domain.Page
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository
 class InstructorQueryDslRepository(
     private val queryFactory: JPAQueryFactory,
 ) {
-    fun search(criteria: InstructorSearchCriteria, pageable: Pageable): Page<InstructorJpaEntity> {
+    fun search(criteria: SearchInstructorsCriteria, pageable: Pageable): Page<InstructorJpaEntity> {
         val content = queryFactory
             .selectFrom(instructorJpaEntity)
             .where(
