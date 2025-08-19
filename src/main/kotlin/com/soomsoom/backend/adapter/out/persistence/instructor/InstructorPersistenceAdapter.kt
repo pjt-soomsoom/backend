@@ -1,9 +1,9 @@
 package com.soomsoom.backend.adapter.out.persistence.instructor
 
-import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.InstructorJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.InstructorQueryDslRepository
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.InstructorJpaEntity
+import com.soomsoom.backend.application.port.`in`.instructor.query.SearchInstructorsCriteria
 import com.soomsoom.backend.application.port.out.instructor.InstructorPort
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.common.DeletionStatus
@@ -28,7 +28,7 @@ class InstructorPersistenceAdapter(
         return entity?.toDomain()
     }
 
-    override fun search(criteria: InstructorSearchCriteria, pageable: Pageable): Page<Instructor> {
+    override fun search(criteria: SearchInstructorsCriteria, pageable: Pageable): Page<Instructor> {
         return instructorQueryDslRepository.search(criteria, pageable).map { it.toDomain() }
     }
 

@@ -1,13 +1,13 @@
 package com.soomsoom.backend.common.argumentresolvers.pageble
 
 import org.springframework.core.MethodParameter
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
-import java.awt.print.Pageable
 
 @Component
 class CustomPageableArgumentResolver : HandlerMethodArgumentResolver {

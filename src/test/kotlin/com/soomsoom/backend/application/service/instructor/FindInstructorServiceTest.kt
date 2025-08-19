@@ -1,7 +1,8 @@
 package com.soomsoom.backend.application.service.instructor
 
-import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
+import com.soomsoom.backend.application.port.`in`.instructor.query.SearchInstructorsCriteria
 import com.soomsoom.backend.application.port.out.instructor.InstructorPort
+import com.soomsoom.backend.application.service.instructor.query.FindInstructorService
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.instructor.InstructorErrorCode
@@ -66,7 +67,7 @@ class FindInstructorServiceTest : BehaviorSpec({
     }
 
     Given("강사 목록 조회 조건이 주어졌을 때") {
-        val criteria = InstructorSearchCriteria(deletionStatus = DeletionStatus.ACTIVE)
+        val criteria = SearchInstructorsCriteria(deletionStatus = DeletionStatus.ACTIVE)
         val pageable = PageRequest.of(0, 10)
         val now = LocalDateTime.now()
         val mockInstructor = Instructor(1L, "김강사", "안녕하세요", "url", profileImageFileKey = "key", now, now, null)

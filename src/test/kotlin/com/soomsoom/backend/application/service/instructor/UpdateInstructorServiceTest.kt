@@ -5,6 +5,7 @@ import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMe
 import com.soomsoom.backend.application.port.out.instructor.InstructorPort
 import com.soomsoom.backend.application.port.out.upload.FileUploadUrlGeneratorPort
 import com.soomsoom.backend.application.port.out.upload.dto.FileUploadUrl
+import com.soomsoom.backend.application.service.instructor.command.UpdateInstructorService
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.instructor.InstructorErrorCode
 import com.soomsoom.backend.domain.instructor.model.Instructor

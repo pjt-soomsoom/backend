@@ -1,20 +1,21 @@
 package com.soomsoom.backend.adapter.`in`.web.api.instructor
 
-import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.RegisterInstructorRequest
+import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.SearchInstructorsRequest
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.UpdateInstructorInfoRequest
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.UploadCompleteRequest
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.toCommand
+import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.toCriteria
 import com.soomsoom.backend.adapter.`in`.web.api.upload.request.FileMetadata
 import com.soomsoom.backend.application.port.`in`.instructor.command.CompleteImageUploadCommand
 import com.soomsoom.backend.application.port.`in`.instructor.dto.FindInstructorResult
 import com.soomsoom.backend.application.port.`in`.instructor.dto.RegisterInstructorResult
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.DeleteInstructorUseCase
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.FindInstructorByIdUseCase
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.RegisterInstructorUseCase
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.SearchInstructorUseCase
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.UpdateInstructorInfoUseCase
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.UpdateInstructorProfileImageUrlUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.command.DeleteInstructorUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.command.RegisterInstructorUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.command.UpdateInstructorInfoUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.command.UpdateInstructorProfileImageUrlUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.query.FindInstructorByIdUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.query.SearchInstructorUseCase
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
 import com.soomsoom.backend.domain.common.DeletionStatus
 import jakarta.validation.Valid
@@ -78,10 +79,10 @@ class InstructorController(
     @GetMapping("/instructors")
     @ResponseStatus(HttpStatus.OK)
     fun searchInstructors(
-        criteria: InstructorSearchCriteria,
+        request: SearchInstructorsRequest,
         pageable: Pageable,
     ): Page<FindInstructorResult> {
-        return searchInstructorUseCase.search(criteria, pageable)
+        return searchInstructorUseCase.search(request.toCriteria(), pageable)
     }
 
     /**
