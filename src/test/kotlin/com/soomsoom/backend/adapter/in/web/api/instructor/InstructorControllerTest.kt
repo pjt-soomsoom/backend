@@ -5,19 +5,20 @@ import com.ninjasquad.springmockk.MockkBean
 import com.soomsoom.backend.adapter.`in`.security.config.SecurityConfig
 import com.soomsoom.backend.adapter.`in`.security.provider.JwtTokenProvider
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.config.InstructorConfigurer
-import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.InstructorSearchCriteria
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.RegisterInstructorRequest
+import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.SearchInstructorsRequest
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.UpdateInstructorInfoRequest
 import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.toCommand
+import com.soomsoom.backend.adapter.`in`.web.api.instructor.request.toCriteria
 import com.soomsoom.backend.adapter.`in`.web.api.upload.request.FileMetadata
 import com.soomsoom.backend.application.port.`in`.instructor.dto.FindInstructorResult
 import com.soomsoom.backend.application.port.`in`.instructor.dto.RegisterInstructorResult
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.DeleteInstructorUseCase
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.FindInstructorByIdUseCase
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.RegisterInstructorUseCase
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.SearchInstructorUseCase
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.UpdateInstructorInfoUseCase
-import com.soomsoom.backend.application.port.`in`.instructor.usecase.UpdateInstructorProfileImageUrlUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.command.DeleteInstructorUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.command.RegisterInstructorUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.command.UpdateInstructorInfoUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.command.UpdateInstructorProfileImageUrlUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.query.FindInstructorByIdUseCase
+import com.soomsoom.backend.application.port.`in`.instructor.usecase.query.SearchInstructorUseCase
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
 import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.fixture.TestUserFixture
@@ -132,7 +133,7 @@ class InstructorControllerTest(
     }
 
     Given("강사 목록 검색 API (/instructors)") {
-        val searchCriteria = InstructorSearchCriteria(deletionStatus = DeletionStatus.ACTIVE)
+        val request = SearchInstructorsRequest(deletionStatus = DeletionStatus.ACTIVE)
         val pageable: Pageable = PageRequest.of(0, 20)
         val now = LocalDateTime.now()
 
@@ -159,7 +160,7 @@ class InstructorControllerTest(
         val pagedResults = PageImpl(searchResultList, pageable, searchResultList.size.toLong())
 
         When("활성 상태의 강사 목록 조회를 요청하면") {
-            every { searchInstructorUseCase.search(searchCriteria, any()) } returns pagedResults
+            every { searchInstructorUseCase.search(request.toCriteria(), any()) } returns pagedResults
 
             Then("200 OK 상태 코드와 함께 페이징된 강사 목록을 반환해야 한다") {
                 mockMvc.get("/instructors") {
@@ -179,7 +180,7 @@ class InstructorControllerTest(
         When("검색 결과가 없으면") {
             val emptyPage = PageImpl(emptyList<FindInstructorResult>(), pageable, 0)
 
-            every { searchInstructorUseCase.search(searchCriteria, any()) } returns emptyPage
+            every { searchInstructorUseCase.search(request.toCriteria(), any()) } returns emptyPage
 
             Then("200 OK 상태 코드와 함께 빈 페이지 응답을 반환해야 한다") {
                 mockMvc.get("/instructors") {

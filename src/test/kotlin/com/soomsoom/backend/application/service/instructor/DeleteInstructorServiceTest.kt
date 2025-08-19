@@ -1,6 +1,7 @@
 package com.soomsoom.backend.application.service.instructor
 
 import com.soomsoom.backend.application.port.out.instructor.InstructorPort
+import com.soomsoom.backend.application.service.instructor.command.DeleteInstructorService
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.instructor.InstructorErrorCode
 import com.soomsoom.backend.domain.instructor.model.Instructor
