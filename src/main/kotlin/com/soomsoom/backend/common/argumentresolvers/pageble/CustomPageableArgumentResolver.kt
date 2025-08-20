@@ -67,9 +67,11 @@ class CustomPageableArgumentResolver : HandlerMethodArgumentResolver {
             if (param.isBlank()) return@mapNotNull null // 비어있는 파라미터는 무시
 
             val parts = param.split(",")
-            val field = parts[0]
+            val field = parts[0].trim()
             // 정렬 방향이 없으면 DESC를 기본값으로 사용
-            val direction = parts.getOrNull(1)?.let { Sort.Direction.fromString(it) } ?: Sort.Direction.DESC
+            val direction = parts.getOrNull(1)?.trim()?.let {
+                Sort.Direction.fromString(it.uppercase())
+            } ?: Sort.Direction.DESC
 
             Sort.Order(direction, field)
         }

@@ -1,5 +1,6 @@
 package com.soomsoom.backend.adapter.`in`.security.provider
 
+import com.soomsoom.backend.adapter.`in`.security.service.CustomUserDetails
 import com.soomsoom.backend.application.port.out.auth.TokenGeneratorPort
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
@@ -11,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Component
 import java.util.*
 import javax.crypto.SecretKey
@@ -37,9 +37,13 @@ class JwtTokenProvider(
         val now = Date()
         val validity = Date(now.time + accessTokenExpiration)
 
+        val userId = (authentication.principal as? CustomUserDetails)?.id
+            ?: throw IllegalStateException("Authentication principal is not CustomUserDetails")
+
         return Jwts.builder()
             .subject(authentication.name)
             .claim("auth", authorities)
+            .claim("userId", userId)
             .issuedAt(now)
             .expiration(validity)
             .signWith(key)
@@ -72,7 +76,12 @@ class JwtTokenProvider(
                 ?: emptyList<GrantedAuthority>()
             )
 
-        val principal = User(claims.subject, "", authorities)
+        val principal = CustomUserDetails(
+            id = (claims["userId"] as Number).toLong(),
+            username = claims.subject,
+            password = "",
+            authorities = authorities.toMutableList()
+        )
         return UsernamePasswordAuthenticationToken(principal, "", authorities)
     }
 
