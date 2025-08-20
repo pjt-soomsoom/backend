@@ -88,10 +88,20 @@ class ActivityPersistenceAdapterTest(
     Given("활성 상태와 삭제된 상태의 활동이 DB에 저장되어 있을 때") {
         // 테스트 데이터 준비
         val activeActivity = activityPersistenceAdapter.save(
-            BreathingActivity(id = null, title = "활성 활동", descriptions = mutableListOf(), authorId = author.id, narratorId = narrator.id, durationInSeconds = 10, thumbnailImageUrl = null, thumbnailFileKey = null, audioUrl = null, audioFileKey = null, timeline = mutableListOf()) // ✨ 수정됨
+            BreathingActivity(
+                id = null, title = "활성 활동", descriptions = mutableListOf(),
+                authorId = author.id, narratorId = narrator.id,
+                durationInSeconds = 10, thumbnailImageUrl = null, thumbnailFileKey = null,
+                audioUrl = null, audioFileKey = null, timeline = mutableListOf()
+            ) // ✨ 수정됨
         )
         val deletedActivity = activityPersistenceAdapter.save(
-            BreathingActivity(id = null, title = "삭제된 활동", descriptions = mutableListOf(), authorId = author.id, narratorId = narrator.id, durationInSeconds = 10, thumbnailImageUrl = null, thumbnailFileKey = null, audioUrl = null, audioFileKey = null, timeline = mutableListOf()) // ✨ 수정됨
+            BreathingActivity(
+                id = null, title = "삭제된 활동", descriptions = mutableListOf(),
+                authorId = author.id, narratorId = narrator.id,
+                durationInSeconds = 10, thumbnailImageUrl = null, thumbnailFileKey = null,
+                audioUrl = null, audioFileKey = null, timeline = mutableListOf()
+            ) // ✨ 수정됨
         ).apply { delete() }
         activityPersistenceAdapter.save(deletedActivity)
 

@@ -4,9 +4,11 @@ import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.ActivityWithInstructorsDto
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.QActivityWithInstructorsDto
+import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.ActivityJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.QActivityJpaEntity.activityJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.QInstructorJpaEntity
 import com.soomsoom.backend.application.port.`in`.activity.query.SearchActivitiesCriteria
+import com.soomsoom.backend.common.utils.QueryDslSortUtil
 import com.soomsoom.backend.domain.common.DeletionStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -59,7 +61,7 @@ class ActivityQueryDslRepository(
             )
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
-            .orderBy(activityJpaEntity.createdAt.desc())
+            .orderBy(*QueryDslSortUtil.toOrderSpecifiers(pageable.sort, ActivityJpaEntity::class.java).toTypedArray())
             .fetch()
 
         val countQuery = queryFactory
