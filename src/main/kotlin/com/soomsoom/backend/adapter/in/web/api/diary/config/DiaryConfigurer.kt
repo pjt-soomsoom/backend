@@ -10,6 +10,6 @@ class DiaryConfigurer : DomainSecurityConfigurer {
     override fun configure(
         authorize: AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry,
     ) {
-        authorize.requestMatchers("/api/v1/diaries/**").authenticated()
+        authorize.requestMatchers("/diaries/**").authenticated()
     }
 }
