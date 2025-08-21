@@ -4,12 +4,14 @@ import com.soomsoom.backend.application.port.`in`.activity.command.CompleteActiv
 import jakarta.validation.constraints.NotBlank
 
 data class CompleteActivityThumbnailChangeRequest(
+    val userId: Long?,
     @field:NotBlank
     val fileKey: String?,
 )
 
-fun CompleteActivityThumbnailChangeRequest.toCommand(activityId: Long): CompleteActivityThumbnailChangeCommand {
+fun CompleteActivityThumbnailChangeRequest.toCommand(activityId: Long, principalId: Long): CompleteActivityThumbnailChangeCommand {
     return CompleteActivityThumbnailChangeCommand(
+        userId = this.userId ?: principalId,
         activityId = activityId,
         fileKey = this.fileKey!!
     )

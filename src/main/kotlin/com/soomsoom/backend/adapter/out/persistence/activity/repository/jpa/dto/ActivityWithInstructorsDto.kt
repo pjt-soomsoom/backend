@@ -10,11 +10,12 @@ data class ActivityWithInstructorsDto @QueryProjection constructor(
     val activity: ActivityJpaEntity,
     val author: InstructorJpaEntity,
     val narrator: InstructorJpaEntity,
+    val isFavorited: Boolean,
 )
 
 fun ActivityWithInstructorsDto.toActivityResult(): ActivityResult {
     val activity = this.activity.toDomain()
     val author = this.author.toDomain()
     val narrator = this.narrator.toDomain()
-    return ActivityResult.from(activity, author, narrator)
+    return ActivityResult.from(activity, author, narrator, this.isFavorited)
 }

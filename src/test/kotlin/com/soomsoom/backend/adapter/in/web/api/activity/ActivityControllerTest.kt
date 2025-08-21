@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import com.soomsoom.backend.adapter.`in`.security.config.SecurityConfig
 import com.soomsoom.backend.adapter.`in`.security.provider.JwtTokenProvider
-import com.soomsoom.backend.adapter.`in`.web.api.activity.config.ActivityConfigurer
+import com.soomsoom.backend.adapter.`in`.web.api.activity.config.UserConfigurer
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.CreateActivityRequest
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.update.UpdateActivityMetadataRequest
 import com.soomsoom.backend.adapter.`in`.web.api.upload.request.FileMetadata
@@ -39,7 +39,7 @@ import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
 
 @WebMvcTest(controllers = [ActivityController::class])
-@Import(SecurityConfig::class, ActivityConfigurer::class)
+@Import(SecurityConfig::class, UserConfigurer::class)
 class ActivityControllerTest(
     @MockkBean private val createActivityUseCase: CreateActivityUseCase,
     @MockkBean private val findActivityUseCase: FindActivityUseCase,

@@ -4,5 +4,5 @@ import com.soomsoom.backend.application.port.`in`.instructor.dto.FindInstructorR
 import com.soomsoom.backend.domain.common.DeletionStatus
 
 interface FindInstructorByIdUseCase {
-    fun findById(instructorId: Long, deletionStatus: DeletionStatus = DeletionStatus.ACTIVE): FindInstructorResult
+    fun findById(instructorId: Long, userId: Long, deletionStatus: DeletionStatus = DeletionStatus.ACTIVE): FindInstructorResult
 }

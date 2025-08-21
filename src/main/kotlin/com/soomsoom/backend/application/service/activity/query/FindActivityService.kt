@@ -24,14 +24,14 @@ class FindActivityService(
     /**
      * 단 건 조회
      */
-    @PreAuthorize("hasRole('ADMIN') or #deletionStatus.name() == 'ACTIVE'")
-    override fun findActivity(activityId: Long, deletionStatus: DeletionStatus): ActivityResult {
-        return activityPort.findByIdWithInstructors(activityId, deletionStatus)
+    @PreAuthorize("hasRole('ADMIN') or #deletionStatus.name() == 'ACTIVE' and #userId == authentication.principal.id")
+    override fun findActivity(activityId: Long, userId: Long, deletionStatus: DeletionStatus): ActivityResult {
+        return activityPort.findByIdWithInstructors(activityId, userId, deletionStatus)
             ?. let { dto ->
                 val activity = dto.activity.toDomain()
                 val author = dto.author.toDomain()
                 val narrator = dto.narrator.toDomain()
-                ActivityResult.from(activity, author, narrator)
+                ActivityResult.from(activity, author, narrator, dto.isFavorited)
             }
             ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
     }
@@ -39,7 +39,7 @@ class FindActivityService(
     /**
      * 다 건 조회
      */
-    @PreAuthorize("hasRole('ADMIN') or #criteria.deletionStatus.name == 'ACTIVE'")
+    @PreAuthorize("hasRole('ADMIN') or #criteria.deletionStatus.name == 'ACTIVE' and #criteria.userId == authentication.principal.id")
     override fun search(criteria: SearchActivitiesCriteria, pageable: Pageable): Page<ActivityResult> {
         val dtoPage = activityPort.search(criteria, pageable)
 
@@ -47,7 +47,7 @@ class FindActivityService(
             val activity = dto.activity.toDomain()
             val author = dto.author.toDomain()
             val narrator = dto.narrator.toDomain()
-            ActivityResult.from(activity, author, narrator)
+            ActivityResult.from(activity, author, narrator, dto.isFavorited)
         }
     }
 }

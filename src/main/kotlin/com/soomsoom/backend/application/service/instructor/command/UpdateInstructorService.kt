@@ -25,16 +25,16 @@ class UpdateInstructorService(
 
     @PreAuthorize("hasRole('ADMIN')")
     override fun updateInfo(command: UpdateInstructorInfoCommand): FindInstructorResult {
-        return instructorPort.findById(command.instructorId)
+        val instructor = instructorPort.findById(command.instructorId)
             ?.apply {
                 updateInfo(
                     name = command.name,
                     bio = command.bio
                 )
             }
-            ?.let(instructorPort::save)
-            ?.let(FindInstructorResult::from)
             ?: throw SoomSoomException(InstructorErrorCode.NOT_FOUND)
+        val savedInstructor = instructorPort.save(instructor)
+        return FindInstructorResult.from(savedInstructor, null)
     }
 
     override fun updateProfileImageUrl(

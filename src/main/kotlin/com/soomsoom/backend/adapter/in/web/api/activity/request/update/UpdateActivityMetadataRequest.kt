@@ -5,14 +5,16 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 
 data class UpdateActivityMetadataRequest(
+    val userId: Long?,
     @field:NotBlank(message = "제목은 비워둘 수 없습니다.")
     val title: String?,
     @field:NotEmpty(message = "설명은 비워둘 수 없습니다.")
     val descriptions: List<String>?,
 )
 
-fun UpdateActivityMetadataRequest.toCommand(activityId: Long): UpdateActivityMetadataCommand {
+fun UpdateActivityMetadataRequest.toCommand(activityId: Long, principalId: Long): UpdateActivityMetadataCommand {
     return UpdateActivityMetadataCommand(
+        userId = this.userId ?: principalId,
         activityId = activityId,
         title = this.title!!,
         descriptions = this.descriptions!!

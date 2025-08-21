@@ -29,7 +29,7 @@ class UpdateActivityTimelineService(
         breathingActivity.updateTimeline(command.timeline)
 
         activityPort.save(breathingActivity)
-        return activityPort.findByIdWithInstructors(command.activityId)
+        return activityPort.findByIdWithInstructors(command.activityId, command.userId)
             ?.toActivityResult()
             ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
     }
