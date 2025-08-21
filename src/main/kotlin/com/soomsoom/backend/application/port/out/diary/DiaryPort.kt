@@ -1,10 +1,10 @@
 package com.soomsoom.backend.application.port.out.diary
 
+import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.dto.DailyDiaryRecordAdapterDto
+import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.dto.EmotionCount
 import com.soomsoom.backend.application.port.`in`.diary.query.GetDailyDiaryRecordCriteria
 import com.soomsoom.backend.application.port.`in`.diary.query.GetMonthlyDiaryStatsCriteria
 import com.soomsoom.backend.application.port.`in`.diary.query.SearchDiariesCriteria
-import com.soomsoom.backend.application.port.out.diary.dto.DailyDiaryRecordAdapterDto
-import com.soomsoom.backend.application.port.out.diary.dto.EmotionCount
 import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.diary.model.Diary
 import org.springframework.data.domain.Page

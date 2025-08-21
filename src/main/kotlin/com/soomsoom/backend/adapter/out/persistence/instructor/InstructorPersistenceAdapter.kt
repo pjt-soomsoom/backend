@@ -2,6 +2,7 @@ package com.soomsoom.backend.adapter.out.persistence.instructor
 
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.InstructorJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.InstructorQueryDslRepository
+import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.dto.InstructorWithFollowStatusDto
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.InstructorJpaEntity
 import com.soomsoom.backend.application.port.`in`.instructor.query.SearchInstructorsCriteria
 import com.soomsoom.backend.application.port.out.instructor.InstructorPort
@@ -43,5 +44,13 @@ class InstructorPersistenceAdapter(
         }
 
         return instructorJpaRepository.save(entityToSave).toDomain()
+    }
+
+    override fun findWithFollowStatusById(instructorId: Long, userId: Long, deletionStatus: DeletionStatus): InstructorWithFollowStatusDto? {
+        return instructorQueryDslRepository.findWithFollowStatusById(instructorId, userId, deletionStatus)
+    }
+
+    override fun searchWithFollowStatus(criteria: SearchInstructorsCriteria, pageable: Pageable): Page<InstructorWithFollowStatusDto> {
+        return instructorQueryDslRepository.searchWithFollowStatus(criteria, pageable)
     }
 }

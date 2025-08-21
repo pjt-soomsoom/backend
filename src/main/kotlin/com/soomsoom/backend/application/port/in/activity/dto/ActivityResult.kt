@@ -1,5 +1,7 @@
 package com.soomsoom.backend.application.port.`in`.activity.dto
 
+import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.activity.ActivityErrorCode
 import com.soomsoom.backend.domain.activity.model.Activity
 import com.soomsoom.backend.domain.activity.model.BreathingActivity
 import com.soomsoom.backend.domain.activity.model.MeditationActivity
@@ -16,6 +18,7 @@ data class ActivityResult(
     val durationInSeconds: Int,
     val audioUrl: String?,
     val timeline: List<TimelineEvent>? = null,
+    val isFavorited: Boolean,
 ) {
     /**
      * 강사의 상세 정보를 담는 DTO
@@ -28,7 +31,7 @@ data class ActivityResult(
     )
 
     companion object {
-        fun from(activity: Activity, author: Instructor, narrator: Instructor): ActivityResult {
+        fun from(activity: Activity, author: Instructor, narrator: Instructor, isFavorited: Boolean): ActivityResult {
             return when (activity) {
                 is BreathingActivity -> ActivityResult(
                     id = activity.id!!,
@@ -39,7 +42,8 @@ data class ActivityResult(
                     narrator = InstructorInfo(narrator.id!!, narrator.name, narrator.bio, narrator.profileImageUrl),
                     durationInSeconds = activity.durationInSeconds,
                     audioUrl = activity.audioUrl,
-                    timeline = activity.timeline
+                    timeline = activity.timeline,
+                    isFavorited = isFavorited
                 )
                 is MeditationActivity -> ActivityResult(
                     id = activity.id!!,
@@ -49,9 +53,10 @@ data class ActivityResult(
                     author = InstructorInfo(author.id!!, author.name, author.bio, author.profileImageUrl),
                     narrator = InstructorInfo(narrator.id!!, narrator.name, narrator.bio, narrator.profileImageUrl),
                     durationInSeconds = activity.durationInSeconds,
-                    audioUrl = activity.audioUrl
+                    audioUrl = activity.audioUrl,
+                    isFavorited = isFavorited
                 )
-                else -> throw IllegalArgumentException("Unsupported Activity Type")
+                else -> throw SoomSoomException(ActivityErrorCode.UNSUPPORTED_ACTIVITY_TYPE)
             }
         }
     }

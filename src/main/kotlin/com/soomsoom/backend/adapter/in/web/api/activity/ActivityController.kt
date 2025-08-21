@@ -1,5 +1,6 @@
 package com.soomsoom.backend.adapter.`in`.web.api.activity
 
+import com.soomsoom.backend.adapter.`in`.security.service.CustomUserDetails
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.CompleteActivityUploadRequest
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.CreateActivityRequest
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.SearchActivitiesRequest
@@ -24,11 +25,15 @@ import com.soomsoom.backend.application.port.`in`.activity.usecase.command.Updat
 import com.soomsoom.backend.application.port.`in`.activity.usecase.command.UpdateActivityTimelineUseCase
 import com.soomsoom.backend.application.port.`in`.activity.usecase.query.FindActivityUseCase
 import com.soomsoom.backend.application.port.`in`.activity.usecase.query.SearchActivitiesUseCase
+import com.soomsoom.backend.application.port.`in`.favorite.command.ToggleFavoriteCommand
+import com.soomsoom.backend.application.port.`in`.favorite.dto.ToggleFavoriteResult
+import com.soomsoom.backend.application.port.`in`.favorite.usecase.command.ToggleFavoriteUseCase
 import com.soomsoom.backend.domain.common.DeletionStatus
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
@@ -50,6 +55,7 @@ class ActivityController(
     private val changeActivityThumbnailUseCase: ChangeActivityThumbnailUseCase,
     private val changeActivityAudioUseCase: ChangeActivityAudioUseCase,
     private val softDeleteActivityUseCase: SoftDeleteActivityUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
 ) {
 
     /**
@@ -83,10 +89,11 @@ class ActivityController(
     @GetMapping("/activities/{activityId}")
     @ResponseStatus(HttpStatus.OK)
     fun findActivity(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
         @PathVariable activityId: Long,
         @RequestParam(required = false) deletionStatus: DeletionStatus?,
     ): ActivityResult {
-        return findActivityUseCase.findActivity(activityId, deletionStatus ?: DeletionStatus.ACTIVE)
+        return findActivityUseCase.findActivity(activityId, userDetails.id, deletionStatus ?: DeletionStatus.ACTIVE)
     }
 
     /**
@@ -94,10 +101,11 @@ class ActivityController(
      */
     @GetMapping("/activities")
     fun searchActivities(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
         @ModelAttribute request: SearchActivitiesRequest,
         pageable: Pageable,
     ): Page<ActivityResult> {
-        return searchActivitiesUseCase.search(request.toCriteria(), pageable)
+        return searchActivitiesUseCase.search(request.toCriteria(userDetails.id), pageable)
     }
 
     /**
@@ -106,11 +114,12 @@ class ActivityController(
     @PatchMapping("/activities/{activityId}/metadata")
     @ResponseStatus(HttpStatus.OK)
     fun updateMetadata(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
         @PathVariable activityId: Long,
         @Valid @RequestBody
         request: UpdateActivityMetadataRequest,
     ): ActivityResult {
-        return updateActivityMetadataUseCase.updateMetadata(request.toCommand(activityId))
+        return updateActivityMetadataUseCase.updateMetadata(request.toCommand(activityId, userDetails.id))
     }
 
     /**
@@ -119,11 +128,12 @@ class ActivityController(
     @PatchMapping("/activities/{activityId}/timeline")
     @ResponseStatus(HttpStatus.OK)
     fun updateTimeline(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
         @PathVariable activityId: Long,
         @Valid @RequestBody
         request: UpdateActivityTimelineRequest,
     ): ActivityResult {
-        return updateActivityTimelineUseCase.updateTimeline(request.toCommand(activityId))
+        return updateActivityTimelineUseCase.updateTimeline(request.toCommand(activityId, userDetails.id))
     }
 
     /**
@@ -145,11 +155,12 @@ class ActivityController(
     @PostMapping("/activities/{activityId}/thumbnail/complete-upload")
     @ResponseStatus(HttpStatus.OK)
     fun completeThumbnailChange(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
         @PathVariable activityId: Long,
         @Valid @RequestBody
         request: CompleteActivityThumbnailChangeRequest,
     ): ActivityResult {
-        return changeActivityThumbnailUseCase.completeThumbnailChange(request.toCommand(activityId))
+        return changeActivityThumbnailUseCase.completeThumbnailChange(request.toCommand(activityId, userDetails.id))
     }
 
     /**
@@ -171,11 +182,12 @@ class ActivityController(
     @PostMapping("/activities/{activityId}/audio/complete-upload")
     @ResponseStatus(HttpStatus.OK)
     fun completeAudioChange(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
         @PathVariable activityId: Long,
         @Valid @RequestBody
         request: CompleteActivityAudioChangeRequest,
     ): ActivityResult {
-        return changeActivityAudioUseCase.completeAudioChange(request.toCommand(activityId))
+        return changeActivityAudioUseCase.completeAudioChange(request.toCommand(activityId, userDetails.id))
     }
 
     /**
@@ -185,5 +197,18 @@ class ActivityController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun softDeleteActivity(@PathVariable activityId: Long) {
         softDeleteActivityUseCase.softDeleteActivity(activityId)
+    }
+
+    /**
+     * 활동 즐겨찾기 토글 (추가/제거)
+     */
+    @PostMapping("/activities/{activityId}/favorite")
+    @ResponseStatus(HttpStatus.OK)
+    fun toggleFavorite(
+        @PathVariable activityId: Long,
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+    ): ToggleFavoriteResult {
+        val command = ToggleFavoriteCommand(userId = userDetails.id, activityId = activityId)
+        return toggleFavoriteUseCase.toggle(command)
     }
 }

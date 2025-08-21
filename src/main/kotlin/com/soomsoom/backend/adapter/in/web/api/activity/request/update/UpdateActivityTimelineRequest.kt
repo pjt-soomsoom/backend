@@ -5,12 +5,14 @@ import com.soomsoom.backend.domain.activity.model.TimelineEvent
 import jakarta.validation.constraints.NotEmpty
 
 data class UpdateActivityTimelineRequest(
+    val userId: Long?,
     @field:NotEmpty(message = "타임라인은 비워둘 수 없습니다.")
     val timeline: List<TimelineEvent>?,
 )
 
-fun UpdateActivityTimelineRequest.toCommand(activityId: Long): UpdateActivityTimelineCommand {
+fun UpdateActivityTimelineRequest.toCommand(activityId: Long, principalId: Long): UpdateActivityTimelineCommand {
     return UpdateActivityTimelineCommand(
+        userId = this.userId ?: principalId,
         activityId = activityId,
         timeline = this.timeline!!
     )

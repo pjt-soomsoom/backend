@@ -91,7 +91,7 @@ class ChangeActivityAudioService(
         }
 
         activityPort.save(activity)
-        return activityPort.findByIdWithInstructors(command.activityId)
+        return activityPort.findByIdWithInstructors(command.activityId, command.userId)
             ?.toActivityResult()
             ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
     }

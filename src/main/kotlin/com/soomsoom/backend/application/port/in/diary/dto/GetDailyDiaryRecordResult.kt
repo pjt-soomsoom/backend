@@ -1,6 +1,6 @@
 package com.soomsoom.backend.application.port.`in`.diary.dto
 
-import com.soomsoom.backend.application.port.out.diary.dto.DailyDiaryRecordAdapterDto
+import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.dto.DailyDiaryRecordAdapterDto
 import com.soomsoom.backend.domain.diary.model.Emotion
 import java.time.LocalDate
 

@@ -2,10 +2,12 @@ package com.soomsoom.backend.adapter.out.persistence.activity.repository
 
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.ActivityJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.ActivityQueryDslRepository
+import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.ActivityWithFavoriteStatusDto
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.ActivityWithInstructorsDto
 import com.soomsoom.backend.adapter.out.persistence.activity.toDomain
 import com.soomsoom.backend.adapter.out.persistence.activity.toJpaEntity
 import com.soomsoom.backend.application.port.`in`.activity.query.SearchActivitiesCriteria
+import com.soomsoom.backend.application.port.`in`.activity.query.SearchInstructorActivitiesCriteria
 import com.soomsoom.backend.application.port.out.activity.ActivityPort
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
@@ -39,8 +41,8 @@ class ActivityPersistenceAdapter(
     }
 
     // author, narrator 정보 포함해서 조회
-    override fun findByIdWithInstructors(id: Long, deletionStatus: DeletionStatus): ActivityWithInstructorsDto? {
-        return activityQueryDslRepository.findById(id, deletionStatus)
+    override fun findByIdWithInstructors(id: Long, userId: Long, deletionStatus: DeletionStatus): ActivityWithInstructorsDto? {
+        return activityQueryDslRepository.findById(id, userId, deletionStatus)
     }
 
     // 도메인 객체만 조회
@@ -51,5 +53,12 @@ class ActivityPersistenceAdapter(
             DeletionStatus.ALL -> activityJpaRepository.findByIdOrNull(id)
         }
         return entity?.toDomain()
+    }
+
+    override fun searchByInstructorIdWithFavoriteStatus(
+        criteria: SearchInstructorActivitiesCriteria,
+        pageable: Pageable,
+    ): Page<ActivityWithFavoriteStatusDto> {
+        return activityQueryDslRepository.searchByInstructorIdWithFavoriteStatus(criteria, pageable)
     }
 }

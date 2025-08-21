@@ -4,14 +4,16 @@ import com.soomsoom.backend.application.port.`in`.instructor.command.UpdateInstr
 import jakarta.validation.constraints.NotBlank
 
 data class UpdateInstructorInfoRequest(
+    val userId: Long?,
     @field: NotBlank(message = "강사 이름은 빈 값일 수 없습니다.")
     val name: String,
     val bio: String?,
 )
 
-fun UpdateInstructorInfoRequest.toCommand(instructorId: Long): UpdateInstructorInfoCommand {
+fun UpdateInstructorInfoRequest.toCommand(instructorId: Long, principalId: Long): UpdateInstructorInfoCommand {
     return UpdateInstructorInfoCommand(
         instructorId = instructorId,
+        userId = this.userId ?: principalId,
         name = name,
         bio = bio
     )
