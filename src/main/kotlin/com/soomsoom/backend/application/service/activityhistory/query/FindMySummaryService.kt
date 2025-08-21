@@ -4,6 +4,7 @@ import com.soomsoom.backend.application.port.`in`.activityhistory.dto.FindMySumm
 import com.soomsoom.backend.application.port.`in`.activityhistory.usecase.query.FindMySummaryUseCase
 import com.soomsoom.backend.application.port.out.activityhistory.ActivityHistoryPort
 import com.soomsoom.backend.application.port.out.diary.DiaryPort
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,6 +19,7 @@ class FindMySummaryService(
      * @param userId 조회할 사용자의 ID
      * @return 일기 작성 횟수, 활동 완료 횟수, 총 활동 시간 정보
      */
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     override fun find(userId: Long): FindMySummaryResult {
         // 각 Port를 통해 필요한 데이터를 각각 조회
         val summary = activityHistoryPort.findUserSummary(userId)
