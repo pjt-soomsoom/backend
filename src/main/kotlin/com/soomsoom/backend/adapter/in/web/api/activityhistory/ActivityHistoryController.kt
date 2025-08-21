@@ -10,6 +10,7 @@ import com.soomsoom.backend.application.port.`in`.activityhistory.usecase.comman
 import com.soomsoom.backend.application.port.`in`.activityhistory.usecase.query.FindActivityProgressUseCase
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -64,7 +65,9 @@ class ActivityHistoryController(
     fun findProgress(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
         @PathVariable activityId: Long,
-    ): FindActivityProgressResult? {
-        return findActivityProgressUseCase.find(userDetails.id, activityId)
+    ): ResponseEntity<FindActivityProgressResult> {
+        val result = findActivityProgressUseCase.find(userDetails.id, activityId)
+        return result?.let { ResponseEntity.ok(it) }
+            ?: ResponseEntity.noContent().build()
     }
 }
