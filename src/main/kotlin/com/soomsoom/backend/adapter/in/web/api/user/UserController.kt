@@ -1,6 +1,8 @@
 package com.soomsoom.backend.adapter.`in`.web.api.user
 
 import com.soomsoom.backend.adapter.`in`.security.service.CustomUserDetails
+import com.soomsoom.backend.application.port.`in`.activityhistory.dto.FindMySummaryResult
+import com.soomsoom.backend.application.port.`in`.activityhistory.usecase.query.FindMySummaryUseCase
 import com.soomsoom.backend.application.port.`in`.favorite.dto.FavoriteActivityResult
 import com.soomsoom.backend.application.port.`in`.favorite.usecase.query.FindFavoriteActivitiesUseCase
 import com.soomsoom.backend.application.port.`in`.follow.dto.FollowingInstructorResult
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
     private val findFavoriteActivitiesUseCase: FindFavoriteActivitiesUseCase,
     private val findFollowingInstructorsUseCase: FindFollowingInstructorsUseCase,
+    private val findMySummaryUseCase: FindMySummaryUseCase,
 ) {
 
     /**
@@ -46,5 +49,18 @@ class UserController(
     ): Page<FollowingInstructorResult> {
         val targetUserId = userId ?: userDetails.id
         return findFollowingInstructorsUseCase.find(targetUserId, pageable)
+    }
+
+    /**
+     * 마이페이지 활동 요약 정보 조회
+     */
+    @GetMapping("/users/me/summary")
+    @ResponseStatus(HttpStatus.OK)
+    fun getMySummary(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+        @RequestParam(required = false) userId: Long?
+    ): FindMySummaryResult {
+        val targetUserId = userId ?: userDetails.id
+        return findMySummaryUseCase.find(targetUserId)
     }
 }

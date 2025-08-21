@@ -67,12 +67,17 @@ class DiaryQueryDslRepository(
             .fetch()
     }
 
-    private fun deletionStatusEq(deletionStatus: DeletionStatus): BooleanExpression? {
-        return when (deletionStatus) {
-            DeletionStatus.ACTIVE -> diaryJpaEntity.deletedAt.isNull
-            DeletionStatus.DELETED -> diaryJpaEntity.deletedAt.isNotNull
-            DeletionStatus.ALL -> null
-        }
+    /**
+     * userId로 감정 일기 수 조회
+     */
+    fun countByUserId(userId: Long, deletionStatus: DeletionStatus): Long {
+        return queryFactory.select(diaryJpaEntity.count())
+            .from(diaryJpaEntity)
+            .where(
+                diaryJpaEntity.userId.eq(userId),
+                deletionStatusEq(deletionStatus) // 기존 헬퍼 메서드 재사용
+            )
+            .fetchOne() ?: 0L
     }
 
     // 월 별 감정 통계
@@ -96,5 +101,13 @@ class DiaryQueryDslRepository(
             )
             .groupBy(diaryJpaEntity.emotion)
             .fetch()
+    }
+
+    private fun deletionStatusEq(deletionStatus: DeletionStatus): BooleanExpression? {
+        return when (deletionStatus) {
+            DeletionStatus.ACTIVE -> diaryJpaEntity.deletedAt.isNull
+            DeletionStatus.DELETED -> diaryJpaEntity.deletedAt.isNotNull
+            DeletionStatus.ALL -> null
+        }
     }
 }

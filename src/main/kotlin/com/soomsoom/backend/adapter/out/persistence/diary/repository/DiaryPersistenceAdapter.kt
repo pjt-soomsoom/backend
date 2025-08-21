@@ -75,4 +75,11 @@ class DiaryPersistenceAdapter(
     override fun getDailyDiaryRecords(criteria: GetDailyDiaryRecordCriteria): List<DailyDiaryRecordAdapterDto> {
         return diaryQueryDslRepository.findDailyDiaryRecords(criteria)
     }
+
+    /**
+     * 사용자별 일기 수를 조회
+     */
+    override fun countByUserId(userId: Long, deletionStatus: DeletionStatus): Long {
+        return diaryQueryDslRepository.countByUserId(userId, deletionStatus)
+    }
 }

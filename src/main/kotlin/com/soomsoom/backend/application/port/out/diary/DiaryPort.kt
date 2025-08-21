@@ -18,4 +18,5 @@ interface DiaryPort {
     fun search(criteria: SearchDiariesCriteria, pageable: Pageable): Page<Diary>
     fun getMonthlyEmotionCounts(criteria: GetMonthlyDiaryStatsCriteria): List<EmotionCount>
     fun getDailyDiaryRecords(criteria: GetDailyDiaryRecordCriteria): List<DailyDiaryRecordAdapterDto>
+    fun countByUserId(userId: Long, deletionStatus: DeletionStatus = DeletionStatus.ACTIVE): Long
 }
