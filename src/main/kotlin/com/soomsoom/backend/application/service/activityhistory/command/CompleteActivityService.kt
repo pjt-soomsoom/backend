@@ -6,7 +6,7 @@ import com.soomsoom.backend.application.port.out.activity.ActivityPort
 import com.soomsoom.backend.application.port.out.activityhistory.ActivityHistoryPort
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.EventType
-import com.soomsoom.backend.common.event.payload.ActivityCompletedNotificationPayload
+import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
 import com.soomsoom.backend.domain.activityhistory.model.ActivityCompletionLog
@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -30,7 +31,7 @@ class CompleteActivityService(
     @PreAuthorize("hasRole('ADMIN') or #command.userId == authentication.principal.id")
     override fun complete(command: CompleteActivityCommand) {
         // 해당 activity가 실제로 존재하는지 확인
-        activityPort.findById(command.activityId) ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
+        val activity = activityPort.findById(command.activityId) ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
 
         // 완료 기록(ActivityCompletionLog)을 DB에 새로 생성하여 저장
         val log = ActivityCompletionLog(null, command.userId, command.activityId, null)
@@ -39,9 +40,11 @@ class CompleteActivityService(
         // 활동이 완료되었음을 시스템에 알리는 이벤트를 발행 (업적 시스템 및 알림 시스템이 이 이벤트를 수신)
         val event = Event(
             eventType = EventType.ACTIVITY_COMPLETED,
-            payload = ActivityCompletedNotificationPayload(
+            payload = ActivityCompletedPayload(
                 userId = command.userId,
-                activityId = command.activityId
+                activityId = command.activityId,
+                activityType = activity.type,
+                completedAt = LocalDateTime.now()
             )
         )
         eventPublisher.publishEvent(event)

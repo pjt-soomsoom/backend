@@ -2,7 +2,7 @@ package com.soomsoom.backend.application.port.`in`.activity.dto
 
 import com.soomsoom.backend.application.port.out.upload.dto.FileUploadUrl
 import com.soomsoom.backend.common.utils.getOrThrow
-import com.soomsoom.backend.domain.user.FileCategory
+import com.soomsoom.backend.domain.upload.type.FileCategory
 
 data class CreateActivityResult(
     val activityId: Long,

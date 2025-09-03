@@ -32,6 +32,7 @@ class BreathingActivity(
     modifiedAt = modifiedAt,
     deletedAt = deletedAt
 ) {
+    override val type: ActivityType = ActivityType.BREATHING
     fun updateTimeline(timeline: List<TimelineEvent>) {
         this.timeline = timeline
     }

@@ -16,7 +16,7 @@ import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
 import com.soomsoom.backend.domain.activity.model.MeditationActivity
 import com.soomsoom.backend.domain.upload.UploadErrorCode
-import com.soomsoom.backend.domain.user.FileCategory
+import com.soomsoom.backend.domain.upload.type.FileCategory
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
