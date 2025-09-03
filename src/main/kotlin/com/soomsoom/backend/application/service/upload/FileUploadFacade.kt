@@ -3,8 +3,8 @@ package com.soomsoom.backend.application.service.upload
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
 import com.soomsoom.backend.application.port.out.upload.FileUploadUrlGeneratorPort
 import com.soomsoom.backend.application.port.out.upload.dto.FileUploadUrl
-import com.soomsoom.backend.domain.user.FileCategory
-import com.soomsoom.backend.domain.user.FileDomain
+import com.soomsoom.backend.domain.upload.type.FileCategory
+import com.soomsoom.backend.domain.upload.type.FileDomain
 import org.springframework.stereotype.Component
 
 @Component

@@ -1,4 +1,4 @@
-package com.soomsoom.backend.domain.user
+package com.soomsoom.backend.domain.upload.type
 
 enum class FileCategory {
     PROFILE,

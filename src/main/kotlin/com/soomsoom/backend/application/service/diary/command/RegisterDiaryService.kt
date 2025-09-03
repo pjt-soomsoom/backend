@@ -22,7 +22,6 @@ class RegisterDiaryService(
 ) : RegisterDiaryUseCase {
     override fun register(command: RegisterDiaryCommand): RegisterDiaryResult {
         if (diaryPort.existsByUserIdAndRecordDate(command.userId, command.date)) {
-            // 2. 이미 일기가 존재하면, 직접 정의한 예외를 발생시킵니다.
             throw SoomSoomException(DiaryErrorCode.DIARY_ALREADY_EXISTS)
         }
 
@@ -36,9 +35,15 @@ class RegisterDiaryService(
 
         val event = Event(
             eventType = EventType.DIARY_CREATED,
-            payload = DiaryCreatedPayload(userId = savedDiary.userId, diaryId = savedDiary.id!!)
+            payload = DiaryCreatedPayload(
+                userId = savedDiary.userId,
+                diaryId = savedDiary.id!!,
+                recordDate = diary.recordDate,
+                emotion = diary.emotion
+            )
         )
         eventPublisher.publishEvent(event)
+
         return RegisterDiaryResult.from(savedDiary)
     }
 }

@@ -89,4 +89,11 @@ class DiaryPersistenceAdapter(
     override fun countByUserIdAndDateBetween(userId: Long, startDate: LocalDate, endDate: LocalDate): Long {
         return diaryJpaRepository.countByUserIdAndRecordDateBetweenAndDeletedAtIsNull(userId, startDate, endDate)
     }
+
+    /**
+     * 특정 사용자 ID와 날짜를 기준으로, 해당 날짜 이전의 가장 최근 일기 1개를 날짜 내림차순으로 조회
+     */
+    override fun findLatestBefore(userId: Long, recordDate: LocalDate): Diary? {
+        return diaryJpaRepository.findTopByUserIdAndRecordDateBeforeOrderByRecordDateDesc(userId, recordDate)?.toDomain()
+    }
 }

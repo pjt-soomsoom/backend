@@ -6,12 +6,9 @@ import com.soomsoom.backend.application.port.out.activity.ActivityPort
 import com.soomsoom.backend.application.port.out.activityhistory.ActivityHistoryPort
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.EventType
-import com.soomsoom.backend.common.event.payload.ActivityCompletedNotificationPayload
+import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
-import com.soomsoom.backend.domain.activity.model.ActivityType
-import com.soomsoom.backend.domain.activity.model.BreathingActivity
-import com.soomsoom.backend.domain.activity.model.MeditationActivity
 import com.soomsoom.backend.domain.activityhistory.model.ActivityCompletionLog
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.access.prepost.PreAuthorize
@@ -43,7 +40,7 @@ class CompleteActivityService(
         // 활동이 완료되었음을 시스템에 알리는 이벤트를 발행 (업적 시스템 및 알림 시스템이 이 이벤트를 수신)
         val event = Event(
             eventType = EventType.ACTIVITY_COMPLETED,
-            payload = ActivityCompletedNotificationPayload(
+            payload = ActivityCompletedPayload(
                 userId = command.userId,
                 activityId = command.activityId,
                 activityType = activity.type,

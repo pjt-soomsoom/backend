@@ -10,8 +10,11 @@ import com.soomsoom.backend.domain.achievement.model.UserAchieved
 import com.soomsoom.backend.domain.achievement.model.UserProgress
 
 // Achievement
-fun AchievementJpaEntity.toDomain(): Achievement = Achievement(id, name, description, phrase, grade, category, rewardPoints, rewardItemId)
+fun AchievementJpaEntity.toDomain(): Achievement = Achievement(id, name, description, phrase, grade, category, rewardPoints, rewardItemId, deletedAt)
 fun Achievement.toEntity(): AchievementJpaEntity = AchievementJpaEntity(id, name, description, phrase, grade, category, rewardPoints, rewardItemId)
+    .apply {
+        this.deletedAt = this@toEntity.deletedAt
+    }
 
 // AchievementCondition
 fun AchievementConditionJpaEntity.toDomain(): AchievementCondition = AchievementCondition(id, achievementId, type, targetValue)

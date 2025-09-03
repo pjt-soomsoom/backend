@@ -1,5 +1,7 @@
 package com.soomsoom.backend.domain.achievement.model
 
+import java.time.LocalDateTime
+
 class Achievement(
     val id: Long,
     var name: String, // 업적 이름 (예: "마음 일기 첫 발걸음")
@@ -9,7 +11,14 @@ class Achievement(
     var category: AchievementCategory,
     var rewardPoints: Int?, // 보상 재화
     var rewardItemId: Long?, // 보상 아이템
+    var deletedAt: LocalDateTime? = null,
 ) {
+
+    lateinit var conditions: List<AchievementCondition>
+
+    val isDeleted: Boolean
+        get() = deletedAt != null
+
     fun update(
         name: String,
         description: String,
@@ -39,7 +48,7 @@ class Achievement(
             rewardItemId: Long?,
         ): Achievement {
             require(name.isNotBlank()) { "업적 이름은 비워둘 수 없습니다." }
-            require(description.isNotBlank()) {"업적 설명은 비워둘 수 없습니다."}
+            require(description.isNotBlank()) { "업적 설명은 비워둘 수 없습니다." }
 
             return Achievement(
                 id = 0L,
@@ -49,8 +58,13 @@ class Achievement(
                 grade = grade,
                 category = category,
                 rewardPoints = rewardPoints,
-                rewardItemId = rewardItemId
+                rewardItemId = rewardItemId,
+                deletedAt = null
             )
         }
+    }
+
+    fun delete() {
+        this.deletedAt = LocalDateTime.now()
     }
 }

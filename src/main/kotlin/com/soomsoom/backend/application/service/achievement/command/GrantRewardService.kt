@@ -1,6 +1,8 @@
 package com.soomsoom.backend.application.service.achievement.command
 
 import com.soomsoom.backend.application.port.`in`.achievement.usecase.command.GrantRewardUseCase
+import com.soomsoom.backend.application.port.`in`.user.command.AddUserPointsCommand
+import com.soomsoom.backend.application.port.`in`.user.usecase.command.AddUserPointsUseCase
 import com.soomsoom.backend.application.port.out.achievement.AchievementPort
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.achievement.AchievementErrorCode
@@ -11,14 +13,16 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class GrantRewardService(
     private val achievementPort: AchievementPort,
+    private val addUserPointsUseCase: AddUserPointsUseCase,
 ) : GrantRewardUseCase {
-    override fun grandReward(userId: Long, achievementId: Long) {
+    override fun grantReward(userId: Long, achievementId: Long) {
         val achievement = achievementPort.findById(achievementId)
             ?: throw SoomSoomException(AchievementErrorCode.NOT_FOUND)
 
         achievement.rewardPoints?.let { points ->
             if (points > 0) {
-                /* TODO: 포인트 지급 로직 */
+                val command = AddUserPointsCommand(userId = userId, pointsToAdd = points)
+                addUserPointsUseCase.add(command)
             }
         }
 

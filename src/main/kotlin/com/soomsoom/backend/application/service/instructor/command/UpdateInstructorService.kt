@@ -10,8 +10,8 @@ import com.soomsoom.backend.application.port.out.instructor.InstructorPort
 import com.soomsoom.backend.application.port.out.upload.FileUploadUrlGeneratorPort
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.instructor.InstructorErrorCode
-import com.soomsoom.backend.domain.user.FileCategory
-import com.soomsoom.backend.domain.user.FileDomain
+import com.soomsoom.backend.domain.upload.type.FileCategory
+import com.soomsoom.backend.domain.upload.type.FileDomain
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

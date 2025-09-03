@@ -14,8 +14,8 @@ import com.soomsoom.backend.application.service.upload.GenerateUploadUrlsRequest
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.instructor.model.Instructor
 import com.soomsoom.backend.domain.upload.UploadErrorCode
-import com.soomsoom.backend.domain.user.FileCategory
-import com.soomsoom.backend.domain.user.FileDomain
+import com.soomsoom.backend.domain.upload.type.FileCategory
+import com.soomsoom.backend.domain.upload.type.FileDomain
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe

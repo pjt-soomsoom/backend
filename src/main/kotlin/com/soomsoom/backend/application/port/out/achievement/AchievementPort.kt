@@ -1,10 +1,12 @@
 package com.soomsoom.backend.application.port.out.achievement
 
+import com.soomsoom.backend.application.port.`in`.achievement.query.FindAllAchievementsCriteria
+import com.soomsoom.backend.application.port.`in`.achievement.query.FindMyAchievementsCriteria
 import com.soomsoom.backend.application.port.out.achievement.dto.AchievementDetailsDto
 import com.soomsoom.backend.domain.achievement.model.Achievement
 import com.soomsoom.backend.domain.achievement.model.AchievementCondition
-import com.soomsoom.backend.domain.achievement.model.AchievementStatusFilter
 import com.soomsoom.backend.domain.achievement.model.ConditionType
+import com.soomsoom.backend.domain.common.DeletionStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
@@ -12,7 +14,7 @@ interface AchievementPort {
     /**
      * ID로 업적의 기본 정보를 조회
      */
-    fun findById(achievementId: Long): Achievement?
+    fun findById(achievementId: Long, deletionStatus: DeletionStatus = DeletionStatus.ACTIVE): Achievement?
 
     /**
      * 특정 업적에 속한 모든 달성 조건 목록을 조회
@@ -28,10 +30,35 @@ interface AchievementPort {
     /**
      * 사용자의 업적 현황(업적 정보, 달성 여부, 진행도)을 조회
      */
-    fun findAchievementsWithProgress(userId: Long, pageable: Pageable, statusFilter: AchievementStatusFilter): Page<AchievementDetailsDto>
+    fun findAchievementsWithProgress(criteria: FindMyAchievementsCriteria, pageable: Pageable): Page<AchievementDetailsDto>
 
     /**
      * 새로 달성 가능한 업적이 있는지 조회
      */
     fun findNewlyAchievableIds(userId: Long, type: ConditionType): List<Long>
+
+    /**
+     * [ADMIN] 업적 저장 (생성/수정)
+     */
+    fun save(achievement: Achievement): Achievement
+
+    /**
+     * [ADMIN] 업적 ID로 삭제
+     */
+    fun delete(achievement: Achievement)
+
+    /**
+     * [ADMIN] 모든 업적 목록 조회 (페이징)
+     */
+    fun findAll(criteria: FindAllAchievementsCriteria, pageable: Pageable): Page<Achievement>
+
+    /**
+     * [ADMIN] 여러 개의 달성 조건을 한 번에 저장
+     */
+    fun saveConditions(conditions: List<AchievementCondition>): List<AchievementCondition>
+
+    /**
+     * [ADMIN] 특정 업적에 속한 모든 달성 조건들을 삭제
+     */
+    fun deleteConditionsByAchievementId(achievementId: Long)
 }

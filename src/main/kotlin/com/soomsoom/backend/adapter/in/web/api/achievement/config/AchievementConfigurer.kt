@@ -10,5 +10,6 @@ import org.springframework.stereotype.Component
 class AchievementConfigurer : DomainSecurityConfigurer {
     override fun configure(authorize: AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry) {
         authorize.requestMatchers(HttpMethod.GET, "/users/me/achievements").hasAnyRole("USER", "ADMIN")
+        authorize.requestMatchers("/achievements/**").hasRole("ADMIN")
     }
 }

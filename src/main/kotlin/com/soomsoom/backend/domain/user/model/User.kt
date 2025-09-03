@@ -38,7 +38,7 @@ class User private constructor(
                 id = null,
                 account = Account.Anonymous(deviceId),
                 role = Role.ROLE_ANONYMOUS,
-                points = 0,
+                points = 0
             )
         }
 
@@ -47,7 +47,7 @@ class User private constructor(
                 id = null,
                 account = Account.Social(socialProvider, socialId, deviceId),
                 role = Role.ROLE_USER,
-                points = 0,
+                points = 0
             )
         }
 
@@ -56,7 +56,7 @@ class User private constructor(
                 id = null,
                 account = Account.IdPassword(username, password),
                 role = Role.ROLE_ADMIN,
-                points = 0,
+                points = 0
             )
         }
     }

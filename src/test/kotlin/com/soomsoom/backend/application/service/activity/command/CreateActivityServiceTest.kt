@@ -14,7 +14,7 @@ import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.model.BreathingActivity
 import com.soomsoom.backend.domain.instructor.InstructorErrorCode
 import com.soomsoom.backend.domain.instructor.model.Instructor
-import com.soomsoom.backend.domain.user.FileCategory
+import com.soomsoom.backend.domain.upload.type.FileCategory
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe

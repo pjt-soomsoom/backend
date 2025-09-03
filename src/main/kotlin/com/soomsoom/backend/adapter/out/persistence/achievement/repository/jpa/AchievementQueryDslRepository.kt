@@ -4,14 +4,19 @@ import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.dto.AchievementWithProgressDto
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.dto.QAchievementWithProgressDto
+import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.entity.AchievementConditionJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.entity.AchievementJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.entity.QAchievementConditionJpaEntity.achievementConditionJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.entity.QAchievementJpaEntity.achievementJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.entity.QUserAchievedJpaEntity.userAchievedJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.entity.QUserProgressJpaEntity.userProgressJpaEntity
+import com.soomsoom.backend.application.port.`in`.achievement.query.FindAllAchievementsCriteria
+import com.soomsoom.backend.application.port.`in`.achievement.query.FindMyAchievementsCriteria
 import com.soomsoom.backend.common.utils.QueryDslSortUtil
 import com.soomsoom.backend.domain.achievement.model.AchievementGrade
 import com.soomsoom.backend.domain.achievement.model.AchievementStatusFilter
 import com.soomsoom.backend.domain.achievement.model.ConditionType
+import com.soomsoom.backend.domain.common.DeletionStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.support.PageableExecutionUtils
@@ -23,9 +28,8 @@ class AchievementQueryDslRepository(
 ) {
 
     fun findAchievementsWithProgress(
-        userId: Long,
+        criteria: FindMyAchievementsCriteria,
         pageable: Pageable,
-        statusFilter: AchievementStatusFilter,
     ): Page<AchievementWithProgressDto> {
         val content = queryFactory
             .select(
@@ -39,16 +43,17 @@ class AchievementQueryDslRepository(
             .from(achievementJpaEntity)
             .leftJoin(achievementConditionJpaEntity).on(achievementJpaEntity.id.eq(achievementConditionJpaEntity.achievementId))
             .leftJoin(userAchievedJpaEntity).on(
-                achievementJpaEntity.id.eq(userAchievedJpaEntity.achievementId).and(userAchievedJpaEntity.userId.eq(userId))
+                achievementJpaEntity.id.eq(userAchievedJpaEntity.achievementId).and(userAchievedJpaEntity.userId.eq(criteria.userId))
             )
             .leftJoin(userProgressJpaEntity).on(
-                achievementConditionJpaEntity.type.eq(userProgressJpaEntity.type).and(userProgressJpaEntity.userId.eq(userId))
+                achievementConditionJpaEntity.type.eq(userProgressJpaEntity.type).and(userProgressJpaEntity.userId.eq(criteria.userId))
             )
             .where(
-                statusFilter(statusFilter),
+                statusFilter(criteria.statusFilter),
+                deletionStatusEq(criteria.deletionStatus),
                 hiddenFilter()
             )
-            .orderBy(*QueryDslSortUtil.toOrderSpecifiers(pageable.sort, achievementJpaEntity.javaClass).toTypedArray())
+            .orderBy(*QueryDslSortUtil.toOrderSpecifiers(pageable.sort, AchievementJpaEntity::class.java).toTypedArray())
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .fetch()
@@ -57,10 +62,11 @@ class AchievementQueryDslRepository(
             .select(achievementJpaEntity.count())
             .from(achievementJpaEntity)
             .leftJoin(userAchievedJpaEntity).on(
-                achievementJpaEntity.id.eq(userAchievedJpaEntity.achievementId).and(userAchievedJpaEntity.userId.eq(userId))
+                achievementJpaEntity.id.eq(userAchievedJpaEntity.achievementId).and(userAchievedJpaEntity.userId.eq(criteria.userId))
             )
             .where(
-                statusFilter(statusFilter),
+                statusFilter(criteria.statusFilter),
+                deletionStatusEq(criteria.deletionStatus),
                 hiddenFilter()
             )
 
@@ -71,6 +77,11 @@ class AchievementQueryDslRepository(
         val subquery = queryFactory
             .select(achievementConditionJpaEntity.achievementId)
             .from(achievementConditionJpaEntity)
+            .join(achievementJpaEntity).on(achievementConditionJpaEntity.achievementId.eq(achievementJpaEntity.id))
+            .where(
+                achievementConditionJpaEntity.type.eq(type),
+                achievementJpaEntity.deletedAt.isNull // 활성 상태(삭제되지 않음)인 업적만 필터링
+            )
             .where(achievementConditionJpaEntity.type.eq(type))
 
         return queryFactory
@@ -95,9 +106,40 @@ class AchievementQueryDslRepository(
                         .`when`(userProgressJpaEntity.currentValue.goe(achievementConditionJpaEntity.targetValue))
                         .then(1)
                         .otherwise(0)
-                        .sum().longValue() // ✨ [컴파일 오류 수정] Integer -> Long 타입으로 캐스팅
+                        .sum().longValue()
                 )
             )
+            .fetch()
+    }
+
+    fun findAll(criteria: FindAllAchievementsCriteria, pageable: Pageable): Page<AchievementJpaEntity> {
+        val content = queryFactory
+            .selectFrom(achievementJpaEntity)
+            .where(
+                deletionStatusEq(criteria.deletionStatus)
+            )
+            .orderBy(*QueryDslSortUtil.toOrderSpecifiers(pageable.sort, AchievementJpaEntity::class.java).toTypedArray())
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+            .fetch()
+
+        val countQuery = queryFactory
+            .select(achievementJpaEntity.count())
+            .from(achievementJpaEntity)
+            .where(
+                deletionStatusEq(criteria.deletionStatus)
+            )
+
+        return PageableExecutionUtils.getPage(content, pageable) { countQuery.fetchOne() ?: 0L }
+    }
+
+    fun findConditionsIn(achievementIds: List<Long>): List<AchievementConditionJpaEntity> {
+        if (achievementIds.isEmpty()) {
+            return emptyList()
+        }
+        return queryFactory
+            .selectFrom(achievementConditionJpaEntity)
+            .where(achievementConditionJpaEntity.achievementId.`in`(achievementIds))
             .fetch()
     }
 
@@ -112,5 +154,13 @@ class AchievementQueryDslRepository(
     private fun hiddenFilter(): BooleanExpression {
         return achievementJpaEntity.grade.ne(AchievementGrade.SPECIAL)
             .or(userAchievedJpaEntity.id.isNotNull)
+    }
+
+    private fun deletionStatusEq(deletionStatus: DeletionStatus): BooleanExpression? {
+        return when (deletionStatus) {
+            DeletionStatus.ACTIVE -> achievementJpaEntity.deletedAt.isNull
+            DeletionStatus.DELETED -> achievementJpaEntity.deletedAt.isNotNull
+            DeletionStatus.ALL -> null
+        }
     }
 }

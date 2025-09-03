@@ -2,8 +2,8 @@ package com.soomsoom.backend.adapter.out.s3
 
 import com.soomsoom.backend.application.port.out.upload.FileUploadUrlGeneratorPort
 import com.soomsoom.backend.application.port.out.upload.dto.FileUploadUrl
-import com.soomsoom.backend.domain.user.FileCategory
-import com.soomsoom.backend.domain.user.FileDomain
+import com.soomsoom.backend.domain.upload.type.FileCategory
+import com.soomsoom.backend.domain.upload.type.FileDomain
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
