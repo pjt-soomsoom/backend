@@ -3,6 +3,7 @@ package com.soomsoom.backend.application.port.`in`.activity.dto
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
 import com.soomsoom.backend.domain.activity.model.Activity
+import com.soomsoom.backend.domain.activity.model.ActivityType
 import com.soomsoom.backend.domain.activity.model.BreathingActivity
 import com.soomsoom.backend.domain.activity.model.MeditationActivity
 import com.soomsoom.backend.domain.activity.model.TimelineEvent
@@ -10,6 +11,7 @@ import com.soomsoom.backend.domain.instructor.model.Instructor
 
 data class ActivityResult(
     val id: Long,
+    val type: ActivityType,
     val title: String,
     val thumbnailImageUrl: String?,
     val descriptions: List<String>,
@@ -35,6 +37,7 @@ data class ActivityResult(
             return when (activity) {
                 is BreathingActivity -> ActivityResult(
                     id = activity.id!!,
+                    type = activity.type,
                     title = activity.title,
                     thumbnailImageUrl = activity.thumbnailImageUrl,
                     descriptions = activity.descriptions,
@@ -47,6 +50,7 @@ data class ActivityResult(
                 )
                 is MeditationActivity -> ActivityResult(
                     id = activity.id!!,
+                    type = activity.type,
                     title = activity.title,
                     thumbnailImageUrl = activity.thumbnailImageUrl,
                     descriptions = activity.descriptions,

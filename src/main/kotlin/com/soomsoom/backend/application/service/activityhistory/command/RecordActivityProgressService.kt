@@ -2,10 +2,16 @@ package com.soomsoom.backend.application.service.activityhistory.command
 
 import com.soomsoom.backend.application.port.`in`.activityhistory.command.RecordActivityProgressCommand
 import com.soomsoom.backend.application.port.`in`.activityhistory.usecase.command.RecordActivityProgressUseCase
+import com.soomsoom.backend.application.port.out.activity.ActivityPort
 import com.soomsoom.backend.application.port.out.activityhistory.ActivityHistoryPort
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.payload.UserPlayTimeAccumulatedPayload
+import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.activity.ActivityErrorCode
+import com.soomsoom.backend.domain.activity.model.ActivityType
+import com.soomsoom.backend.domain.activity.model.BreathingActivity
+import com.soomsoom.backend.domain.activity.model.MeditationActivity
 import com.soomsoom.backend.domain.activityhistory.model.ActivityProgress
 import com.soomsoom.backend.domain.activityhistory.model.UserActivitySummary
 import org.springframework.context.ApplicationEventPublisher
@@ -18,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional
 class RecordActivityProgressService(
     private val activityHistoryPort: ActivityHistoryPort,
     private val eventPublisher: ApplicationEventPublisher,
+    private val activityPort: ActivityPort,
 ) : RecordActivityProgressUseCase {
 
     /**
@@ -33,7 +40,7 @@ class RecordActivityProgressService(
         val summary = updateUserActivitySummary(command.userId, command.actualPlayTimeInSeconds)
 
         // 누적 시간이 갱신되었음을 시스템에 알리는 이벤트를 발행 (업적 시스템이 이 이벤트를 수신)
-        publishUserPlayTimeAccumulatedEvent(summary)
+        publishUserPlayTimeAccumulatedEvent(summary, command.activityId)
     }
 
     /**
@@ -61,12 +68,20 @@ class RecordActivityProgressService(
     /**
      * 누적 시간 갱신 이벤트를 발행
      */
-    private fun publishUserPlayTimeAccumulatedEvent(summary: UserActivitySummary) {
+    private fun publishUserPlayTimeAccumulatedEvent(summary: UserActivitySummary, activityId: Long) {
+        val activity = activityPort.findById(activityId) ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
+        val activityType = when (activity) {
+            is MeditationActivity -> ActivityType.MEDITATION
+            is BreathingActivity -> ActivityType.BREATHING
+            else -> throw SoomSoomException(ActivityErrorCode.UNSUPPORTED_ACTIVITY_TYPE)
+        }
+
         val event = Event(
             eventType = EventType.USER_PLAY_TIME_ACCUMULATED,
             payload = UserPlayTimeAccumulatedPayload(
                 userId = summary.userId,
-                totalPlaySeconds = summary.totalPlaySeconds
+                totalPlaySeconds = summary.totalPlaySeconds,
+                activityType = activityType
             )
         )
         eventPublisher.publishEvent(event)

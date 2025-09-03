@@ -9,11 +9,15 @@ import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.payload.ActivityCompletedNotificationPayload
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
+import com.soomsoom.backend.domain.activity.model.ActivityType
+import com.soomsoom.backend.domain.activity.model.BreathingActivity
+import com.soomsoom.backend.domain.activity.model.MeditationActivity
 import com.soomsoom.backend.domain.activityhistory.model.ActivityCompletionLog
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -30,7 +34,7 @@ class CompleteActivityService(
     @PreAuthorize("hasRole('ADMIN') or #command.userId == authentication.principal.id")
     override fun complete(command: CompleteActivityCommand) {
         // 해당 activity가 실제로 존재하는지 확인
-        activityPort.findById(command.activityId) ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
+        val activity = activityPort.findById(command.activityId) ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
 
         // 완료 기록(ActivityCompletionLog)을 DB에 새로 생성하여 저장
         val log = ActivityCompletionLog(null, command.userId, command.activityId, null)
@@ -41,7 +45,9 @@ class CompleteActivityService(
             eventType = EventType.ACTIVITY_COMPLETED,
             payload = ActivityCompletedNotificationPayload(
                 userId = command.userId,
-                activityId = command.activityId
+                activityId = command.activityId,
+                activityType = activity.type,
+                completedAt = LocalDateTime.now()
             )
         )
         eventPublisher.publishEvent(event)

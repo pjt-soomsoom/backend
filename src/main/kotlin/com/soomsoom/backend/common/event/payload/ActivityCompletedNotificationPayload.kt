@@ -1,6 +1,8 @@
 package com.soomsoom.backend.common.event.payload
 
 import com.soomsoom.backend.common.event.NotificationPayload
+import com.soomsoom.backend.domain.activity.model.ActivityType
+import java.time.LocalDateTime
 
 /**
  * '활동 완료' 이벤트의 내용물
@@ -9,4 +11,6 @@ import com.soomsoom.backend.common.event.NotificationPayload
 data class ActivityCompletedNotificationPayload(
     val userId: Long,
     val activityId: Long,
+    val activityType: ActivityType,
+    val completedAt: LocalDateTime,
 ) : NotificationPayload

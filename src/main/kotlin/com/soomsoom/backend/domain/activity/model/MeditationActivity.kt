@@ -30,4 +30,6 @@ class MeditationActivity(
     createdAt = createdAt,
     modifiedAt = modifiedAt,
     deletedAt = deletedAt
-)
+) {
+    override val type: ActivityType = ActivityType.MEDITATION
+}

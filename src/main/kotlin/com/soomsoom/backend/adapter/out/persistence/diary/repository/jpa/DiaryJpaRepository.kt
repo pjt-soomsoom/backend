@@ -7,5 +7,6 @@ import java.time.LocalDate
 interface DiaryJpaRepository : JpaRepository<DiaryJpaEntity, Long> {
     fun findByIdAndDeletedAtIsNull(id: Long): DiaryJpaEntity?
     fun findByIdAndDeletedAtIsNotNull(id: Long): DiaryJpaEntity?
-    fun existsByUserIdAndRecordDate(userId: Long, date: LocalDate): Boolean
+    fun existsByUserIdAndRecordDateAndDeletedAtIsNull(userId: Long, date: LocalDate): Boolean
+    fun countByUserIdAndRecordDateBetweenAndDeletedAtIsNull(userId: Long, startDate: LocalDate, endDate: LocalDate): Long
 }

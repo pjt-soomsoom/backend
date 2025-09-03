@@ -58,7 +58,7 @@ class UserController(
     @ResponseStatus(HttpStatus.OK)
     fun getMySummary(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-        @RequestParam(required = false) userId: Long?
+        @RequestParam(required = false) userId: Long?,
     ): FindMySummaryResult {
         val targetUserId = userId ?: userDetails.id
         return findMySummaryUseCase.find(targetUserId)

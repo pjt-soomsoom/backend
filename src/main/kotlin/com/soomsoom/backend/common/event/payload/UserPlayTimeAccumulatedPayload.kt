@@ -1,6 +1,7 @@
 package com.soomsoom.backend.common.event.payload
 
 import com.soomsoom.backend.common.event.Payload
+import com.soomsoom.backend.domain.activity.model.ActivityType
 
 /**
  * '사용자 누적 시간 갱신' 이벤트의 내용물
@@ -9,4 +10,5 @@ import com.soomsoom.backend.common.event.Payload
 data class UserPlayTimeAccumulatedPayload(
     val userId: Long,
     val totalPlaySeconds: Long,
+    val activityType: ActivityType,
 ) : Payload

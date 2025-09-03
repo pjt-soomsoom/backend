@@ -17,6 +17,8 @@ abstract class Activity(
     open val modifiedAt: LocalDateTime? = null,
     open var deletedAt: LocalDateTime? = null,
 ) {
+    abstract val type: ActivityType
+
     val isDeleted: Boolean
         get() = deletedAt != null
 

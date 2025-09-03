@@ -52,7 +52,7 @@ class DiaryPersistenceAdapter(
     }
 
     override fun existsByUserIdAndRecordDate(userId: Long, date: LocalDate): Boolean {
-        return diaryJpaRepository.existsByUserIdAndRecordDate(userId, date)
+        return diaryJpaRepository.existsByUserIdAndRecordDateAndDeletedAtIsNull(userId, date)
     }
 
     /**
@@ -81,5 +81,12 @@ class DiaryPersistenceAdapter(
      */
     override fun countByUserId(userId: Long, deletionStatus: DeletionStatus): Long {
         return diaryQueryDslRepository.countByUserId(userId, deletionStatus)
+    }
+
+    /**
+     * 특정 사용자가 특정 기간 사이에 작성한 일기의 개수를 조회
+     */
+    override fun countByUserIdAndDateBetween(userId: Long, startDate: LocalDate, endDate: LocalDate): Long {
+        return diaryJpaRepository.countByUserIdAndRecordDateBetweenAndDeletedAtIsNull(userId, startDate, endDate)
     }
 }
