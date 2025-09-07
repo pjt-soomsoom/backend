@@ -3,7 +3,7 @@ package com.soomsoom.backend.adapter.out.persistence.user
 import com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.UserJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.entity.UserJpaEntity
 import com.soomsoom.backend.application.port.out.user.UserPort
-import com.soomsoom.backend.domain.user.model.User
+import com.soomsoom.backend.domain.user.model.aggregate.User
 import org.springframework.stereotype.Repository
 
 @Repository

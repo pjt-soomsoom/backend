@@ -2,8 +2,8 @@ package com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.entity
 
 import com.soomsoom.backend.common.entity.BaseTimeEntity
 import com.soomsoom.backend.domain.user.model.Account
-import com.soomsoom.backend.domain.user.model.Role
-import com.soomsoom.backend.domain.user.model.User
+import com.soomsoom.backend.domain.user.model.aggregate.Role
+import com.soomsoom.backend.domain.user.model.aggregate.User
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType

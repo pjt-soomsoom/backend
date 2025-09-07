@@ -1,5 +1,14 @@
 package com.soomsoom.backend.common.exception
 
+import com.soomsoom.backend.common.DomainErrorReason.DELETED_ITEM
+import com.soomsoom.backend.common.DomainErrorReason.DUPLICATE_SLOT_IN_COLLECTION
+import com.soomsoom.backend.common.DomainErrorReason.ITEM_ALREADY_OWNED
+import com.soomsoom.backend.common.DomainErrorReason.ITEM_NOT_OWNED
+import com.soomsoom.backend.common.DomainErrorReason.ITEM_SOLD_OUT
+import com.soomsoom.backend.common.DomainErrorReason.NOT_ENOUGH_POINTS
+import com.soomsoom.backend.common.DomainErrorReason.NOT_PURCHASABLE_ITEM
+import com.soomsoom.backend.domain.item.CollectionErrorCode
+import com.soomsoom.backend.domain.item.ItemErrorCode
 import com.soomsoom.backend.domain.user.UserErrorCode
 import org.springframework.context.MessageSource
 import org.springframework.http.HttpStatus
@@ -44,5 +53,34 @@ class GlobalExceptionHandler(
         return ResponseEntity
             .status(UserErrorCode.ACCESS_DENIED.status)
             .body(UserErrorCode.ACCESS_DENIED.message(messageSource))
+    }
+
+    @ExceptionHandler(IllegalArgumentException::class, IllegalStateException::class)
+    fun handleDomainValidationException(e: RuntimeException): ResponseEntity<String> {
+        val errorCode: ErrorCode = when (e.message) {
+            // Item
+            NOT_PURCHASABLE_ITEM -> ItemErrorCode.NOT_PURCHASABLE
+            DELETED_ITEM -> ItemErrorCode.DELETED
+            ITEM_SOLD_OUT -> ItemErrorCode.SOLD_OUT
+            // Collection
+            DUPLICATE_SLOT_IN_COLLECTION -> CollectionErrorCode.DUPLICATE_SLOT
+            // User-Item
+            ITEM_ALREADY_OWNED -> UserErrorCode.ITEM_ALREADY_OWNED
+            NOT_ENOUGH_POINTS -> UserErrorCode.NOT_ENOUGH_POINTS
+            ITEM_NOT_OWNED -> UserErrorCode.ITEM_NOT_OWNED
+            // 번역 규칙이 없는 경우, 예측하지 못한 서버 내부 오류로 처리
+            else -> return handleException(e as Exception)
+        }
+
+        return ResponseEntity
+            .status(errorCode.status)
+            .body(errorCode.message(messageSource))
+    }
+
+    @ExceptionHandler(Exception::class)
+    fun handleException(e: Exception): ResponseEntity<String> {
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("알 수 없는 오류가 발생했습니다. 관리자에게 문의하세요.")
     }
 }
