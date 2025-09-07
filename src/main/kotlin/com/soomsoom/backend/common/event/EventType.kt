@@ -12,4 +12,7 @@ enum class EventType {
 
     // diary 작성 완료
     DIARY_CREATED,
+
+    // 아이템 구매(획득)
+    ITEM_PURCHASED,
 }

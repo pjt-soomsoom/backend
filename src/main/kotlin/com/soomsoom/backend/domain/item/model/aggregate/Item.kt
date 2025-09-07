@@ -1,12 +1,12 @@
 package com.soomsoom.backend.domain.item.model.aggregate
 
-import com.soomsoom.backend.common.DomainErrorReason.DELETED_ITEM
-import com.soomsoom.backend.common.DomainErrorReason.ITEM_SOLD_OUT
-import com.soomsoom.backend.common.DomainErrorReason.NOT_PURCHASABLE_ITEM
+import com.soomsoom.backend.common.exception.DomainErrorReason.DELETED_ITEM
+import com.soomsoom.backend.common.exception.DomainErrorReason.ITEM_SOLD_OUT
+import com.soomsoom.backend.common.exception.DomainErrorReason.NOT_PURCHASABLE_ITEM
+import com.soomsoom.backend.domain.common.vo.Points
 import com.soomsoom.backend.domain.item.model.enums.AcquisitionType
 import com.soomsoom.backend.domain.item.model.enums.EquipSlot
 import com.soomsoom.backend.domain.item.model.enums.ItemType
-import com.soomsoom.backend.domain.item.model.vo.Points
 import com.soomsoom.backend.domain.item.model.vo.Stock
 import java.time.LocalDateTime
 
@@ -20,9 +20,12 @@ class Item(
     var acquisitionType: AcquisitionType,
     var price: Points,
     var imageUrl: String,
+    var imageFileKey: String,
     var lottieUrl: String? = null,
+    var lottieFileKey: String? = null,
     var stock: Stock,
     val createdAt: LocalDateTime? = null,
+    val modifiedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
 ) {
     val isDeleted: Boolean
@@ -30,6 +33,15 @@ class Item(
 
     init {
         validate()
+    }
+
+    private fun validate() {
+        require(name.isNotBlank()) { "아이템 이름은 비워둘 수 없습니다." }
+        if (acquisitionType != AcquisitionType.PURCHASE) {
+            require(price.value == 0) { "구매 아이템이 아닌 경우 가격은 0이어야 합니다." }
+        } else {
+            require(price.value > 0) { "구매 아이템은 가격이 0보다 커야 합니다." }
+        }
     }
 
     fun validatePurchasable() {
@@ -46,12 +58,12 @@ class Item(
         this.deletedAt = LocalDateTime.now()
     }
 
-    fun update(
+    fun updateInfo(
         name: String,
         description: String?,
         phrase: String?,
         price: Points,
-        newTotalQuantity: Int?
+        newTotalQuantity: Int?,
     ) {
         this.name = name
         this.description = description
@@ -61,10 +73,17 @@ class Item(
         validate()
     }
 
-    private fun validate() {
-        require(name.isNotBlank()) { "아이템 이름은 비워둘 수 없습니다." }
-        if (acquisitionType != AcquisitionType.PURCHASE) {
-            require(price.value == 0) { "구매 아이템이 아닌 경우 가격은 0이어야 합니다." }
-        }
+    fun updateImage(url: String, fileKey: String): String? {
+        val oldFileKey = this.imageFileKey
+        this.imageUrl = url
+        this.imageFileKey = fileKey
+        return if (oldFileKey != fileKey) oldFileKey else null
+    }
+
+    fun updateLottie(url: String?, fileKey: String?): String? {
+        val oldFileKey = this.lottieFileKey
+        this.lottieUrl = url
+        this.lottieFileKey = fileKey
+        return if (oldFileKey != null && oldFileKey != fileKey) oldFileKey else null
     }
 }

@@ -14,6 +14,7 @@ data class FindItemsCriteria(
 )
 
 enum class ItemSortCriteria {
-    RECOMMENDED,
-    LATEST,
+    POPULARITY, // 인기순 (판매순)
+    PRICE, // 가격순
+    LATEST, // 최신순
 }

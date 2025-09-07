@@ -2,6 +2,7 @@ package com.soomsoom.backend.application.service.user.query
 
 import com.soomsoom.backend.application.port.`in`.item.dto.toDto
 import com.soomsoom.backend.application.port.`in`.user.dto.CartDto
+import com.soomsoom.backend.application.port.`in`.user.dto.toDto
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindCartUseCase
 import com.soomsoom.backend.application.port.out.item.ItemPort
 import com.soomsoom.backend.application.port.out.user.CartPort
@@ -18,27 +19,15 @@ class FindCartService(
     private val cartPort: CartPort,
     private val userPort: UserPort,
     private val itemPort: ItemPort,
-) : FindCartUseCase{
+) : FindCartUseCase {
 
-    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
+    @PreAuthorize("#userId == authentication.principal.id")
     override fun findCart(userId: Long): CartDto {
-        val user = userPort.findById(userId) ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
+        val user = userPort.findById(userId)
+            ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
         val cart = cartPort.findByUserId(userId)
+        val items = itemPort.findAllByIds(cart.items.map { it.itemId })
 
-        if (cart == null || cart.items.isEmpty()) {
-            return CartDto(userId, emptyList(), 0)
-        }
-
-        val itemIds = cart.items.map { it.itemId }
-        val itemsInCart = itemPort.findItemsByIds(itemIds)
-
-        val itemDtoInCart = itemsInCart.map { it.toDto(user) }
-        val totalPrice = itemsInCart.sumOf { it.price.value }
-
-        return CartDto(
-            userId = userId,
-            items = itemDtoInCart,
-            totalPrice = totalPrice
-        )
+        return cart.toDto(user, items)
     }
 }

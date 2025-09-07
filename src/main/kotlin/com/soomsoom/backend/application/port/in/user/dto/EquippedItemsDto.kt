@@ -1,33 +1,33 @@
 package com.soomsoom.backend.application.port.`in`.user.dto
 
+import com.soomsoom.backend.application.port.`in`.item.dto.ItemDto
+import com.soomsoom.backend.application.port.`in`.item.dto.toDto
 import com.soomsoom.backend.domain.item.model.aggregate.Item
-import com.soomsoom.backend.domain.user.model.entity.OwnedItem
+import com.soomsoom.backend.domain.user.model.aggregate.User
 import com.soomsoom.backend.domain.user.model.vo.EquippedItems
 
 data class EquippedItemsDto(
-    val hat: OwnedItemDto?,
-    val eyewear: OwnedItemDto?,
-    val background: OwnedItemDto?,
-    val frame: OwnedItemDto?,
-    val floor: OwnedItemDto?,
-    val shelf: OwnedItemDto?,
+    val hat: ItemDto?,
+    val eyewear: ItemDto?,
+    val background: ItemDto?,
+    val frame: ItemDto?,
+    val floor: ItemDto?,
+    val shelf: ItemDto?,
 )
 
-fun EquippedItems.toDto(items: Map<Long, Item>): EquippedItemsDto {
-    val toOwnedItemDto: (Long?) -> OwnedItemDto? = { itemId ->
-        itemId?.let { id ->
-            items[id]?.let { item ->
-                OwnedItem(userId = 0L, itemId = id, acquisitionType = item.acquisitionType).toDto(item)
-            }
+fun EquippedItems.toDto(user: User, equippedItemMap: Map<Long, Item>): EquippedItemsDto {
+    fun getItemDtoForSlot(itemId: Long?): ItemDto? {
+        return itemId?.let { id ->
+            equippedItemMap[id]?.toDto(user)
         }
     }
 
     return EquippedItemsDto(
-        hat = toOwnedItemDto(this.hat),
-        eyewear = toOwnedItemDto(this.eyewear),
-        background = toOwnedItemDto(this.background),
-        frame = toOwnedItemDto(this.frame),
-        floor = toOwnedItemDto(this.floor),
-        shelf = toOwnedItemDto(this.shelf)
+        hat = getItemDtoForSlot(this.hat),
+        eyewear = getItemDtoForSlot(this.eyewear),
+        background = getItemDtoForSlot(this.background),
+        frame = getItemDtoForSlot(this.frame),
+        floor = getItemDtoForSlot(this.floor),
+        shelf = getItemDtoForSlot(this.shelf)
     )
 }

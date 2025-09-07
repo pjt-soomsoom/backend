@@ -6,5 +6,5 @@ class CartItem(
     val id: Long = 0L,
     val cartId: Long,
     val itemId: Long,
-    val addedAt: LocalDateTime = LocalDateTime.now()
+    val addedAt: LocalDateTime = LocalDateTime.now(),
 )

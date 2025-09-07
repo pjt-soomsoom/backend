@@ -21,7 +21,7 @@ class GrantRewardService(
 
         achievement.rewardPoints?.let { points ->
             if (points > 0) {
-                val command = AddUserPointsCommand(userId = userId, pointsToAdd = points)
+                val command = AddUserPointsCommand(userId = userId, amount = points)
                 addUserPointsUseCase.add(command)
             }
         }

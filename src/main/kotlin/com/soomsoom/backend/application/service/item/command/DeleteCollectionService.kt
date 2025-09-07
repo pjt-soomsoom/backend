@@ -1,6 +1,6 @@
 package com.soomsoom.backend.application.service.item.command
 
-import com.soomsoom.backend.application.port.`in`.item.usecase.command.DeleteCollectionUseCase
+import com.soomsoom.backend.application.port.`in`.item.usecase.command.collection.DeleteCollectionUseCase
 import com.soomsoom.backend.application.port.out.item.CollectionPort
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.item.CollectionErrorCode
@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class DeleteCollectionService(
-    private val collectionPort: CollectionPort
-) : DeleteCollectionUseCase{
+    private val collectionPort: CollectionPort,
+) : DeleteCollectionUseCase {
 
     @PreAuthorize("hasRole('ADMIN')")
     override fun deleteCollection(collectionId: Long) {
@@ -20,6 +20,7 @@ class DeleteCollectionService(
             ?: throw SoomSoomException(CollectionErrorCode.NOT_FOUND)
 
         collection.delete()
-        collectionPort.save(collection)
+
+        collectionPort.delete(collection)
     }
 }

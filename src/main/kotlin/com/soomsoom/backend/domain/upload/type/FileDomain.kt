@@ -4,4 +4,5 @@ enum class FileDomain {
     INSTRUCTORS,
     ACTIVITIES,
     ITEMS,
+    COLLECTIONS,
 }

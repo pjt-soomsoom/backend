@@ -1,8 +1,8 @@
 package com.soomsoom.backend.adapter.out.persistence.item
 
 import com.soomsoom.backend.adapter.out.persistence.item.repository.jpa.entity.CollectionJpaEntity
+import com.soomsoom.backend.domain.common.vo.Points
 import com.soomsoom.backend.domain.item.model.aggregate.Collection
-import com.soomsoom.backend.domain.item.model.vo.Points
 
 fun CollectionJpaEntity.toDomain(): Collection {
     return Collection.from(

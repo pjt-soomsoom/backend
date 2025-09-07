@@ -1,10 +1,9 @@
 package com.soomsoom.backend.adapter.out.persistence.item
 
 import com.soomsoom.backend.adapter.out.persistence.item.repository.jpa.entity.ItemJpaEntity
+import com.soomsoom.backend.domain.common.vo.Points
 import com.soomsoom.backend.domain.item.model.aggregate.Item
-import com.soomsoom.backend.domain.item.model.vo.Points
 import com.soomsoom.backend.domain.item.model.vo.Stock
-import java.time.LocalDateTime
 
 fun ItemJpaEntity.toDomain(): Item {
     return Item(
@@ -37,6 +36,6 @@ fun Item.toJpaEntity(): ItemJpaEntity {
         imageUrl = this.imageUrl,
         lottieUrl = this.lottieUrl,
         totalQuantity = this.stock.totalQuantity,
-        currentQuantity = this.stock.currentQuantity,
+        currentQuantity = this.stock.currentQuantity
     )
 }

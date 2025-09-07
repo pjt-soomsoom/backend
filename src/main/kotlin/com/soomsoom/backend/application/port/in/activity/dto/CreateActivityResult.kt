@@ -11,7 +11,6 @@ data class CreateActivityResult(
     val audioUploadInfo: FileUploadInfo,
 ) {
 
-
     companion object {
         /**
          * 활동 ID와 파일 업로드 URL 맵으로부터 CreateActivityResult 객체

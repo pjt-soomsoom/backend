@@ -1,6 +1,7 @@
 package com.soomsoom.backend.application.port.`in`.item.dto
 
 import com.soomsoom.backend.domain.item.model.aggregate.Item
+import com.soomsoom.backend.domain.item.model.enums.AcquisitionType
 import com.soomsoom.backend.domain.item.model.enums.EquipSlot
 import com.soomsoom.backend.domain.item.model.enums.ItemType
 import com.soomsoom.backend.domain.user.model.aggregate.User
@@ -12,17 +13,21 @@ data class ItemDto(
     val description: String?,
     val phrase: String?,
     val itemType: ItemType,
+    val equipSlot: EquipSlot, // ✨ 추가
+    val acquisitionType: AcquisitionType, // ✨ 도메인 모델과 일치시키기 위해 추가
     val price: Int,
     val imageUrl: String,
     val lottieUrl: String?,
     val isSoldOut: Boolean,
     val isOwned: Boolean,
     val isEquipped: Boolean,
-    val createdAt: LocalDateTime?
+    val createdAt: LocalDateTime,
+    val modifiedAt: LocalDateTime,
+    val deletedAt: LocalDateTime?,
 )
 
 fun Item.toDto(user: User): ItemDto {
-    val isOwned = user.ownedItems.contains(this.id)
+    val isOwned = user.hasItem(this.id)
     val isEquipped = user.equippedItems.let { equipped ->
         when (this.equipSlot) {
             EquipSlot.HAT -> equipped.hat == this.id
@@ -40,13 +45,17 @@ fun Item.toDto(user: User): ItemDto {
         description = this.description,
         phrase = this.phrase,
         itemType = this.itemType,
+        equipSlot = this.equipSlot,
+        acquisitionType = this.acquisitionType,
         price = this.price.value,
         imageUrl = this.imageUrl,
         lottieUrl = this.lottieUrl,
         isSoldOut = this.stock.isSoldOut(),
         isOwned = isOwned,
         isEquipped = isEquipped,
-        createdAt = this.createdAt
+        createdAt = this.createdAt!!,
+        modifiedAt = this.modifiedAt!!,
+        deletedAt = this.deletedAt
     )
 }
 
@@ -57,12 +66,16 @@ fun Item.toAdminDto(): ItemDto {
         description = this.description,
         phrase = this.phrase,
         itemType = this.itemType,
+        equipSlot = this.equipSlot,
+        acquisitionType = this.acquisitionType,
         price = this.price.value,
         imageUrl = this.imageUrl,
         lottieUrl = this.lottieUrl,
         isSoldOut = this.stock.isSoldOut(),
         isOwned = false,
         isEquipped = false,
-        createdAt = this.createdAt
+        createdAt = this.createdAt!!,
+        modifiedAt = this.modifiedAt!!,
+        deletedAt = this.deletedAt
     )
 }

@@ -16,7 +16,8 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "items")
 class ItemJpaEntity(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 
     var name: String,
@@ -45,5 +46,4 @@ class ItemJpaEntity(
     var totalQuantity: Int?,
 
     var currentQuantity: Int,
-) : BaseTimeEntity() {
-}
+) : BaseTimeEntity()

@@ -1,9 +1,9 @@
 package com.soomsoom.backend.application.service.item.command
 
-import com.soomsoom.backend.application.port.`in`.item.command.CompleteItemUploadCommand
-import com.soomsoom.backend.application.port.`in`.item.command.CreateItemCommand
+import com.soomsoom.backend.application.port.`in`.item.command.item.CompleteItemUploadCommand
+import com.soomsoom.backend.application.port.`in`.item.command.item.CreateItemCommand
 import com.soomsoom.backend.application.port.`in`.item.dto.CreateItemResult
-import com.soomsoom.backend.application.port.`in`.item.usecase.command.CreateItemUseCase
+import com.soomsoom.backend.application.port.`in`.item.usecase.command.item.CreateItemUseCase
 import com.soomsoom.backend.application.port.`in`.upload.dto.FileUploadInfo
 import com.soomsoom.backend.application.port.out.item.ItemPort
 import com.soomsoom.backend.application.port.out.upload.FileDeleterPort
@@ -12,9 +12,9 @@ import com.soomsoom.backend.application.port.out.upload.FileValidatorPort
 import com.soomsoom.backend.application.service.upload.FileUploadFacade
 import com.soomsoom.backend.application.service.upload.GenerateUploadUrlsRequest
 import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.common.vo.Points
 import com.soomsoom.backend.domain.item.ItemErrorCode
 import com.soomsoom.backend.domain.item.model.aggregate.Item
-import com.soomsoom.backend.domain.item.model.vo.Points
 import com.soomsoom.backend.domain.item.model.vo.Stock
 import com.soomsoom.backend.domain.upload.UploadErrorCode
 import com.soomsoom.backend.domain.upload.type.FileCategory
@@ -31,11 +31,11 @@ class CreateItemService(
     private val fileValidatorPort: FileValidatorPort,
     private val fileUrlResolverPort: FileUrlResolverPort,
     private val fileDeleterPort: FileDeleterPort,
-) : CreateItemUseCase{
+) : CreateItemUseCase {
 
     @PreAuthorize("hasRole('ADMIN')")
-    override fun createItem(command: CreateItemCommand): CreateItemResult {
-        val newItem = Item(
+    override fun create(command: CreateItemCommand): CreateItemResult {
+        val initialItem = Item(
             name = command.name,
             description = command.description,
             phrase = command.phrase,
@@ -43,16 +43,13 @@ class CreateItemService(
             equipSlot = command.equipSlot,
             acquisitionType = command.acquisitionType,
             price = Points(command.price),
-            imageUrl = "", // Presigned URL 업로드 전이므로 빈 값으로 초기화
+            stock = Stock(command.totalQuantity, command.totalQuantity ?: 1),
+            imageUrl = "",
             lottieUrl = null,
-            stock = Stock(
-                totalQuantity = command.totalQuantity,
-                currentQuantity = command.totalQuantity ?: 0
-            )
+            imageFileKey = "",
+            lottieFileKey = null
         )
-
-        val savedItem = itemPort.save(newItem)
-        val itemId = savedItem.id
+        val savedItem = itemPort.save(initialItem)
 
         val filesToUpload = mutableListOf<GenerateUploadUrlsRequest.FileInfo>()
         filesToUpload.add(GenerateUploadUrlsRequest.FileInfo(FileCategory.IMAGE, command.imageMetadata))
@@ -60,40 +57,46 @@ class CreateItemService(
             filesToUpload.add(GenerateUploadUrlsRequest.FileInfo(FileCategory.ANIMATION, it))
         }
 
-        val uploadUrls = fileUploadFacade.generateUploadUrls(
-            GenerateUploadUrlsRequest(
-                domain = FileDomain.ITEMS,
-                domainId = itemId,
-                files = filesToUpload
-            )
+        val request = GenerateUploadUrlsRequest(
+            domain = FileDomain.ITEMS,
+            domainId = savedItem.id,
+            files = filesToUpload
         )
+        val uploadUrls = fileUploadFacade.generateUploadUrls(request)
 
-        val imageUploadInfo = uploadUrls[FileCategory.IMAGE]!!
-        val lottieUploadInfo = uploadUrls[FileCategory.ANIMATION]
+        val imageUploadInfo = uploadUrls[FileCategory.IMAGE]!!.let {
+            FileUploadInfo(preSignedUrl = it.preSignedUrl, fileKey = it.fileKey)
+        }
+        val lottieUploadInfo = uploadUrls[FileCategory.ANIMATION]?.let {
+            FileUploadInfo(preSignedUrl = it.preSignedUrl, fileKey = it.fileKey)
+        }
 
         return CreateItemResult(
-            itemId = itemId,
-            imageUploadInfo = FileUploadInfo(imageUploadInfo.preSignedUrl, imageUploadInfo.fileKey),
-            lottieUploadInfo = lottieUploadInfo?.let { FileUploadInfo(it.preSignedUrl, it.fileKey) }
+            itemId = savedItem.id,
+            imageUploadInfo = imageUploadInfo,
+            lottieUploadInfo = lottieUploadInfo
         )
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    override fun completeItemUpload(command: CompleteItemUploadCommand) {
-        if (!fileValidatorPort.validate(command.imageFileKey)) {
+    override fun completeUpload(command: CompleteItemUploadCommand) {
+        val item = itemPort.findById(command.itemId)
+            ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
+
+        check(fileValidatorPort.validate(command.imageFileKey)) {
             throw SoomSoomException(UploadErrorCode.FILE_KEY_MISMATCH)
         }
         command.lottieFileKey?.let {
-            if (!fileValidatorPort.validate(it)) {
+            check(fileValidatorPort.validate(it)) {
                 throw SoomSoomException(UploadErrorCode.FILE_KEY_MISMATCH)
             }
         }
 
-        val item = itemPort.findById(command.itemId)
-            ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
+        val imageUrl = fileUrlResolverPort.resolve(command.imageFileKey)
+        val lottieUrl = command.lottieFileKey?.let { fileUrlResolverPort.resolve(it) }
 
-        item.imageUrl = fileUrlResolverPort.resolve(command.imageFileKey)
-        item.lottieUrl = command.lottieFileKey?.let { fileUrlResolverPort.resolve(it) }
+        item.updateImage(url = imageUrl, fileKey = command.imageFileKey)
+        item.updateLottie(url = lottieUrl, fileKey = command.lottieFileKey)
 
         itemPort.save(item)
     }

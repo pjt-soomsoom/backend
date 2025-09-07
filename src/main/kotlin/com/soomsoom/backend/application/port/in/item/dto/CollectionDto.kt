@@ -3,18 +3,24 @@ package com.soomsoom.backend.application.port.`in`.item.dto
 import com.soomsoom.backend.domain.item.model.aggregate.Collection
 import com.soomsoom.backend.domain.item.model.aggregate.Item
 import com.soomsoom.backend.domain.user.model.aggregate.User
+import java.time.LocalDateTime
 
 data class CollectionDto(
     val id: Long,
     val name: String,
     val description: String?,
     val phrase: String?,
+    val imageUrl: String,
+    val lottieUrl: String?,
     val basePrice: Int,
     val purchasePrice: Int,
     val ownedItemsCount: Int,
     val totalItemsCount: Int,
     val isOwned: Boolean,
     val items: List<ItemDto>?,
+    val createdAt: LocalDateTime,
+    val modifiedAt: LocalDateTime?,
+    val deletedAt: LocalDateTime?,
 )
 
 /**
@@ -27,12 +33,17 @@ fun Collection.toDto(items: List<Item>, user: User): CollectionDto {
         name = this.name,
         description = this.description,
         phrase = this.phrase,
+        imageUrl = this.imageUrl,
+        lottieUrl = this.lottieUrl,
         basePrice = this.basePrice.value,
         purchasePrice = this.calculatePurchasePrice(user, items).value,
         ownedItemsCount = items.count { user.ownedItems.contains(it.id) },
         totalItemsCount = items.size,
         isOwned = this.isCompletedBy(user),
-        items = items.map { it.toDto(user) }
+        items = items.map { it.toDto(user) },
+        createdAt = this.createdAt!!,
+        modifiedAt = this.modifiedAt,
+        deletedAt = this.deletedAt
     )
 }
 
@@ -46,12 +57,17 @@ fun Collection.toAdminDto(items: List<Item>): CollectionDto {
         name = this.name,
         description = this.description,
         phrase = this.phrase,
+        imageUrl = this.imageUrl,
+        lottieUrl = this.lottieUrl,
         basePrice = this.basePrice.value,
         purchasePrice = this.basePrice.value,
         ownedItemsCount = 0,
         totalItemsCount = items.size,
         isOwned = false,
-        items = items.map { it.toAdminDto() }
+        items = items.map { it.toAdminDto() },
+        createdAt = this.createdAt!!,
+        modifiedAt = this.modifiedAt,
+        deletedAt = this.deletedAt
     )
 }
 
@@ -65,11 +81,17 @@ fun Collection.toListDto(user: User, items: List<Item>): CollectionDto {
         name = this.name,
         description = this.description,
         phrase = this.phrase,
+        imageUrl = this.imageUrl,
+        lottieUrl = this.lottieUrl,
         basePrice = this.basePrice.value,
         purchasePrice = this.calculatePurchasePrice(user, items).value,
         ownedItemsCount = items.count { user.ownedItems.contains(it.id) },
         totalItemsCount = items.size,
         isOwned = this.isCompletedBy(user),
-        items = null // 목록 조회에서는 items 필드를 null로 설정
+        items = null, // 목록 조회에서는 items 필드를 null로 설정,
+        createdAt = this.createdAt!!,
+        modifiedAt = this.modifiedAt,
+        deletedAt = this.deletedAt
+
     )
 }

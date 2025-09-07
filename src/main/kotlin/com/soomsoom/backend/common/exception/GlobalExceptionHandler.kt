@@ -1,12 +1,14 @@
 package com.soomsoom.backend.common.exception
 
-import com.soomsoom.backend.common.DomainErrorReason.DELETED_ITEM
-import com.soomsoom.backend.common.DomainErrorReason.DUPLICATE_SLOT_IN_COLLECTION
-import com.soomsoom.backend.common.DomainErrorReason.ITEM_ALREADY_OWNED
-import com.soomsoom.backend.common.DomainErrorReason.ITEM_NOT_OWNED
-import com.soomsoom.backend.common.DomainErrorReason.ITEM_SOLD_OUT
-import com.soomsoom.backend.common.DomainErrorReason.NOT_ENOUGH_POINTS
-import com.soomsoom.backend.common.DomainErrorReason.NOT_PURCHASABLE_ITEM
+import com.soomsoom.backend.common.exception.DomainErrorReason.COLLECTION_ALREADY_OWNED
+import com.soomsoom.backend.common.exception.DomainErrorReason.DELETED_ITEM
+import com.soomsoom.backend.common.exception.DomainErrorReason.DUPLICATE_SLOT_IN_COLLECTION
+import com.soomsoom.backend.common.exception.DomainErrorReason.EMPTY_ITEMS_IN_COLLECTION
+import com.soomsoom.backend.common.exception.DomainErrorReason.ITEM_ALREADY_OWNED
+import com.soomsoom.backend.common.exception.DomainErrorReason.ITEM_NOT_OWNED
+import com.soomsoom.backend.common.exception.DomainErrorReason.ITEM_SOLD_OUT
+import com.soomsoom.backend.common.exception.DomainErrorReason.NOT_ENOUGH_POINTS
+import com.soomsoom.backend.common.exception.DomainErrorReason.NOT_PURCHASABLE_ITEM
 import com.soomsoom.backend.domain.item.CollectionErrorCode
 import com.soomsoom.backend.domain.item.ItemErrorCode
 import com.soomsoom.backend.domain.user.UserErrorCode
@@ -64,6 +66,8 @@ class GlobalExceptionHandler(
             ITEM_SOLD_OUT -> ItemErrorCode.SOLD_OUT
             // Collection
             DUPLICATE_SLOT_IN_COLLECTION -> CollectionErrorCode.DUPLICATE_SLOT
+            EMPTY_ITEMS_IN_COLLECTION -> CollectionErrorCode.EMPTY_ITEMS_IN_COLLECTION
+            COLLECTION_ALREADY_OWNED -> CollectionErrorCode.ALREADY_OWNED
             // User-Item
             ITEM_ALREADY_OWNED -> UserErrorCode.ITEM_ALREADY_OWNED
             NOT_ENOUGH_POINTS -> UserErrorCode.NOT_ENOUGH_POINTS

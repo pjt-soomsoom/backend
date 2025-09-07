@@ -23,22 +23,17 @@ class FindCollectionService(
     private val collectionPort: CollectionPort,
     private val itemPort: ItemPort,
     private val userPort: UserPort,
-) : FindCollectionUseCase{
+) : FindCollectionUseCase {
 
     @PreAuthorize("hasRole('ADMIN') or #criteria.userId == authentication.principal.id")
     override fun findCollections(criteria: FindCollectionsCriteria): Page<CollectionDto> {
         val user = userPort.findById(criteria.userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
-        val collectionPage = collectionPort.findAll(criteria)
-
-        // N+1 문제를 방지하기 위해, 필요한 모든 아이템을 한 번에 조회
-        val allItemIds = collectionPage.content.flatMap { it.itemIds }.distinct()
-        val allItems = itemPort.findItemsByIds(allItemIds).associateBy { it.id }
+        val collectionPage = collectionPort.searchWithItems(criteria)
 
         return collectionPage.map { collection ->
-            val itemsInThisCollection = collection.itemIds.mapNotNull { allItems[it] }
-            collection.toListDto(user, itemsInThisCollection)
+            collection.toListDto(user, collection.items)
         }
     }
 
@@ -50,8 +45,6 @@ class FindCollectionService(
         val collection = collectionPort.findById(collectionId, deletionStatus)
             ?: throw SoomSoomException(CollectionErrorCode.NOT_FOUND)
 
-        val itemsInCollection = itemPort.findItemsByIds(collection.itemIds)
-
-        return collection.toDto(itemsInCollection, user)
+        return collection.toDto(collection.items, user)
     }
 }

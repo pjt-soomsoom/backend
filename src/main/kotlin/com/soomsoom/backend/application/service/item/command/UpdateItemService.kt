@@ -1,14 +1,16 @@
 package com.soomsoom.backend.application.service.item.command
 
-import com.soomsoom.backend.application.port.`in`.item.command.CompleteItemImageUpdateCommand
-import com.soomsoom.backend.application.port.`in`.item.command.CompleteItemLottieUpdateCommand
-import com.soomsoom.backend.application.port.`in`.item.command.UpdateItemCommand
-import com.soomsoom.backend.application.port.`in`.item.command.UpdateItemImageCommand
-import com.soomsoom.backend.application.port.`in`.item.command.UpdateItemLottieCommand
+import com.soomsoom.backend.application.port.`in`.item.command.item.CompleteItemImageUpdateCommand
+import com.soomsoom.backend.application.port.`in`.item.command.item.CompleteItemLottieUpdateCommand
+import com.soomsoom.backend.application.port.`in`.item.command.item.UpdateItemImageCommand
+import com.soomsoom.backend.application.port.`in`.item.command.item.UpdateItemInfoCommand
+import com.soomsoom.backend.application.port.`in`.item.command.item.UpdateItemLottieCommand
 import com.soomsoom.backend.application.port.`in`.item.dto.ItemDto
 import com.soomsoom.backend.application.port.`in`.item.dto.UpdateItemFileResult
 import com.soomsoom.backend.application.port.`in`.item.dto.toAdminDto
-import com.soomsoom.backend.application.port.`in`.item.usecase.command.UpdateItemUseCase
+import com.soomsoom.backend.application.port.`in`.item.usecase.command.item.UpdateItemImageUseCase
+import com.soomsoom.backend.application.port.`in`.item.usecase.command.item.UpdateItemInfoUseCase
+import com.soomsoom.backend.application.port.`in`.item.usecase.command.item.UpdateItemLottieUseCase
 import com.soomsoom.backend.application.port.`in`.upload.dto.FileUploadInfo
 import com.soomsoom.backend.application.port.out.item.ItemPort
 import com.soomsoom.backend.application.port.out.upload.FileDeleterPort
@@ -17,8 +19,8 @@ import com.soomsoom.backend.application.port.out.upload.FileValidatorPort
 import com.soomsoom.backend.application.service.upload.FileUploadFacade
 import com.soomsoom.backend.application.service.upload.GenerateUploadUrlsRequest
 import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.common.vo.Points
 import com.soomsoom.backend.domain.item.ItemErrorCode
-import com.soomsoom.backend.domain.item.model.vo.Points
 import com.soomsoom.backend.domain.upload.UploadErrorCode
 import com.soomsoom.backend.domain.upload.type.FileCategory
 import com.soomsoom.backend.domain.upload.type.FileDomain
@@ -34,13 +36,14 @@ class UpdateItemService(
     private val fileValidatorPort: FileValidatorPort,
     private val fileUrlResolverPort: FileUrlResolverPort,
     private val fileDeleterPort: FileDeleterPort,
-) : UpdateItemUseCase{
+) : UpdateItemInfoUseCase, UpdateItemImageUseCase, UpdateItemLottieUseCase {
 
     @PreAuthorize("hasRole('ADMIN')")
-    override fun updateItem(command: UpdateItemCommand): ItemDto {
-        val item = itemPort.findById(command.itemId) ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
+    override fun updateInfo(command: UpdateItemInfoCommand): ItemDto {
+        val item = itemPort.findById(command.itemId)
+            ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
 
-        item.update(
+        item.updateInfo(
             name = command.name,
             description = command.description,
             phrase = command.phrase,
@@ -48,91 +51,86 @@ class UpdateItemService(
             newTotalQuantity = command.totalQuantity
         )
 
-        val savedItem = itemPort.save(item)
-
-        return savedItem.toAdminDto()
+        return itemPort.save(item).toAdminDto()
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    override fun updateItemImage(command: UpdateItemImageCommand): UpdateItemFileResult {
-        if (!itemPort.existsById(command.itemId)) {
-            throw SoomSoomException(ItemErrorCode.NOT_FOUND)
-        }
+    override fun updateImage(command: UpdateItemImageCommand): UpdateItemFileResult {
+        val item = itemPort.findById(command.itemId)
+            ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
 
-        val uploadUrls = fileUploadFacade.generateUploadUrls(
-            GenerateUploadUrlsRequest(
-                domain = FileDomain.ITEMS,
-                domainId = command.itemId,
-                files = listOf(GenerateUploadUrlsRequest.FileInfo(FileCategory.IMAGE, command.imageMetadata))
-            )
+        val request = GenerateUploadUrlsRequest(
+            domain = FileDomain.ITEMS,
+            domainId = item.id,
+            files = listOf(GenerateUploadUrlsRequest.FileInfo(FileCategory.IMAGE, command.imageMetadata))
         )
-        val imageUploadInfo = uploadUrls[FileCategory.IMAGE]!!
+        val uploadUrls = fileUploadFacade.generateUploadUrls(request)
+
+        val imageUploadUrl = uploadUrls[FileCategory.IMAGE]!!
+        val imageUploadInfo = FileUploadInfo(
+            preSignedUrl = imageUploadUrl.preSignedUrl,
+            fileKey = imageUploadUrl.fileKey
+        )
 
         return UpdateItemFileResult(
-            itemId = command.itemId,
-            fileUploadInfo = FileUploadInfo(imageUploadInfo.preSignedUrl, imageUploadInfo.fileKey)
+            itemId = item.id,
+            fileUploadInfo = imageUploadInfo
         )
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    override fun completeItemImageUpdate(command: CompleteItemImageUpdateCommand) {
-        if (!fileValidatorPort.validate(command.imageFileKey)) {
+    override fun completeImageUpdate(command: CompleteItemImageUpdateCommand) {
+        val item = itemPort.findById(command.itemId)
+            ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
+
+        check(fileValidatorPort.validate(command.imageFileKey)) {
             throw SoomSoomException(UploadErrorCode.FILE_KEY_MISMATCH)
         }
 
-        val item = itemPort.findById(command.itemId) ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
-
-        val oldImageKey = item.imageUrl
-        item.imageUrl = fileUrlResolverPort.resolve(command.imageFileKey)
-
+        val imageUrl = fileUrlResolverPort.resolve(command.imageFileKey)
+        val oldFileKey = item.updateImage(url = imageUrl, fileKey = command.imageFileKey)
         itemPort.save(item)
 
-        if (oldImageKey.isNotBlank()) {
-            fileDeleterPort.delete(oldImageKey)
-        }
+        oldFileKey?.let { fileDeleterPort.delete(it) }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    override fun updateItemLottie(command: UpdateItemLottieCommand): UpdateItemFileResult {
-        if (!itemPort.existsById(command.itemId)) {
-            throw SoomSoomException(ItemErrorCode.NOT_FOUND)
-        }
+    override fun updateLottie(command: UpdateItemLottieCommand): UpdateItemFileResult {
+        val item = itemPort.findById(command.itemId)
+            ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
 
-        val lottieMetadata = command.lottieMetadata
-        lottieMetadata ?: return UpdateItemFileResult(command.itemId, null)
-
-        val uploadUrls = fileUploadFacade.generateUploadUrls(
-            GenerateUploadUrlsRequest(
+        val lottieUploadInfo = command.lottieMetadata?.let {
+            val request = GenerateUploadUrlsRequest(
                 domain = FileDomain.ITEMS,
-                domainId = command.itemId,
-                files = listOf(GenerateUploadUrlsRequest.FileInfo(FileCategory.ANIMATION, lottieMetadata))
+                domainId = item.id,
+                files = listOf(GenerateUploadUrlsRequest.FileInfo(FileCategory.ANIMATION, it))
             )
-        )
-        val lottieUploadInfo = uploadUrls[FileCategory.ANIMATION]!!
+            val uploadUrls = fileUploadFacade.generateUploadUrls(request)
+            val lottieUploadUrl = uploadUrls[FileCategory.ANIMATION]!!
+            FileUploadInfo(preSignedUrl = lottieUploadUrl.preSignedUrl, fileKey = lottieUploadUrl.fileKey)
+        }
 
         return UpdateItemFileResult(
-            itemId = command.itemId,
-            fileUploadInfo = FileUploadInfo(lottieUploadInfo.preSignedUrl, lottieUploadInfo.fileKey)
+            itemId = item.id,
+            fileUploadInfo = lottieUploadInfo
         )
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    override fun completeItemLottieUpdate(command: CompleteItemLottieUpdateCommand) {
-        val item = itemPort.findById(command.itemId) ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
-        val oldLottieKey = item.lottieUrl
+    override fun completeLottieUpdate(command: CompleteItemLottieUpdateCommand) {
+        val item = itemPort.findById(command.itemId)
+            ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
 
-        val newLottieFileKey = command.lottieFileKey
-        if (newLottieFileKey == null) {
-            item.lottieUrl = null
-        } else {
-            if (!fileValidatorPort.validate(newLottieFileKey)) {
+        command.lottieFileKey?.let {
+            check(fileValidatorPort.validate(it)) {
                 throw SoomSoomException(UploadErrorCode.FILE_KEY_MISMATCH)
             }
-            item.lottieUrl = fileUrlResolverPort.resolve(newLottieFileKey)
         }
 
+        val lottieUrl = command.lottieFileKey?.let { fileUrlResolverPort.resolve(it) }
+        val oldFileKey = item.updateLottie(url = lottieUrl, fileKey = command.lottieFileKey)
         itemPort.save(item)
 
-        oldLottieKey?.let { fileDeleterPort.delete(it) }
+        oldFileKey?.let { fileDeleterPort.delete(it) }
     }
 }
