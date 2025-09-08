@@ -26,7 +26,18 @@ class CollectionJpaEntity(
     @Column(columnDefinition = "TEXT")
     var description: String?,
 
-    var basePrice: Int,
+    @Column(columnDefinition = "TEXT")
+    var phrase: String?,
+
+    @Column(nullable = false)
+    var imageUrl: String,
+
+    var lottieUrl: String?,
+
+    @Column(nullable = false)
+    var imageFileKey: String,
+
+    var lottieFileKey: String?,
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -40,9 +51,13 @@ class CollectionJpaEntity(
     fun update(domain: Collection, itemEntities: Set<ItemJpaEntity>) {
         this.name = domain.name
         this.description = domain.description
-        this.basePrice = domain.basePrice
+        this.phrase = domain.phrase
+        this.imageUrl = domain.imageUrl
+        this.lottieUrl = domain.lottieUrl
+        this.imageFileKey = domain.imageFileKey
+        this.lottieFileKey = domain.lottieFileKey
+        this.deletedAt = domain.deletedAt
         this.items.clear()
         this.items.addAll(itemEntities)
-        this.deletedAt = domain.deletedAt
     }
 }

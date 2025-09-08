@@ -24,6 +24,7 @@ class UpdateEquippedItemsService(
         val user = userPort.findById(command.userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
+        // 아이템 착용 전에 실제 아이템을 가지고 있는지 검증
         command.itemsToEquip.values.forEach { itemIdToEquip ->
             check(user.hasItem(itemIdToEquip)) {
                 throw SoomSoomException(UserErrorCode.ITEM_NOT_OWNED)

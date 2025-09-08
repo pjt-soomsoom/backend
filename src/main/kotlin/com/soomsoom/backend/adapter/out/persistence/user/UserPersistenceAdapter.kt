@@ -11,7 +11,7 @@ class UserPersistenceAdapter(
     private val userJpaRepository: UserJpaRepository,
 ) : UserPort {
     override fun save(user: User): User {
-        val entity = UserJpaEntity.from(user)
+        val entity = user.toEntity()
         return userJpaRepository.save(entity)
             .let(UserJpaEntity::toDomain)
     }
