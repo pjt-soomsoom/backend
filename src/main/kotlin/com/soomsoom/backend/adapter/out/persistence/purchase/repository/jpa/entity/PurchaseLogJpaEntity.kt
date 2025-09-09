@@ -17,7 +17,8 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "purchase_logs")
 class PurchaseLogJpaEntity(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 
     @Column(nullable = false, updatable = false)
@@ -34,5 +35,4 @@ class PurchaseLogJpaEntity(
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, updatable = false)
     val acquisitionType: AcquisitionType,
-): BaseTimeEntity() {
-}
+) : BaseTimeEntity()

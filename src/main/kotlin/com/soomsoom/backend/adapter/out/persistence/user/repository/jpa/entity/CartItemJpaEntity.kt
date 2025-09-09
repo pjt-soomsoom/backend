@@ -14,7 +14,8 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "cart_items")
 class CartItemJpaEntity(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 
     @ManyToOne(fetch = FetchType.LAZY)

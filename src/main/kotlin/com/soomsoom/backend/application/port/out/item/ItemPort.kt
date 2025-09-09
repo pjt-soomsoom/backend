@@ -14,4 +14,6 @@ interface ItemPort {
     fun search(criteria: FindItemsCriteria): Page<Item>
     fun delete(item: Item)
     fun findOwnedItems(criteria: FindOwnedItemsCriteria): Page<Item>
+    fun findAllByIdsForUpdate(itemIds: List<Long>): List<Item>
+    fun findByIdForUpdate(itemId: Long): Item?
 }

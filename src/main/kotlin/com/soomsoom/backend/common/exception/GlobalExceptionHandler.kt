@@ -73,7 +73,8 @@ class GlobalExceptionHandler(
             NOT_ENOUGH_POINTS -> UserErrorCode.NOT_ENOUGH_POINTS
             ITEM_NOT_OWNED -> UserErrorCode.ITEM_NOT_OWNED
             // 번역 규칙이 없는 경우, 예측하지 못한 서버 내부 오류로 처리
-            else -> return handleException(e as Exception)
+            else -> throw e
+//            else -> return handleException(e as Exception)
         }
 
         return ResponseEntity
@@ -81,10 +82,10 @@ class GlobalExceptionHandler(
             .body(errorCode.message(messageSource))
     }
 
-    @ExceptionHandler(Exception::class)
-    fun handleException(e: Exception): ResponseEntity<String> {
-        return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("알 수 없는 오류가 발생했습니다. 관리자에게 문의하세요.")
-    }
+//    @ExceptionHandler(Exception::class)
+//    fun handleException(e: Exception): ResponseEntity<String> {
+//        return ResponseEntity
+//            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+//            .body("알 수 없는 오류가 발생했습니다. 관리자에게 문의하세요.")
+//    }
 }

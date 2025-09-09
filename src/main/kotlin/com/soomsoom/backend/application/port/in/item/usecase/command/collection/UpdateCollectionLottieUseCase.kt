@@ -7,4 +7,5 @@ import com.soomsoom.backend.application.port.`in`.item.dto.UpdateCollectionFileR
 interface UpdateCollectionLottieUseCase {
     fun updateLottie(command: UpdateCollectionLottieCommand): UpdateCollectionFileResult
     fun completeLottieUpdate(command: CompleteCollectionLottieUpdateCommand)
+    fun removeLottie(collectionId: Long)
 }

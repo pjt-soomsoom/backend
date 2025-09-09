@@ -58,7 +58,7 @@ class UserJpaEntity(
     val ownedCollectionIds: MutableSet<Long> = mutableSetOf(),
 
     @Embedded
-    var equippedItems: EquippedItemsEmbeddable,
+    var equippedItems: EquippedItemsEmbeddable = EquippedItemsEmbeddable(null, null, null, null, null, null),
 ) : BaseTimeEntity() {
     enum class AccountType {
         ANONYMOUS, SOCIAL, ID_PASSWORD
@@ -67,6 +67,10 @@ class UserJpaEntity(
     fun update(domain: User) {
         this.role = domain.role
         this.points = PointsEmbeddable(domain.points.value)
+
+        if (this.equippedItems == null) {
+            this.equippedItems = EquippedItemsEmbeddable(null, null, null, null, null, null)
+        }
         this.equippedItems.update(domain.equippedItems)
 
         this.ownedItemIds.clear()

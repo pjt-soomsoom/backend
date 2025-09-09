@@ -34,4 +34,3 @@ data class EquippedItemsEmbeddable(
         this.shelf = domain.shelf
     }
 }
-

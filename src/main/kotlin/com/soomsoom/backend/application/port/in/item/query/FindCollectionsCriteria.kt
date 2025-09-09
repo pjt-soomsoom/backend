@@ -12,7 +12,8 @@ data class FindCollectionsCriteria(
 )
 
 enum class CollectionSortCriteria {
-    POPULARITY, // 인기순 (컬렉션 완성 유저 수 기준)
-    PRICE, // 가격순
-    LATEST, // 최신순
+    POPULARITY, // 인기순 (판매순)
+    PRICE_ASC,
+    PRICE_DESC,
+    CREATED,
 }

@@ -6,7 +6,7 @@ data class CreateCollectionCommand(
     val name: String,
     val description: String?,
     val phrase: String?,
-    val image: ValidatedFileMetadata,
-    val lottie: ValidatedFileMetadata?,
+    val imageMetadata: ValidatedFileMetadata,
+    val lottieMetadata: ValidatedFileMetadata?,
     val itemIds: List<Long>,
 )

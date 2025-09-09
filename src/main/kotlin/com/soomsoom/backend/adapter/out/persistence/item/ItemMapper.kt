@@ -27,9 +27,6 @@ fun Item.toEntity(): ItemJpaEntity {
     }
 }
 
-/**
- * ItemJpaEntity를 Item 도메인 객체로 변환합니다.
- */
 fun ItemJpaEntity.toDomain(): Item {
     return Item(
         id = this.id,

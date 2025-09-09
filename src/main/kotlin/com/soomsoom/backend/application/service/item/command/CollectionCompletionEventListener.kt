@@ -15,7 +15,7 @@ class CollectionCompletionEventListener(
     private val userPort: UserPort,
     private val userOwnedCollectionPort: UserOwnedCollectionPort,
 ) {
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     fun handleItemPurchasedEvent(event: Event<ItemPurchasedPayload>) {
         val payload = event.payload
         val userId = payload.userId

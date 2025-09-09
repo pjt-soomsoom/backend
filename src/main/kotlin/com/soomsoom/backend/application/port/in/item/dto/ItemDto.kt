@@ -13,8 +13,8 @@ data class ItemDto(
     val description: String?,
     val phrase: String?,
     val itemType: ItemType,
-    val equipSlot: EquipSlot, // ✨ 추가
-    val acquisitionType: AcquisitionType, // ✨ 도메인 모델과 일치시키기 위해 추가
+    val equipSlot: EquipSlot,
+    val acquisitionType: AcquisitionType,
     val price: Int,
     val imageUrl: String,
     val lottieUrl: String?,

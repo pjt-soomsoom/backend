@@ -13,7 +13,23 @@ data class EquippedItemsDto(
     val frame: ItemDto?,
     val floor: ItemDto?,
     val shelf: ItemDto?,
-)
+) {
+    companion object {
+        /**
+         * 장착한 아이템이 하나도 없는 상태를 나타내는 DTO를 생성
+         */
+        fun empty(): EquippedItemsDto {
+            return EquippedItemsDto(
+                hat = null,
+                eyewear = null,
+                background = null,
+                frame = null,
+                floor = null,
+                shelf = null
+            )
+        }
+    }
+}
 
 fun EquippedItems.toDto(user: User, equippedItemMap: Map<Long, Item>): EquippedItemsDto {
     fun getItemDtoForSlot(itemId: Long?): ItemDto? {

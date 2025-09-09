@@ -35,6 +35,8 @@ class SecurityConfig(
                 authorize
                     .requestMatchers(
                         "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
                         "/auth/admin/login",
                         "/auth/admin/sign-up"
                     ).permitAll()

@@ -7,6 +7,13 @@ class Cart(
     val userId: Long,
     items: MutableList<CartItem> = mutableListOf(),
 ) {
+    companion object {
+        fun create(
+            userId: Long,
+        ): Cart {
+            return Cart(0, userId)
+        }
+    }
     private val _items: MutableList<CartItem> = items
     val items: List<CartItem>
         get() = _items.toList()

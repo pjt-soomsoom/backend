@@ -135,4 +135,18 @@ class UpdateCollectionService(
 
         oldFileKey?.let { fileDeleterPort.delete(it) }
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    override fun removeLottie(collectionId: Long) {
+        val collection = collectionPort.findById(collectionId)
+            ?: throw SoomSoomException(CollectionErrorCode.NOT_FOUND)
+        val oldFileKey = collection.lottieFileKey
+        if (oldFileKey != null) {
+            fileDeleterPort.delete(oldFileKey)
+        }
+
+        collection.removeLottie()
+
+        collectionPort.save(collection)
+    }
 }

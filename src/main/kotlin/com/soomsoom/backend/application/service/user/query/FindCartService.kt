@@ -27,7 +27,6 @@ class FindCartService(
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
         val cart = cartPort.findByUserId(userId)
         val items = itemPort.findAllByIds(cart.items.map { it.itemId })
-
         return cart.toDto(user, items)
     }
 }

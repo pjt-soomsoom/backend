@@ -1,6 +1,6 @@
 package com.soomsoom.backend.application.service.item.command
 
-import com.soomsoom.backend.application.port.`in`.item.command.collection.CompleteICollectionUploadCommand
+import com.soomsoom.backend.application.port.`in`.item.command.collection.CompleteCollectionUploadCommand
 import com.soomsoom.backend.application.port.`in`.item.command.collection.CreateCollectionCommand
 import com.soomsoom.backend.application.port.`in`.item.dto.CreateCollectionResult
 import com.soomsoom.backend.application.port.`in`.item.usecase.command.collection.CreateCollectionUseCase
@@ -48,8 +48,8 @@ class CreateCollectionService(
         val savedCollection = collectionPort.save(initialCollection)
 
         val filesToUpload = mutableListOf<GenerateUploadUrlsRequest.FileInfo>()
-        filesToUpload.add(GenerateUploadUrlsRequest.FileInfo(FileCategory.IMAGE, command.image))
-        command.lottie?.let {
+        filesToUpload.add(GenerateUploadUrlsRequest.FileInfo(FileCategory.IMAGE, command.imageMetadata))
+        command.lottieMetadata?.let {
             filesToUpload.add(GenerateUploadUrlsRequest.FileInfo(FileCategory.ANIMATION, it))
         }
 
@@ -75,7 +75,7 @@ class CreateCollectionService(
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    override fun completeUpload(command: CompleteICollectionUploadCommand) {
+    override fun completeUpload(command: CompleteCollectionUploadCommand) {
         val collection = collectionPort.findById(command.collectionId)
             ?: throw SoomSoomException(CollectionErrorCode.NOT_FOUND)
 

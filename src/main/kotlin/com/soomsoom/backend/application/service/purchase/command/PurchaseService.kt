@@ -2,7 +2,7 @@ package com.soomsoom.backend.application.service.purchase.command
 
 import com.soomsoom.backend.application.port.`in`.item.dto.toDto
 import com.soomsoom.backend.application.port.`in`.purchase.command.PurchaseCartItemsCommand
-import com.soomsoom.backend.application.port.`in`.purchase.command.PurchaseItemCommand
+import com.soomsoom.backend.application.port.`in`.purchase.command.PurchaseItemsCommand
 import com.soomsoom.backend.application.port.`in`.purchase.dto.PurchaseResultDto
 import com.soomsoom.backend.application.port.`in`.purchase.usecase.PurchaseUseCase
 import com.soomsoom.backend.application.port.out.item.ItemPort
@@ -36,14 +36,17 @@ class PurchaseService(
 ) : PurchaseUseCase {
 
     @PreAuthorize("#command.userId == authentication.principal.id")
-    override fun purchaseItem(command: PurchaseItemCommand): PurchaseResultDto {
+    override fun purchaseItems(command: PurchaseItemsCommand): PurchaseResultDto {
         val user = userPort.findById(command.userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
-        val item = itemPort.findById(command.itemId)
-            ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
+        val itemsToPurchase = itemPort.findAllByIdsForUpdate(command.itemIds)
 
-        val purchasedItems = purchaseItemsInternal(user, listOf(item), item.price.value)
+        if (itemsToPurchase.size != command.itemIds.toSet().size) {
+            throw SoomSoomException(ItemErrorCode.NOT_FOUND)
+        }
+
+        val purchasedItems = purchaseItemsInternal(user, itemsToPurchase, command.expectedTotalPrice)
 
         return PurchaseResultDto(
             purchasedItems = purchasedItems.map { it.toDto(user) },
@@ -61,7 +64,7 @@ class PurchaseService(
             return PurchaseResultDto(emptyList(), user.points.value)
         }
 
-        val itemsToPurchase = itemPort.findAllByIds(cart.items.map { it.itemId })
+        val itemsToPurchase = itemPort.findAllByIdsForUpdate(cart.items.map { it.itemId })
         val purchasedItems = purchaseItemsInternal(user, itemsToPurchase, command.expectedTotalPrice)
 
         cart.clear()

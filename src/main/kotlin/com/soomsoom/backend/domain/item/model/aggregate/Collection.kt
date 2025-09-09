@@ -51,8 +51,7 @@ class Collection(
     }
 
     fun isCompletedBy(user: User): Boolean {
-        val collectionItemIds = this.items.map { it.id }.toSet()
-        return user.ownedItems.containsAll(collectionItemIds)
+        return user.hasCollection(this.id)
     }
 
     fun update(
@@ -80,6 +79,11 @@ class Collection(
         this.lottieUrl = url
         this.lottieFileKey = fileKey
         return if (oldFileKey != null && oldFileKey != fileKey) oldFileKey else null
+    }
+
+    fun removeLottie() {
+        this.lottieUrl = null
+        this.lottieFileKey = null
     }
 
     fun delete() {

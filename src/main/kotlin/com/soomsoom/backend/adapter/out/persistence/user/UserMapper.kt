@@ -23,7 +23,7 @@ fun User.toEntity(): UserJpaEntity {
         socialProvider = (this.account as? Account.Social)?.socialProvider,
         socialId = (this.account as? Account.Social)?.socialId,
         username = (this.account as? Account.IdPassword)?.username,
-        password = (this.account as? Account.IdPassword)?.password,
+        password = (this.account as? Account.IdPassword)?.password
     )
     entity.ownedItemIds.clear()
     entity.ownedItemIds.addAll(this.ownedItems)
@@ -38,6 +38,9 @@ fun UserJpaEntity.toDomain(): User {
         UserJpaEntity.AccountType.SOCIAL -> Account.Social(this.socialProvider!!, this.socialId!!, this.deviceId!!)
         UserJpaEntity.AccountType.ID_PASSWORD -> Account.IdPassword(this.username!!, this.password!!)
     }
+
+    val equippedItemsEmbeddable = this.equippedItems ?: EquippedItemsEmbeddable(null, null, null, null, null, null)
+
     return User.from(
         id = this.id,
         account = account,
@@ -46,12 +49,12 @@ fun UserJpaEntity.toDomain(): User {
         ownedItems = this.ownedItemIds,
         ownedCollections = this.ownedCollectionIds,
         equippedItems = EquippedItems(
-            hat = this.equippedItems.hat,
-            eyewear = this.equippedItems.eyewear,
-            background = this.equippedItems.background,
-            frame = this.equippedItems.frame,
-            floor = this.equippedItems.floor,
-            shelf = this.equippedItems.shelf
+            hat = equippedItemsEmbeddable.hat,
+            eyewear = equippedItemsEmbeddable.eyewear,
+            background = equippedItemsEmbeddable.background,
+            frame = equippedItemsEmbeddable.frame,
+            floor = equippedItemsEmbeddable.floor,
+            shelf = equippedItemsEmbeddable.shelf
         )
     )
 }
