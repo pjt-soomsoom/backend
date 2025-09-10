@@ -10,6 +10,8 @@ enum class PurchaseErrorCode(
     private val messageKey: String,
 ) : ErrorCode {
     PRICE_MISMATCH(HttpStatus.CONFLICT, "purchase.price-mismatch"),
+    ALREADY_PURCHASE(HttpStatus.CONFLICT, "purchase.already-purchase"),
+
     ;
 
     override val status: HttpStatus

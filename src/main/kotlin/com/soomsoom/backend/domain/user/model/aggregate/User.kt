@@ -19,12 +19,20 @@ class User private constructor(
     ownedItems: MutableSet<Long> = mutableSetOf(),
     ownedCollections: MutableSet<Long> = mutableSetOf(),
     var equippedItems: EquippedItems = EquippedItems(),
+    equippedCollections: MutableSet<Long> = mutableSetOf(),
 ) {
     private val _ownedItems: MutableSet<Long> = ownedItems
     val ownedItems: Set<Long> get() = _ownedItems.toSet()
 
     private val _ownedCollections: MutableSet<Long> = ownedCollections
     val ownedCollections: Set<Long> get() = _ownedCollections.toSet()
+
+    private val _equippedCollections: MutableSet<Long> = equippedCollections
+    val equippedCollections: Set<Long> get() = _equippedCollections.toSet()
+
+    fun getEquippedItemIds(): Set<Long> {
+        return this.equippedItems.values
+    }
 
     fun hasItem(itemId: Long): Boolean {
         return _ownedItems.contains(itemId)
@@ -60,6 +68,11 @@ class User private constructor(
         this.equippedItems = currentEquipped
     }
 
+    fun updateEquippedCollections(completedCollectionIds: Set<Long>) {
+        this._equippedCollections.clear()
+        this._equippedCollections.addAll(completedCollectionIds)
+    }
+
     companion object {
         fun from(
             id: Long?,
@@ -69,8 +82,18 @@ class User private constructor(
             ownedItems: Set<Long> = setOf(),
             ownedCollections: Set<Long> = setOf(),
             equippedItems: EquippedItems = EquippedItems(),
+            equippedCollections: Set<Long> = setOf(),
         ): User {
-            return User(id, account, role, points, ownedItems.toMutableSet(), ownedCollections.toMutableSet(), equippedItems)
+            return User(
+                id,
+                account,
+                role,
+                points,
+                ownedItems.toMutableSet(),
+                ownedCollections.toMutableSet(),
+                equippedItems,
+                equippedCollections.toMutableSet()
+            )
         }
 
         fun createAnonymous(deviceId: String): User {

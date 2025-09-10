@@ -37,15 +37,13 @@ class PurchaseService(
 
     @PreAuthorize("#command.userId == authentication.principal.id")
     override fun purchaseItems(command: PurchaseItemsCommand): PurchaseResultDto {
-        val user = userPort.findById(command.userId)
+        val user = userPort.findByIdWithCollections(command.userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
-        val itemsToPurchase = itemPort.findAllByIdsForUpdate(command.itemIds)
+        // 구매 가능한지 검증 후 가능하다면 구매할 아이템을 반환
+        val itemsToPurchase = validate(command.itemIds, user)
 
-        if (itemsToPurchase.size != command.itemIds.toSet().size) {
-            throw SoomSoomException(ItemErrorCode.NOT_FOUND)
-        }
-
+        // 구매 처리 및 구매 완료 이벤트 발행
         val purchasedItems = purchaseItemsInternal(user, itemsToPurchase, command.expectedTotalPrice)
 
         // 구매 완료한 물품은 장바구니에서 제거
@@ -61,17 +59,25 @@ class PurchaseService(
 
     @PreAuthorize("#command.userId == authentication.principal.id")
     override fun purchaseCartItems(command: PurchaseCartItemsCommand): PurchaseResultDto {
-        val user = userPort.findById(command.userId)
+        val user = userPort.findByIdWithCollections(command.userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
         val cart = cartPort.findByUserId(command.userId)
+        // 장바구니에 아무것도 없다면 빈 값 반환
         if (cart.items.isEmpty()) {
             return PurchaseResultDto(emptyList(), user.points.value)
         }
 
+        // 장바구니에서 구매할 아이템 목록 조회
         val itemsToPurchase = itemPort.findAllByIdsForUpdate(cart.items.map { it.itemId })
+
+        // 이미 구매한 아이템인지 검증
+        validateAlreadyOwned(itemsToPurchase.map { it.id }, user)
+
+        // 구매 처리 및 구매 완료 이벤트 발행
         val purchasedItems = purchaseItemsInternal(user, itemsToPurchase, command.expectedTotalPrice)
 
+        // 장바구니 비우기
         cart.clear()
         cartPort.save(cart)
 
@@ -79,6 +85,31 @@ class PurchaseService(
             purchasedItems = purchasedItems.map { it.toDto(user) },
             remainingPoints = user.points.value
         )
+    }
+
+    private fun validate(
+        itemIds: List<Long>,
+        user: User,
+    ): List<Item> {
+        // 이미 구매한 아이템이 존재하는지 확인
+        validateAlreadyOwned(itemIds, user)
+
+        val itemsToPurchase = itemPort.findAllByIdsForUpdate(itemIds)
+
+        // 구매할 아이템이 전부 존재하는지 확인
+        if (itemsToPurchase.size != itemIds.toSet().size) {
+            throw SoomSoomException(ItemErrorCode.NOT_FOUND)
+        }
+        return itemsToPurchase
+    }
+
+    private fun validateAlreadyOwned(
+        itemIds: List<Long>,
+        user: User,
+    ) {
+        if (itemIds.any { it in user.ownedItems }) {
+            throw SoomSoomException(PurchaseErrorCode.ALREADY_PURCHASE)
+        }
     }
 
     private fun purchaseItemsInternal(user: User, items: List<Item>, expectedTotalPrice: Int): List<Item> {

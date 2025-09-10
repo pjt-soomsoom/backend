@@ -22,7 +22,7 @@ class FindOwnedCollectionsService(
 
     @PreAuthorize("hasRole('ADMIN') or #criteria.userId == authentication.principal.id")
     override fun findOwnedCollections(criteria: FindOwnedCollectionsCriteria): Page<CollectionDto> {
-        val user = userPort.findById(criteria.userId)
+        val user = userPort.findByIdWithCollections(criteria.userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
         val ownedCollectionPage = collectionPort.findOwnedCollections(criteria)

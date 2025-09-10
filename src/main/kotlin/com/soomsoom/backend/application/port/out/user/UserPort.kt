@@ -11,4 +11,6 @@ interface UserPort {
     fun findById(userId: Long): User?
 
     fun findByUsername(username: String): User?
+
+    fun findByIdWithCollections(userId: Long): User?
 }

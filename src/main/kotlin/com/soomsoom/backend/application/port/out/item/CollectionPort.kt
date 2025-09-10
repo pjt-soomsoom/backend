@@ -13,4 +13,5 @@ interface CollectionPort {
     fun searchWithItems(criteria: FindCollectionsCriteria): Page<Collection>
     fun delete(collection: Collection)
     fun findOwnedCollections(criteria: FindOwnedCollectionsCriteria): Page<Collection>
+    fun findCompletableCollections(itemIds: Set<Long>): List<Collection>
 }

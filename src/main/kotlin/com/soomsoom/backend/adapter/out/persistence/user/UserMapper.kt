@@ -29,6 +29,8 @@ fun User.toEntity(): UserJpaEntity {
     entity.ownedItemIds.addAll(this.ownedItems)
     entity.ownedCollectionIds.clear()
     entity.ownedCollectionIds.addAll(this.ownedCollections)
+    entity.equippedCollectionIds.clear()
+    entity.equippedCollectionIds.addAll(this.equippedCollections)
     return entity
 }
 
@@ -40,7 +42,6 @@ fun UserJpaEntity.toDomain(): User {
     }
 
     val equippedItemsEmbeddable = this.equippedItems ?: EquippedItemsEmbeddable(null, null, null, null, null, null)
-
     return User.from(
         id = this.id,
         account = account,
@@ -55,6 +56,7 @@ fun UserJpaEntity.toDomain(): User {
             frame = equippedItemsEmbeddable.frame,
             floor = equippedItemsEmbeddable.floor,
             shelf = equippedItemsEmbeddable.shelf
-        )
+        ),
+        equippedCollections = this.equippedCollectionIds
     )
 }

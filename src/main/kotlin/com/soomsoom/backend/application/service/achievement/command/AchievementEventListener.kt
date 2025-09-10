@@ -9,6 +9,9 @@ import com.soomsoom.backend.common.event.payload.DiaryCreatedPayload
 import com.soomsoom.backend.common.event.payload.UserPlayTimeAccumulatedPayload
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
@@ -16,7 +19,12 @@ class ProgressUpdateEventListener(
     private val updateUserProgressUseCase: UpdateUserProgressUseCase,
 ) {
     @Async("threadPoolTaskExecutor")
-    @TransactionalEventListener
+    @TransactionalEventListener(
+        classes = [Event::class],
+        condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).DIARY_CREATED",
+        phase = TransactionPhase.AFTER_COMMIT
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleDiaryCreatedEvent(event: Event<DiaryCreatedPayload>) {
         updateUserProgressUseCase.updateProgress(event)
     }
@@ -25,13 +33,23 @@ class ProgressUpdateEventListener(
      * ActivityCompleted 이벤트를 직접 구독하는 리스너
      */
     @Async("threadPoolTaskExecutor")
-    @TransactionalEventListener
+    @TransactionalEventListener(
+        classes = [Event::class],
+        condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).ACTIVITY_COMPLETED",
+        phase = TransactionPhase.AFTER_COMMIT
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleActivityCompletedEvent(event: Event<ActivityCompletedPayload>) {
         updateUserProgressUseCase.updateProgress(event)
     }
 
     @Async("threadPoolTaskExecutor")
-    @TransactionalEventListener
+    @TransactionalEventListener(
+        classes = [Event::class],
+        condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).USER_PLAY_TIME_ACCUMULATED",
+        phase = TransactionPhase.AFTER_COMMIT
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleUserPlayTimeAccumulatedEvent(event: Event<UserPlayTimeAccumulatedPayload>) {
         updateUserProgressUseCase.updateProgress(event)
     }
@@ -42,7 +60,12 @@ class RewardEventListener(
     private val grantRewardUseCase: GrantRewardUseCase,
 ) {
     @Async("threadPoolTaskExecutor")
-    @TransactionalEventListener
+    @TransactionalEventListener(
+        classes = [Event::class],
+        condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).ACHIEVEMENT_ACHIEVED",
+        phase = TransactionPhase.AFTER_COMMIT
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleAchievementAchievedEvent(event: Event<AchievementAchievedNotificationPayload>) {
         grantRewardUseCase.grantReward(event.payload.userId, event.payload.achievementId)
     }
