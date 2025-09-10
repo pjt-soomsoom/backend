@@ -1,7 +1,7 @@
 package com.soomsoom.backend.adapter.`in`.security.service
 
 import com.soomsoom.backend.domain.user.model.Account
-import com.soomsoom.backend.domain.user.model.User
+import com.soomsoom.backend.domain.user.model.aggregate.User
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails

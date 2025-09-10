@@ -1,32 +1,54 @@
 package com.soomsoom.backend.adapter.`in`.web.api.user
 
 import com.soomsoom.backend.adapter.`in`.security.service.CustomUserDetails
+import com.soomsoom.backend.adapter.`in`.web.api.user.request.UpdateEquippedItemsRequest
 import com.soomsoom.backend.application.port.`in`.activityhistory.dto.FindMySummaryResult
 import com.soomsoom.backend.application.port.`in`.activityhistory.usecase.query.FindMySummaryUseCase
 import com.soomsoom.backend.application.port.`in`.favorite.dto.FavoriteActivityResult
 import com.soomsoom.backend.application.port.`in`.favorite.usecase.query.FindFavoriteActivitiesUseCase
 import com.soomsoom.backend.application.port.`in`.follow.dto.FollowingInstructorResult
 import com.soomsoom.backend.application.port.`in`.follow.usecase.query.FindFollowingInstructorsUseCase
+import com.soomsoom.backend.application.port.`in`.item.dto.CollectionDto
+import com.soomsoom.backend.application.port.`in`.item.dto.ItemDto
+import com.soomsoom.backend.application.port.`in`.user.command.UpdateEquippedItemsCommand
+import com.soomsoom.backend.application.port.`in`.user.dto.EquippedItemsDto
+import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedCollectionsCriteria
+import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedItemsCriteria
+import com.soomsoom.backend.application.port.`in`.user.usecase.command.UpdateEquippedItemsUseCase
+import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindEquippedItemsUseCase
+import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindOwnedCollectionsUseCase
+import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindOwnedItemsUseCase
+import com.soomsoom.backend.domain.common.DeletionStatus
+import com.soomsoom.backend.domain.item.model.enums.ItemType
+import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@RequestMapping("/users/me")
 class UserController(
     private val findFavoriteActivitiesUseCase: FindFavoriteActivitiesUseCase,
     private val findFollowingInstructorsUseCase: FindFollowingInstructorsUseCase,
     private val findMySummaryUseCase: FindMySummaryUseCase,
+    private val updateEquippedItemsUseCase: UpdateEquippedItemsUseCase,
+    private val findOwnedItemsUseCase: FindOwnedItemsUseCase,
+    private val findEquippedItemsUseCase: FindEquippedItemsUseCase,
+    private val findOwnedCollectionsUseCase: FindOwnedCollectionsUseCase,
 ) {
 
     /**
      * 내가 즐겨찾기한 활동 목록 조회
      */
-    @GetMapping("/users/me/favorites")
+    @GetMapping("/favorites")
     @ResponseStatus(HttpStatus.OK)
     fun findMyFavorites(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
@@ -40,7 +62,7 @@ class UserController(
     /**
      * 내가 팔로우한 강사 목록 조회
      */
-    @GetMapping("/users/me/following")
+    @GetMapping("/following")
     @ResponseStatus(HttpStatus.OK)
     fun findMyFollowing(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
@@ -54,7 +76,7 @@ class UserController(
     /**
      * 마이페이지 활동 요약 정보 조회
      */
-    @GetMapping("/users/me/summary")
+    @GetMapping("/summary")
     @ResponseStatus(HttpStatus.OK)
     fun getMySummary(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
@@ -62,5 +84,67 @@ class UserController(
     ): FindMySummaryResult {
         val targetUserId = userId ?: userDetails.id
         return findMySummaryUseCase.find(targetUserId)
+    }
+
+    /**
+     * 현재 장착 중인 아이템 목록을 조회
+     */
+    @GetMapping("/equipped-items")
+    fun getMyEquippedItems(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+    ): EquippedItemsDto {
+        return findEquippedItemsUseCase.findEquippedItems(userDetails.id)
+    }
+
+    /**
+     * 현재 장착 아이템 목록을 수정(전체 교체)
+     */
+    @PutMapping("/equipped-items")
+    @ResponseStatus(HttpStatus.OK)
+    fun updateMyEquippedItems(
+        @Valid @RequestBody
+        request: UpdateEquippedItemsRequest,
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+    ) {
+        val command = UpdateEquippedItemsCommand(userDetails.id, request.itemsToEquip)
+        updateEquippedItemsUseCase.updateEquippedItems(command)
+    }
+
+    /**
+     * 내가 소유한 아이템 목록을 조회
+     */
+    @GetMapping("/owned-items")
+    fun getMyOwnedItems(
+        @RequestParam(required = false) userId: Long?,
+        @RequestParam(required = false) itemType: ItemType?,
+        pageable: Pageable,
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+        @RequestParam(required = false) deletionStatus: DeletionStatus?,
+    ): Page<ItemDto> {
+        val targetUserId = userId ?: userDetails.id
+        val criteria = FindOwnedItemsCriteria(
+            userId = targetUserId,
+            itemType = itemType,
+            pageable = pageable,
+            deletionStatus = deletionStatus ?: DeletionStatus.ACTIVE
+        )
+        return findOwnedItemsUseCase.findOwnedItems(criteria)
+    }
+
+    /**
+     * 내가 소유한 컬렉션 목록을 조회
+     */
+    @GetMapping("/owned-collections")
+    fun getMyOwnedCollections(
+        @RequestParam(required = false) userId: Long?,
+        pageable: Pageable,
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+    ): Page<CollectionDto> {
+        val targetUserId = userId ?: userDetails.id
+        val criteria = FindOwnedCollectionsCriteria(
+            userId = targetUserId,
+            pageable = pageable
+        )
+        return findOwnedCollectionsUseCase.findOwnedCollections(criteria)
     }
 }

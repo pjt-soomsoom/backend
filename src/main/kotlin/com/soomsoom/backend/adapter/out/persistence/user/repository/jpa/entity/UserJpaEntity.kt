@@ -1,16 +1,22 @@
 package com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.entity
 
+import com.soomsoom.backend.adapter.out.persistence.common.entity.PointsEmbeddable
 import com.soomsoom.backend.common.entity.BaseTimeEntity
-import com.soomsoom.backend.domain.user.model.Account
-import com.soomsoom.backend.domain.user.model.Role
-import com.soomsoom.backend.domain.user.model.User
+import com.soomsoom.backend.domain.user.model.aggregate.Role
+import com.soomsoom.backend.domain.user.model.aggregate.User
+import jakarta.persistence.AttributeOverride
+import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
+import jakarta.persistence.ElementCollection
+import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
 import jakarta.persistence.Table
 
 @Entity
@@ -35,57 +41,42 @@ class UserJpaEntity(
     var password: String?,
 
     @Enumerated(EnumType.STRING)
-    val role: Role,
+    var role: Role,
+
+    @Embedded
+    @AttributeOverride(name = "value", column = Column(name = "points", nullable = false))
+    var points: PointsEmbeddable,
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "user_owned_items", joinColumns = [JoinColumn(name = "user_id")])
+    @Column(name = "item_id")
+    val ownedItemIds: MutableSet<Long> = mutableSetOf(),
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "user_owned_collections", joinColumns = [JoinColumn(name = "user_id")])
+    @Column(name = "collection_id")
+    val ownedCollectionIds: MutableSet<Long> = mutableSetOf(),
+
+    @Embedded
+    var equippedItems: EquippedItemsEmbeddable = EquippedItemsEmbeddable(null, null, null, null, null, null),
 ) : BaseTimeEntity() {
     enum class AccountType {
         ANONYMOUS, SOCIAL, ID_PASSWORD
     }
 
-    // 도메인 객체를 DB 엔티티로 변환
-    companion object {
-        fun from(user: User): UserJpaEntity {
-            return when (val account = user.account) {
-                is Account.Anonymous -> UserJpaEntity(
-                    user.id ?: 0L,
-                    account.deviceId,
-                    AccountType.ANONYMOUS,
-                    null,
-                    null,
-                    null,
-                    null,
-                    user.role
-                )
-                is Account.Social -> UserJpaEntity(
-                    user.id ?: 0L,
-                    account.deviceId,
-                    AccountType.SOCIAL,
-                    account.socialProvider,
-                    account.socialId,
-                    null,
-                    null,
-                    user.role
-                )
-                is Account.IdPassword -> UserJpaEntity(
-                    user.id ?: 0L,
-                    null,
-                    AccountType.ID_PASSWORD,
-                    null,
-                    null,
-                    account.username,
-                    account.password,
-                    user.role
-                )
-            }
-        }
-    }
+    fun update(domain: User) {
+        this.role = domain.role
+        this.points = PointsEmbeddable(domain.points.value)
 
-    // DB 엔티티를 도메인 객체로 변환
-    fun toDomain(): User {
-        val account = when (this.accountType) {
-            AccountType.ANONYMOUS -> Account.Anonymous(this.deviceId!!)
-            AccountType.SOCIAL -> Account.Social(this.socialProvider!!, this.socialId!!, this.deviceId!!)
-            AccountType.ID_PASSWORD -> Account.IdPassword(this.username!!, this.password!!)
+        if (this.equippedItems == null) {
+            this.equippedItems = EquippedItemsEmbeddable(null, null, null, null, null, null)
         }
-        return User.from(this.id, account, this.role)
+        this.equippedItems.update(domain.equippedItems)
+
+        this.ownedItemIds.clear()
+        this.ownedItemIds.addAll(domain.ownedItems)
+
+        this.ownedCollectionIds.clear()
+        this.ownedCollectionIds.addAll(domain.ownedCollections)
     }
 }

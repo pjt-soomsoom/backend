@@ -1,6 +1,6 @@
 package com.soomsoom.backend.application.port.`in`.user.command
 
-data class DeductUserPointsCommand(
+data class GrantItemToUserCommand(
     val userId: Long,
-    val pointsToDeduct: Int,
+    val itemId: Long,
 )

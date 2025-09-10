@@ -12,9 +12,6 @@ class UserConfigurer : DomainSecurityConfigurer {
         authorize: AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry,
     ) {
         authorize.requestMatchers(HttpMethod.GET, "/users/me/**").hasAnyRole("USER", "ADMIN")
-        authorize.requestMatchers(HttpMethod.POST, "/users/**").hasAnyRole("USER", "ADMIN")
-        authorize.requestMatchers(HttpMethod.PUT, "/users/**").hasAnyRole("USER", "ADMIN")
-        authorize.requestMatchers(HttpMethod.DELETE, "/users/**").hasAnyRole("USER", "ADMIN")
-        authorize.requestMatchers(HttpMethod.PATCH, "/users/**").hasAnyRole("USER", "ADMIN")
+        authorize.requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
     }
 }

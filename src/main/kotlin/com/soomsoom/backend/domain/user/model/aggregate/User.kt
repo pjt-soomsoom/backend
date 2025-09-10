@@ -1,0 +1,103 @@
+package com.soomsoom.backend.domain.user.model.aggregate
+
+import com.soomsoom.backend.common.exception.DomainErrorReason.COLLECTION_ALREADY_OWNED
+import com.soomsoom.backend.common.exception.DomainErrorReason.ITEM_ALREADY_OWNED
+import com.soomsoom.backend.domain.common.vo.Points
+import com.soomsoom.backend.domain.item.model.enums.EquipSlot
+import com.soomsoom.backend.domain.user.model.Account
+import com.soomsoom.backend.domain.user.model.vo.EquippedItems
+
+enum class Role {
+    ROLE_ANONYMOUS, ROLE_USER, ROLE_ADMIN
+}
+
+class User private constructor(
+    val id: Long?,
+    val account: Account,
+    val role: Role,
+    var points: Points,
+    ownedItems: MutableSet<Long> = mutableSetOf(),
+    ownedCollections: MutableSet<Long> = mutableSetOf(),
+    var equippedItems: EquippedItems = EquippedItems(),
+) {
+    private val _ownedItems: MutableSet<Long> = ownedItems
+    val ownedItems: Set<Long> get() = _ownedItems.toSet()
+
+    private val _ownedCollections: MutableSet<Long> = ownedCollections
+    val ownedCollections: Set<Long> get() = _ownedCollections.toSet()
+
+    fun hasItem(itemId: Long): Boolean {
+        return _ownedItems.contains(itemId)
+    }
+
+    fun hasCollection(collectionId: Long): Boolean {
+        return _ownedCollections.contains(collectionId)
+    }
+
+    fun addPoints(amount: Points) {
+        this.points += amount
+    }
+
+    fun deductPoints(amount: Points) {
+        this.points -= amount
+    }
+
+    fun ownItem(itemId: Long) {
+        check(!_ownedItems.contains(itemId)) { ITEM_ALREADY_OWNED }
+        _ownedItems.add(itemId)
+    }
+
+    fun ownCollection(collectionId: Long) {
+        check(!hasCollection(collectionId)) { COLLECTION_ALREADY_OWNED }
+        _ownedCollections.add(collectionId)
+    }
+
+    fun updateEquippedItems(itemsToEquip: Map<EquipSlot, Long>) {
+        var currentEquipped = EquippedItems() // 빈 장비창에서 시작
+        itemsToEquip.forEach { (slot, itemId) ->
+            currentEquipped = currentEquipped.equip(slot, itemId)
+        }
+        this.equippedItems = currentEquipped
+    }
+
+    companion object {
+        fun from(
+            id: Long?,
+            account: Account,
+            role: Role,
+            points: Points = Points(0),
+            ownedItems: Set<Long> = setOf(),
+            ownedCollections: Set<Long> = setOf(),
+            equippedItems: EquippedItems = EquippedItems(),
+        ): User {
+            return User(id, account, role, points, ownedItems.toMutableSet(), ownedCollections.toMutableSet(), equippedItems)
+        }
+
+        fun createAnonymous(deviceId: String): User {
+            return User(
+                id = null,
+                account = Account.Anonymous(deviceId),
+                role = Role.ROLE_ANONYMOUS,
+                points = Points(0)
+            )
+        }
+
+        fun createSocial(socialProvider: String, socialId: String, deviceId: String): User {
+            return User(
+                id = null,
+                account = Account.Social(socialProvider, socialId, deviceId),
+                role = Role.ROLE_USER,
+                points = Points(0)
+            )
+        }
+
+        fun createAdmin(username: String, password: String): User {
+            return User(
+                id = null,
+                account = Account.IdPassword(username, password),
+                role = Role.ROLE_ADMIN,
+                points = Points(10000000)
+            )
+        }
+    }
+}

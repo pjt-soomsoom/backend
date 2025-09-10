@@ -6,4 +6,5 @@ enum class FileCategory {
     VIDEO,
     AUDIO,
     ANIMATION,
+    IMAGE,
 }

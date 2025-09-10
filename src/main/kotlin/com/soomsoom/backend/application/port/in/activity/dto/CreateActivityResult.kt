@@ -1,5 +1,6 @@
 package com.soomsoom.backend.application.port.`in`.activity.dto
 
+import com.soomsoom.backend.application.port.`in`.upload.dto.FileUploadInfo
 import com.soomsoom.backend.application.port.out.upload.dto.FileUploadUrl
 import com.soomsoom.backend.common.utils.getOrThrow
 import com.soomsoom.backend.domain.upload.type.FileCategory
@@ -9,10 +10,6 @@ data class CreateActivityResult(
     val thumbnailUploadInfo: FileUploadInfo,
     val audioUploadInfo: FileUploadInfo,
 ) {
-    data class FileUploadInfo(
-        val preSignedUrl: String,
-        val fileKey: String,
-    )
 
     companion object {
         /**
