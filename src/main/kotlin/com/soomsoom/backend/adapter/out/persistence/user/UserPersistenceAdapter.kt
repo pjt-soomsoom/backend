@@ -1,6 +1,7 @@
 package com.soomsoom.backend.adapter.out.persistence.user
 
 import com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.UserJpaRepository
+import com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.UserQueryDslRepository
 import com.soomsoom.backend.application.port.out.user.UserPort
 import com.soomsoom.backend.domain.user.model.aggregate.User
 import org.springframework.stereotype.Repository
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Repository
 @Repository
 class UserPersistenceAdapter(
     private val userJpaRepository: UserJpaRepository,
+    private val userQueryDslRepository: UserQueryDslRepository,
 ) : UserPort {
     override fun save(user: User): User {
         val entity = user.id?.let { userJpaRepository.findById(it).orElse(null) }
@@ -28,5 +30,9 @@ class UserPersistenceAdapter(
 
     override fun findByUsername(username: String): User? {
         return userJpaRepository.findByUsername(username)?.toDomain()
+    }
+
+    override fun findByIdWithCollections(userId: Long): User? {
+        return userQueryDslRepository.findByIdWithCollections(userId)?.toDomain()
     }
 }

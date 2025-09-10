@@ -14,7 +14,7 @@ class GrantItemToUserService(
     private val userPort: UserPort,
 ) : GrantItemToUserUseCase {
     override fun grantItemToUser(command: GrantItemToUserCommand) {
-        val user = userPort.findById(command.userId)
+        val user = userPort.findByIdWithCollections(command.userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
         if (!user.hasItem(command.itemId)) {

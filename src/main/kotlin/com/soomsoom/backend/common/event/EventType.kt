@@ -15,4 +15,7 @@ enum class EventType {
 
     // 아이템 구매(획득)
     ITEM_PURCHASED,
+
+    // 아이템 착용
+    ITEMS_EQUIPPED,
 }

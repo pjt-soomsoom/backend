@@ -17,7 +17,7 @@ class FindEquippedItemsService(
     private val itemPort: ItemPort,
 ) : FindEquippedItemsUseCase {
     override fun findEquippedItems(userId: Long): EquippedItemsDto {
-        val user = userPort.findById(userId)
+        val user = userPort.findByIdWithCollections(userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
         val equippedItemIds = listOfNotNull(

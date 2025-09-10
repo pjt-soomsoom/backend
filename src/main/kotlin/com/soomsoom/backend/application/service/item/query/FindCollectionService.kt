@@ -6,7 +6,6 @@ import com.soomsoom.backend.application.port.`in`.item.dto.toListDto
 import com.soomsoom.backend.application.port.`in`.item.query.FindCollectionsCriteria
 import com.soomsoom.backend.application.port.`in`.item.usecase.query.FindCollectionUseCase
 import com.soomsoom.backend.application.port.out.item.CollectionPort
-import com.soomsoom.backend.application.port.out.item.ItemPort
 import com.soomsoom.backend.application.port.out.user.UserPort
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.common.DeletionStatus
@@ -21,13 +20,12 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class FindCollectionService(
     private val collectionPort: CollectionPort,
-    private val itemPort: ItemPort,
     private val userPort: UserPort,
 ) : FindCollectionUseCase {
 
     @PreAuthorize("hasRole('ADMIN') or #criteria.userId == authentication.principal.id")
     override fun findCollections(criteria: FindCollectionsCriteria): Page<CollectionDto> {
-        val user = userPort.findById(criteria.userId)
+        val user = userPort.findByIdWithCollections(criteria.userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
         val collectionPage = collectionPort.searchWithItems(criteria)
@@ -39,7 +37,7 @@ class FindCollectionService(
 
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     override fun findCollectionDetails(userId: Long, collectionId: Long, deletionStatus: DeletionStatus): CollectionDto {
-        val user = userPort.findById(userId)
+        val user = userPort.findByIdWithCollections(userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
         val collection = collectionPort.findById(collectionId, deletionStatus)

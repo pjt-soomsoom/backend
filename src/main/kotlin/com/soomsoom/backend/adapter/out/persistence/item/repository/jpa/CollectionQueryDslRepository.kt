@@ -6,6 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.soomsoom.backend.adapter.out.persistence.item.repository.jpa.entity.CollectionJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.item.repository.jpa.entity.QCollectionJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.item.repository.jpa.entity.QCollectionJpaEntity.collectionJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.item.repository.jpa.entity.QItemJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.item.repository.jpa.entity.QItemJpaEntity.itemJpaEntity
@@ -27,7 +28,7 @@ class CollectionQueryDslRepository(
      * 컬렉션 목록을 동적 조건으로 조회 (Item 정보 미포함)
      */
     fun search(criteria: FindCollectionsCriteria, pageable: Pageable): Page<CollectionJpaEntity> {
-        return findInternal(criteria, pageable, false)
+        return findInternal(criteria, pageable, true)
     }
 
     /**
@@ -54,6 +55,7 @@ class CollectionQueryDslRepository(
             )
 
         val results = queryFactory.selectFrom(collectionJpaEntity)
+            .leftJoin(collectionJpaEntity.items, itemJpaEntity).fetchJoin()
             .where(whereClause)
             // TODO: 소유 컬렉션 정렬 기준 추가
             .orderBy(collectionJpaEntity.createdAt.desc())
@@ -67,6 +69,26 @@ class CollectionQueryDslRepository(
             .fetchOne() ?: 0L
 
         return PageImpl(results, pageable, total)
+    }
+
+    fun findCompletableCollections(itemIds: Set<Long>): List<CollectionJpaEntity> {
+        val subCollection = QCollectionJpaEntity("subCollection")
+        val subItem = QItemJpaEntity("subItem")
+
+        return queryFactory
+            .selectFrom(collectionJpaEntity)
+            .leftJoin(collectionJpaEntity.items, itemJpaEntity).fetchJoin()
+            .where(
+                JPAExpressions.selectOne()
+                    .from(subCollection)
+                    .join(subCollection.items, subItem)
+                    .where(
+                        subCollection.id.eq(collectionJpaEntity.id),
+                        subItem.id.notIn(itemIds)
+                    )
+                    .notExists()
+            )
+            .fetch()
     }
 
     private fun findInternal(criteria: FindCollectionsCriteria, pageable: Pageable, fetchItems: Boolean): Page<CollectionJpaEntity> {

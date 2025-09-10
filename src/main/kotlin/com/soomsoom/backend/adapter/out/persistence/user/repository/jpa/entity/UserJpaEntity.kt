@@ -59,6 +59,12 @@ class UserJpaEntity(
 
     @Embedded
     var equippedItems: EquippedItemsEmbeddable = EquippedItemsEmbeddable(null, null, null, null, null, null),
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "user_equipped_collections", joinColumns = [JoinColumn(name = "user_id")])
+    @Column(name = "collection_id")
+    var equippedCollectionIds: MutableSet<Long> = mutableSetOf(),
+
 ) : BaseTimeEntity() {
     enum class AccountType {
         ANONYMOUS, SOCIAL, ID_PASSWORD
@@ -78,5 +84,8 @@ class UserJpaEntity(
 
         this.ownedCollectionIds.clear()
         this.ownedCollectionIds.addAll(domain.ownedCollections)
+
+        this.equippedCollectionIds.clear()
+        this.equippedCollectionIds.addAll(domain.equippedCollections)
     }
 }

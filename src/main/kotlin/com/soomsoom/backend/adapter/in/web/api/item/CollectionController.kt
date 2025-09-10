@@ -73,9 +73,9 @@ class CollectionController(
     fun findCollection(
         @PathVariable collectionId: Long,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-        @RequestParam(required = false) deletionStatus: DeletionStatus?
+        @RequestParam(required = false) deletionStatus: DeletionStatus?,
     ): CollectionDto {
-        return findCollectionUseCase.findCollectionDetails(collectionId, userDetails.id, deletionStatus ?: DeletionStatus.ACTIVE)
+        return findCollectionUseCase.findCollectionDetails(userDetails.id, collectionId, deletionStatus ?: DeletionStatus.ACTIVE)
     }
 
     @PostMapping

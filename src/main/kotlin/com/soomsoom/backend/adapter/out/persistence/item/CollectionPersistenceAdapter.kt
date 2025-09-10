@@ -49,6 +49,10 @@ class CollectionPersistenceAdapter(
         return collectionQueryDslRepository.findOwnedCollections(criteria, criteria.pageable).map { it.toDomain() }
     }
 
+    override fun findCompletableCollections(itemIds: Set<Long>): List<Collection> {
+        return collectionQueryDslRepository.findCompletableCollections(itemIds).map { it.toDomain() }
+    }
+
     override fun delete(collection: Collection) {
         save(collection)
     }
