@@ -24,6 +24,7 @@ import com.soomsoom.backend.application.port.`in`.item.usecase.command.collectio
 import com.soomsoom.backend.application.port.`in`.item.usecase.command.collection.UpdateCollectionLottieUseCase
 import com.soomsoom.backend.application.port.`in`.item.usecase.query.FindCollectionUseCase
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
+import com.soomsoom.backend.domain.common.DeletionStatus
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -56,12 +57,14 @@ class CollectionController(
         @RequestParam(defaultValue = "false") excludeOwned: Boolean,
         pageable: Pageable,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
+        @RequestParam(required = false) deletionStatus: DeletionStatus?,
     ): Page<CollectionDto> {
         val criteria = FindCollectionsCriteria(
             userId = userDetails.id,
             sortCriteria = sort,
             excludeOwned = excludeOwned,
-            pageable = pageable
+            pageable = pageable,
+            deletionStatus = deletionStatus ?: DeletionStatus.ACTIVE
         )
         return findCollectionUseCase.findCollections(criteria)
     }
@@ -70,8 +73,9 @@ class CollectionController(
     fun findCollection(
         @PathVariable collectionId: Long,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
+        @RequestParam(required = false) deletionStatus: DeletionStatus?
     ): CollectionDto {
-        return findCollectionUseCase.findCollectionDetails(collectionId, userDetails.id)
+        return findCollectionUseCase.findCollectionDetails(collectionId, userDetails.id, deletionStatus ?: DeletionStatus.ACTIVE)
     }
 
     @PostMapping

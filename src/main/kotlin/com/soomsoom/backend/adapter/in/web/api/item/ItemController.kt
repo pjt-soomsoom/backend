@@ -24,6 +24,7 @@ import com.soomsoom.backend.application.port.`in`.item.usecase.command.item.Upda
 import com.soomsoom.backend.application.port.`in`.item.usecase.command.item.UpdateItemLottieUseCase
 import com.soomsoom.backend.application.port.`in`.item.usecase.query.FindItemUseCase
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
+import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.item.model.enums.ItemType
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -60,6 +61,7 @@ class ItemController(
         @RequestParam(required = false) itemType: ItemType?,
         @RequestParam(required = true) sort: ItemSortCriteria,
         @RequestParam(defaultValue = "false") excludeOwned: Boolean,
+        @RequestParam(required = false) deletionStatus: DeletionStatus?,
         pageable: Pageable,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
     ): Page<ItemDto> {
@@ -68,7 +70,8 @@ class ItemController(
             itemType = itemType,
             sortCriteria = sort,
             excludeOwned = excludeOwned,
-            pageable = pageable
+            pageable = pageable,
+            deletionStatus = deletionStatus ?: DeletionStatus.ACTIVE
         )
 
         return findItemUseCase.findItems(criteria)
@@ -81,8 +84,9 @@ class ItemController(
     fun findItem(
         @PathVariable itemId: Long,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
+        @RequestParam(required = false) deletionStatus: DeletionStatus?,
     ): ItemDto {
-        return findItemUseCase.findItem(itemId, userDetails.id)
+        return findItemUseCase.findItem(itemId, userDetails.id, deletionStatus ?: DeletionStatus.ACTIVE)
     }
 
     /**

@@ -20,7 +20,7 @@ class FindOwnedItemsService(
     private val itemPort: ItemPort,
 ) : FindOwnedItemsUseCase {
 
-    @PreAuthorize("#criteria.userId == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or #criteria.userId == authentication.principal.id")
     override fun findOwnedItems(criteria: FindOwnedItemsCriteria): Page<ItemDto> {
         val user = userPort.findById(criteria.userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)

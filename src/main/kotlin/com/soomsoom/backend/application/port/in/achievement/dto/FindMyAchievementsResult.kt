@@ -37,7 +37,7 @@ data class FindMyAchievementsResult(
                 // 미달성 시, 현재 진행도를 보여줌
                 userProgress?.let {
                     ProgressInfo(currentValue = it.currentValue, targetValue = targetValue)
-                }
+                } ?: ProgressInfo(currentValue = 0, targetValue = targetValue)
             }
 
             return FindMyAchievementsResult(

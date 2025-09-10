@@ -5,4 +5,7 @@ enum class ItemType {
     HAT,
     BACKGROUND,
     FURNITURE,
+    SHELF,
+    FLOOR,
+    FRAME,
 }

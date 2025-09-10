@@ -18,6 +18,7 @@ import com.soomsoom.backend.application.port.`in`.user.usecase.command.UpdateEqu
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindEquippedItemsUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindOwnedCollectionsUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindOwnedItemsUseCase
+import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.item.model.enums.ItemType
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -114,14 +115,18 @@ class UserController(
      */
     @GetMapping("/owned-items")
     fun getMyOwnedItems(
+        @RequestParam(required = false) userId: Long?,
         @RequestParam(required = false) itemType: ItemType?,
         pageable: Pageable,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
+        @RequestParam(required = false) deletionStatus: DeletionStatus?,
     ): Page<ItemDto> {
+        val targetUserId = userId ?: userDetails.id
         val criteria = FindOwnedItemsCriteria(
-            userId = userDetails.id,
+            userId = targetUserId,
             itemType = itemType,
-            pageable = pageable
+            pageable = pageable,
+            deletionStatus = deletionStatus ?: DeletionStatus.ACTIVE
         )
         return findOwnedItemsUseCase.findOwnedItems(criteria)
     }
@@ -131,11 +136,13 @@ class UserController(
      */
     @GetMapping("/owned-collections")
     fun getMyOwnedCollections(
+        @RequestParam(required = false) userId: Long?,
         pageable: Pageable,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
     ): Page<CollectionDto> {
+        val targetUserId = userId ?: userDetails.id
         val criteria = FindOwnedCollectionsCriteria(
-            userId = userDetails.id,
+            userId = targetUserId,
             pageable = pageable
         )
         return findOwnedCollectionsUseCase.findOwnedCollections(criteria)

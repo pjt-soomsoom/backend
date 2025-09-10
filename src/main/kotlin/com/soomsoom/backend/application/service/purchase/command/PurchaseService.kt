@@ -48,6 +48,11 @@ class PurchaseService(
 
         val purchasedItems = purchaseItemsInternal(user, itemsToPurchase, command.expectedTotalPrice)
 
+        // 구매 완료한 물품은 장바구니에서 제거
+        val cart = cartPort.findByUserId(command.userId)
+        purchasedItems.forEach { cart.removeItem(it.id) }
+        cartPort.save(cart)
+
         return PurchaseResultDto(
             purchasedItems = purchasedItems.map { it.toDto(user) },
             remainingPoints = user.points.value
