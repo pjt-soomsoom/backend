@@ -1,11 +1,14 @@
 package com.soomsoom.backend.domain.activity.model
 
+import com.soomsoom.backend.domain.activity.model.enums.ActivityCategory
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import java.time.LocalDateTime
 
 class BreathingActivity(
     id: Long?,
     title: String,
     descriptions: List<String>,
+    category: ActivityCategory,
     authorId: Long,
     narratorId: Long,
     durationInSeconds: Int,
@@ -21,6 +24,7 @@ class BreathingActivity(
     id = id,
     title = title,
     descriptions = descriptions,
+    category = category,
     authorId = authorId,
     narratorId = narratorId,
     durationInSeconds = durationInSeconds,

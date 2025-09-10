@@ -1,6 +1,7 @@
 package com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity
 
 import com.soomsoom.backend.domain.activity.model.Activity
+import com.soomsoom.backend.domain.activity.model.enums.ActivityCategory
 import jakarta.persistence.DiscriminatorValue
 import jakarta.persistence.Entity
 import jakarta.persistence.PrimaryKeyJoinColumn
@@ -17,7 +18,10 @@ class MeditationActivityJpaEntity(
     narratorId: Long,
     durationInSeconds: Int,
     thumbnailImageUrl: String?,
+    thumbnailFileKey: String?,
     audioUrl: String?,
+    audioFileKey: String?,
+    category: ActivityCategory,
 ) : ActivityJpaEntity(
     title = title,
     descriptions = descriptions,
@@ -26,8 +30,9 @@ class MeditationActivityJpaEntity(
     durationInSeconds = durationInSeconds,
     thumbnailImageUrl = thumbnailImageUrl,
     audioUrl = audioUrl,
-    thumbnailFileKey = null,
-    audioFileKey = null
+    thumbnailFileKey = thumbnailFileKey,
+    audioFileKey = audioFileKey,
+    category = category
 ) {
     override fun update(activity: Activity) {
         super.update(activity)

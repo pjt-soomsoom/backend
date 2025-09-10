@@ -4,6 +4,7 @@ import com.soomsoom.backend.application.port.`in`.activity.command.CompleteActiv
 import com.soomsoom.backend.application.port.`in`.activity.command.CreateActivityCommand
 import com.soomsoom.backend.application.port.`in`.activity.command.CreateBreathingActivityCommand
 import com.soomsoom.backend.application.port.`in`.activity.command.CreateMeditationActivityCommand
+import com.soomsoom.backend.application.port.`in`.activity.command.CreateSoundEffectActivityCommand
 import com.soomsoom.backend.application.port.`in`.activity.dto.CreateActivityResult
 import com.soomsoom.backend.application.port.`in`.activity.usecase.command.CreateActivityUseCase
 import com.soomsoom.backend.application.port.out.activity.ActivityPort
@@ -19,6 +20,7 @@ import com.soomsoom.backend.domain.activity.ActivityErrorCode
 import com.soomsoom.backend.domain.activity.model.Activity
 import com.soomsoom.backend.domain.activity.model.BreathingActivity
 import com.soomsoom.backend.domain.activity.model.MeditationActivity
+import com.soomsoom.backend.domain.activity.model.SoundEffectActivity
 import com.soomsoom.backend.domain.instructor.InstructorErrorCode
 import com.soomsoom.backend.domain.upload.UploadErrorCode
 import com.soomsoom.backend.domain.upload.type.FileCategory
@@ -98,13 +100,19 @@ class CreateActivityService(
                 authorId = command.authorId, narratorId = command.narratorId,
                 durationInSeconds = command.durationInSeconds, thumbnailImageUrl = null,
                 thumbnailFileKey = null, audioUrl = null, audioFileKey = null,
-                timeline = command.timeline
+                timeline = command.timeline, category = command.category
             )
             is CreateMeditationActivityCommand -> MeditationActivity(
                 id = null, title = command.title, descriptions = command.descriptions,
                 authorId = command.authorId, narratorId = command.narratorId,
                 durationInSeconds = command.durationInSeconds, thumbnailImageUrl = null,
-                thumbnailFileKey = null, audioUrl = null, audioFileKey = null
+                thumbnailFileKey = null, audioUrl = null, audioFileKey = null, category = command.category
+            )
+            is CreateSoundEffectActivityCommand -> SoundEffectActivity(
+                id = null, title = command.title, descriptions = command.descriptions,
+                authorId = command.authorId, narratorId = command.narratorId,
+                durationInSeconds = command.durationInSeconds, thumbnailImageUrl = null,
+                thumbnailFileKey = null, audioUrl = null, audioFileKey = null, category = command.category
             )
         }
     }

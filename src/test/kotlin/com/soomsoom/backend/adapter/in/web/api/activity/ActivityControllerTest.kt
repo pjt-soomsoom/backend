@@ -18,7 +18,7 @@ import com.soomsoom.backend.application.port.`in`.activity.usecase.command.Updat
 import com.soomsoom.backend.application.port.`in`.activity.usecase.command.UpdateActivityTimelineUseCase
 import com.soomsoom.backend.application.port.`in`.activity.usecase.query.FindActivityUseCase
 import com.soomsoom.backend.application.port.`in`.activity.usecase.query.SearchActivitiesUseCase
-import com.soomsoom.backend.domain.activity.model.ActivityType
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.fixture.TestUserFixture
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every

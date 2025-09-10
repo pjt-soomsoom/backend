@@ -1,7 +1,7 @@
 package com.soomsoom.backend.common.event.payload
 
 import com.soomsoom.backend.common.event.Payload
-import com.soomsoom.backend.domain.activity.model.ActivityType
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import java.time.LocalDateTime
 
 /**

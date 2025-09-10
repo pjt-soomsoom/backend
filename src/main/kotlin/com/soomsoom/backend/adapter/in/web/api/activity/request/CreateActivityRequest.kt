@@ -4,11 +4,13 @@ import com.soomsoom.backend.adapter.`in`.web.api.upload.request.FileMetadata
 import com.soomsoom.backend.application.port.`in`.activity.command.CreateActivityCommand
 import com.soomsoom.backend.application.port.`in`.activity.command.CreateBreathingActivityCommand
 import com.soomsoom.backend.application.port.`in`.activity.command.CreateMeditationActivityCommand
+import com.soomsoom.backend.application.port.`in`.activity.command.CreateSoundEffectActivityCommand
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
-import com.soomsoom.backend.domain.activity.model.ActivityType
 import com.soomsoom.backend.domain.activity.model.TimelineEvent
+import com.soomsoom.backend.domain.activity.model.enums.ActivityCategory
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
@@ -29,6 +31,8 @@ data class CreateActivityRequest(
     val durationInSeconds: Int?,
     @field:NotNull(message = "활동 타입은 필수입니다.")
     val type: ActivityType?,
+    @field:NotNull(message = "카테고리는 필수입니다.")
+    val category: ActivityCategory?,
     @field:NotNull(message = "썸네일 이미지 정보는 필수입니다.") @field:Valid
     val thumbnailImageMetadata: FileMetadata?,
     @field:NotNull(message = "오디오 파일 정보는 필수입니다.") @field:Valid
@@ -55,7 +59,8 @@ fun CreateActivityRequest.toCommand(): CreateActivityCommand {
             durationInSeconds = this.durationInSeconds!!,
             thumbnailImageMetadata = validatedThumbnail,
             audioMetadata = validatedAudio,
-            timeline = this.timeline ?: emptyList()
+            timeline = this.timeline ?: emptyList(),
+            category = this.category!!
         )
         ActivityType.MEDITATION -> CreateMeditationActivityCommand(
             title = this.title!!,
@@ -64,7 +69,18 @@ fun CreateActivityRequest.toCommand(): CreateActivityCommand {
             narratorId = this.narratorId!!,
             durationInSeconds = this.durationInSeconds!!,
             thumbnailImageMetadata = validatedThumbnail,
-            audioMetadata = validatedAudio
+            audioMetadata = validatedAudio,
+            category = this.category!!
+        )
+        ActivityType.SOUND_EFFECT -> CreateSoundEffectActivityCommand(
+            title = this.title!!,
+            descriptions = this.descriptions!!,
+            authorId = this.authorId!!,
+            narratorId = this.narratorId!!,
+            durationInSeconds = this.durationInSeconds!!,
+            thumbnailImageMetadata = validatedThumbnail,
+            audioMetadata = validatedAudio,
+            category = this.category!!
         )
         else -> throw SoomSoomException(ActivityErrorCode.UNSUPPORTED_ACTIVITY_TYPE)
     }

@@ -7,7 +7,7 @@ import com.soomsoom.backend.application.port.out.activityhistory.ActivityHistory
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
 import com.soomsoom.backend.domain.achievement.model.ConditionType
 import com.soomsoom.backend.domain.achievement.model.UserProgress
-import com.soomsoom.backend.domain.activity.model.ActivityType
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Component
 import java.time.temporal.ChronoUnit
 

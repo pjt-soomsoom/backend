@@ -7,7 +7,7 @@ import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.j
 import com.soomsoom.backend.adapter.out.persistence.activityhistory.toDomain
 import com.soomsoom.backend.adapter.out.persistence.activityhistory.toEntity
 import com.soomsoom.backend.application.port.out.activityhistory.ActivityHistoryPort
-import com.soomsoom.backend.domain.activity.model.ActivityType
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.activityhistory.model.ActivityCompletionLog
 import com.soomsoom.backend.domain.activityhistory.model.ActivityProgress
 import com.soomsoom.backend.domain.activityhistory.model.UserActivitySummary

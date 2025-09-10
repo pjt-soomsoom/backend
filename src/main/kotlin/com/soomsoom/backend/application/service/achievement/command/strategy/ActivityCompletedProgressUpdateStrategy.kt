@@ -4,7 +4,7 @@ package com.soomsoom.backend.application.service.achievement.command.strategy
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.Payload
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
-import com.soomsoom.backend.domain.activity.model.ActivityType
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Component
 
 @Component

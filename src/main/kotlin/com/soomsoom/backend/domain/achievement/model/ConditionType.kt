@@ -19,6 +19,9 @@ enum class ConditionType {
     BREATHING_MULTI_TYPE_COUNT, // 여러 종류(4종) 호흡 완료 횟수
     BREATHING_TOTAL_SECONDS, // 호흡 총 시간
 
+    // 효과음 관련
+    SOUND_EFFECT_TOTAL_SECONDS,
+
     // 히든 업적 관련
     HIDDEN_DIARY_PERFECT_MONTH, // 한 달(30일) 모든 일기 기록 여부 (값: 1이면 달성)
     HIDDEN_EMOTION_OVERCOME, // 최악의 기분 -> 최고의 기분 변화 여부 (값: 1이면 달성)

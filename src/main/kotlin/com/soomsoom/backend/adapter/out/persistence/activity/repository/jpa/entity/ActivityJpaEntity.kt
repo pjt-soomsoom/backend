@@ -2,11 +2,14 @@ package com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.ent
 
 import com.soomsoom.backend.common.entity.BaseTimeEntity
 import com.soomsoom.backend.domain.activity.model.Activity
+import com.soomsoom.backend.domain.activity.model.enums.ActivityCategory
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
 import jakarta.persistence.DiscriminatorColumn
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType.LAZY
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType.IDENTITY
@@ -20,7 +23,7 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "activities")
 @Inheritance(strategy = JOINED)
-@DiscriminatorColumn(name = "acitivity_type")
+@DiscriminatorColumn(name = "activity_type")
 abstract class ActivityJpaEntity(
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -34,6 +37,10 @@ abstract class ActivityJpaEntity(
     var thumbnailFileKey: String?,
     var audioFileKey: String?,
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false)
+    var category: ActivityCategory,
+
     @ElementCollection(fetch = LAZY)
     @CollectionTable(name = "activity_descriptions", joinColumns = [JoinColumn(name = "activity_id")])
     @OrderColumn(name = "sequence")
@@ -43,6 +50,7 @@ abstract class ActivityJpaEntity(
     open fun update(activity: Activity) {
         this.title = activity.title
         this.descriptions = activity.descriptions.toMutableList()
+        this.category = activity.category
         this.authorId = activity.authorId
         this.narratorId = activity.narratorId
         this.durationInSeconds = activity.durationInSeconds
