@@ -5,8 +5,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.BreathingActivityJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.MeditationActivityJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.QActivityJpaEntity.activityJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.SoundEffectActivityJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.entity.QActivityCompletionLogJpaEntity.activityCompletionLogJpaEntity
-import com.soomsoom.backend.domain.activity.model.ActivityType
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
 
@@ -50,6 +51,7 @@ class ActivityCompletionLogQueryDslRepository(
         return when (activityType) {
             ActivityType.BREATHING -> activityJpaEntity.instanceOf(BreathingActivityJpaEntity::class.java)
             ActivityType.MEDITATION -> activityJpaEntity.instanceOf(MeditationActivityJpaEntity::class.java)
+            ActivityType.SOUND_EFFECT -> activityJpaEntity.instanceOf(SoundEffectActivityJpaEntity::class.java)
         }
     }
 }

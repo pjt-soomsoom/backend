@@ -5,8 +5,8 @@ import com.soomsoom.backend.application.port.`in`.activity.command.CompleteBreat
 import com.soomsoom.backend.application.port.`in`.activity.command.CompleteMeditationActivityAudioChangeCommand
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
-import com.soomsoom.backend.domain.activity.model.ActivityType
 import com.soomsoom.backend.domain.activity.model.TimelineEvent
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 

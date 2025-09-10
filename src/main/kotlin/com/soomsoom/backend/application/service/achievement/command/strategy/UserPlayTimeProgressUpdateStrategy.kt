@@ -9,7 +9,7 @@ import com.soomsoom.backend.common.event.Payload
 import com.soomsoom.backend.common.event.payload.UserPlayTimeAccumulatedPayload
 import com.soomsoom.backend.domain.achievement.model.ConditionType
 import com.soomsoom.backend.domain.achievement.model.UserProgress
-import com.soomsoom.backend.domain.activity.model.ActivityType
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Component
 
 @Component
@@ -28,6 +28,7 @@ class UserPlayTimeProgressUpdateStrategy(
         val type = when (payload.activityType) {
             ActivityType.MEDITATION -> ConditionType.MEDITATION_TOTAL_SECONDS
             ActivityType.BREATHING -> ConditionType.BREATHING_TOTAL_SECONDS
+            ActivityType.SOUND_EFFECT -> ConditionType.SOUND_EFFECT_TOTAL_SECONDS
         }
 
         val conditions = achievementPort.findConditionsByType(type)

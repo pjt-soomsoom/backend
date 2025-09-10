@@ -1,7 +1,7 @@
 package com.soomsoom.backend.common.event.payload
 
 import com.soomsoom.backend.common.event.Payload
-import com.soomsoom.backend.domain.activity.model.ActivityType
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 
 /**
  * '사용자 누적 시간 갱신' 이벤트의 내용물

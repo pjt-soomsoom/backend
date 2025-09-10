@@ -22,7 +22,7 @@ class UpdateActivityMetadataService(
         val activity = activityPort.findById(command.activityId)
             ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
 
-        activity.updateMetadata(command.title, command.descriptions)
+        activity.updateMetadata(command.title, command.descriptions, command.category)
 
         activityPort.save(activity)
         return activityPort.findByIdWithInstructors(command.activityId, command.userId)

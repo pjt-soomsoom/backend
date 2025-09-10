@@ -1,5 +1,7 @@
 package com.soomsoom.backend.domain.activity.model
 
+import com.soomsoom.backend.domain.activity.model.enums.ActivityCategory
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import java.time.LocalDateTime
 
 abstract class Activity(
@@ -8,6 +10,7 @@ abstract class Activity(
     open var thumbnailImageUrl: String?,
     open var thumbnailFileKey: String?,
     open var descriptions: List<String>,
+    open var category: ActivityCategory,
     open var authorId: Long,
     open var narratorId: Long,
     open var durationInSeconds: Int,
@@ -45,12 +48,13 @@ abstract class Activity(
     /**
      * 메타데이터(제목, 설명 등) 수정
      */
-    fun updateMetadata(title: String, descriptions: List<String>) {
+    fun updateMetadata(title: String, descriptions: List<String>, category: ActivityCategory) {
         require(title.isNotBlank()) { "제목은 비워둘 수 없습니다." }
         require(descriptions.isNotEmpty()) { "설명은 비워둘 수 없습니다." }
 
         this.title = title
         this.descriptions = descriptions
+        this.category = category
     }
 
     /**

@@ -9,9 +9,9 @@ import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.payload.UserPlayTimeAccumulatedPayload
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
-import com.soomsoom.backend.domain.activity.model.ActivityType
 import com.soomsoom.backend.domain.activity.model.BreathingActivity
 import com.soomsoom.backend.domain.activity.model.MeditationActivity
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.activityhistory.model.ActivityProgress
 import com.soomsoom.backend.domain.activityhistory.model.UserActivitySummary
 import org.springframework.context.ApplicationEventPublisher

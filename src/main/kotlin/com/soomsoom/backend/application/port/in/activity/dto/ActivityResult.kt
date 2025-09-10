@@ -3,15 +3,18 @@ package com.soomsoom.backend.application.port.`in`.activity.dto
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
 import com.soomsoom.backend.domain.activity.model.Activity
-import com.soomsoom.backend.domain.activity.model.ActivityType
 import com.soomsoom.backend.domain.activity.model.BreathingActivity
 import com.soomsoom.backend.domain.activity.model.MeditationActivity
+import com.soomsoom.backend.domain.activity.model.SoundEffectActivity
 import com.soomsoom.backend.domain.activity.model.TimelineEvent
+import com.soomsoom.backend.domain.activity.model.enums.ActivityCategory
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.instructor.model.Instructor
 
 data class ActivityResult(
     val id: Long,
     val type: ActivityType,
+    val category: ActivityCategory,
     val title: String,
     val thumbnailImageUrl: String?,
     val descriptions: List<String>,
@@ -46,6 +49,7 @@ data class ActivityResult(
                     durationInSeconds = activity.durationInSeconds,
                     audioUrl = activity.audioUrl,
                     timeline = activity.timeline,
+                    category = activity.category,
                     isFavorited = isFavorited
                 )
                 is MeditationActivity -> ActivityResult(
@@ -58,7 +62,21 @@ data class ActivityResult(
                     narrator = InstructorInfo(narrator.id!!, narrator.name, narrator.bio, narrator.profileImageUrl),
                     durationInSeconds = activity.durationInSeconds,
                     audioUrl = activity.audioUrl,
-                    isFavorited = isFavorited
+                    isFavorited = isFavorited,
+                    category = activity.category
+                )
+                is SoundEffectActivity -> ActivityResult(
+                    id = activity.id!!,
+                    type = activity.type,
+                    title = activity.title,
+                    thumbnailImageUrl = activity.thumbnailImageUrl,
+                    descriptions = activity.descriptions,
+                    author = InstructorInfo(author.id!!, author.name, author.bio, author.profileImageUrl),
+                    narrator = InstructorInfo(narrator.id!!, narrator.name, narrator.bio, narrator.profileImageUrl),
+                    durationInSeconds = activity.durationInSeconds,
+                    audioUrl = activity.audioUrl,
+                    isFavorited = isFavorited,
+                    category = activity.category
                 )
                 else -> throw SoomSoomException(ActivityErrorCode.UNSUPPORTED_ACTIVITY_TYPE)
             }

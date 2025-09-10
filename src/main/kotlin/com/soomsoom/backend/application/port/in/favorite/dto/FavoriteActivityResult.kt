@@ -3,9 +3,9 @@ package com.soomsoom.backend.application.port.`in`.favorite.dto
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
 import com.soomsoom.backend.domain.activity.model.Activity
-import com.soomsoom.backend.domain.activity.model.ActivityType
 import com.soomsoom.backend.domain.activity.model.BreathingActivity
 import com.soomsoom.backend.domain.activity.model.MeditationActivity
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 
 data class FavoriteActivityResult(
     val activityId: Long,

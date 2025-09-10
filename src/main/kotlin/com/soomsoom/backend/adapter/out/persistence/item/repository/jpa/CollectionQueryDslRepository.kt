@@ -58,6 +58,7 @@ class CollectionQueryDslRepository(
             .leftJoin(collectionJpaEntity.items, itemJpaEntity).fetchJoin()
             .where(whereClause)
             // TODO: 소유 컬렉션 정렬 기준 추가
+            .distinct()
             .orderBy(collectionJpaEntity.createdAt.desc())
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
@@ -88,6 +89,7 @@ class CollectionQueryDslRepository(
                     )
                     .notExists()
             )
+            .distinct()
             .fetch()
     }
 
@@ -103,11 +105,11 @@ class CollectionQueryDslRepository(
 
         val results = query
             .where(whereClause)
+            .distinct()
             .orderBy(getSortOrder(criteria.sortCriteria))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .fetch()
-            .distinct()
 
         val total = queryFactory.select(collectionJpaEntity.id.count())
             .from(collectionJpaEntity)

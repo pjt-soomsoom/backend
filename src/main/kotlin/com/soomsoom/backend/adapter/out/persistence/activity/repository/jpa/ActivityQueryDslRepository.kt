@@ -8,12 +8,17 @@ import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.QActivityWithFavoriteStatusDto
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.QActivityWithInstructorsDto
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.ActivityJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.BreathingActivityJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.MeditationActivityJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.QActivityJpaEntity.activityJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.SoundEffectActivityJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.favorite.repository.jpa.entity.QFavoriteJpaEntity.favoriteJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.QInstructorJpaEntity
 import com.soomsoom.backend.application.port.`in`.activity.query.SearchActivitiesCriteria
 import com.soomsoom.backend.application.port.`in`.activity.query.SearchInstructorActivitiesCriteria
 import com.soomsoom.backend.common.utils.QueryDslSortUtil
+import com.soomsoom.backend.domain.activity.model.enums.ActivityCategory
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.common.DeletionStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -64,6 +69,8 @@ class ActivityQueryDslRepository(
             .join(author).on(activityJpaEntity.authorId.eq(author.id))
             .join(narrator).on(activityJpaEntity.narratorId.eq(narrator.id))
             .where(
+                typeEq(criteria.type),
+                categoryEq(criteria.category),
                 deletionStatusEq(criteria.deletionStatus)
             )
             .offset(pageable.offset)
@@ -109,6 +116,20 @@ class ActivityQueryDslRepository(
                 deletionStatusEq(criteria.deletionStatus)
             )
         return PageableExecutionUtils.getPage(content, pageable) { countQuery.fetchOne() ?: 0L }
+    }
+
+     private fun typeEq(type: ActivityType?): BooleanExpression? {
+         return type?.let {
+             when (it) {
+                 ActivityType.BREATHING -> activityJpaEntity.instanceOf(BreathingActivityJpaEntity::class.java)
+                 ActivityType.MEDITATION -> activityJpaEntity.instanceOf(MeditationActivityJpaEntity::class.java)
+                 ActivityType.SOUND_EFFECT -> activityJpaEntity.instanceOf(SoundEffectActivityJpaEntity::class.java)
+             }
+         }
+     }
+
+    private fun categoryEq(category: ActivityCategory?): BooleanExpression? {
+        return category?.let { activityJpaEntity.category.eq(it) }
     }
 
     private fun isFavoritedExpression(userId: Long?): BooleanExpression {
