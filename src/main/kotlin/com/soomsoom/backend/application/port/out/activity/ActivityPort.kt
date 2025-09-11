@@ -15,4 +15,5 @@ interface ActivityPort {
     fun save(activity: Activity): Activity
     fun findById(id: Long, deletionStatus: DeletionStatus = DeletionStatus.ACTIVE): Activity?
     fun searchByInstructorIdWithFavoriteStatus(criteria: SearchInstructorActivitiesCriteria, pageable: Pageable): Page<ActivityWithFavoriteStatusDto>
+    fun findByIds(activityIds: List<Long>): List<Activity>
 }

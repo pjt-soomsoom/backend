@@ -61,4 +61,8 @@ class ActivityPersistenceAdapter(
     ): Page<ActivityWithFavoriteStatusDto> {
         return activityQueryDslRepository.searchByInstructorIdWithFavoriteStatus(criteria, pageable)
     }
+
+    override fun findByIds(activityIds: List<Long>): List<Activity> {
+        return activityJpaRepository.findAllById(activityIds).map { it.toDomain() }
+    }
 }
