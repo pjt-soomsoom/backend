@@ -5,4 +5,5 @@ enum class FileDomain {
     ACTIVITIES,
     ITEMS,
     COLLECTIONS,
+    BANNERS,
 }

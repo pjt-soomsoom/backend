@@ -118,15 +118,15 @@ class ActivityQueryDslRepository(
         return PageableExecutionUtils.getPage(content, pageable) { countQuery.fetchOne() ?: 0L }
     }
 
-     private fun typeEq(type: ActivityType?): BooleanExpression? {
-         return type?.let {
-             when (it) {
-                 ActivityType.BREATHING -> activityJpaEntity.instanceOf(BreathingActivityJpaEntity::class.java)
-                 ActivityType.MEDITATION -> activityJpaEntity.instanceOf(MeditationActivityJpaEntity::class.java)
-                 ActivityType.SOUND_EFFECT -> activityJpaEntity.instanceOf(SoundEffectActivityJpaEntity::class.java)
-             }
-         }
-     }
+    private fun typeEq(type: ActivityType?): BooleanExpression? {
+        return type?.let {
+            when (it) {
+                ActivityType.BREATHING -> activityJpaEntity.instanceOf(BreathingActivityJpaEntity::class.java)
+                ActivityType.MEDITATION -> activityJpaEntity.instanceOf(MeditationActivityJpaEntity::class.java)
+                ActivityType.SOUND_EFFECT -> activityJpaEntity.instanceOf(SoundEffectActivityJpaEntity::class.java)
+            }
+        }
+    }
 
     private fun categoryEq(category: ActivityCategory?): BooleanExpression? {
         return category?.let { activityJpaEntity.category.eq(it) }
