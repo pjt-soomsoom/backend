@@ -98,11 +98,16 @@ jobs:
       # 8. 배포 패키지 생성 및 S3 업로드
       - name: Zip and upload to S3 for CodeDeploy
         run: |
-          # 배포 스크립트에 이미지 태그(버전) 정보를 전달하기 위한 파일 생성
-          echo "${{ github.sha }}" > IMAGE_TAG
-          zip -r deploy.zip appspec.yml scripts/ IMAGE_TAG
-          aws s3 cp deploy.zip s3://$S3_BUCKET_NAME/soomsoom-backend/${{ github.sha }}.zip
+            # EC2의 start.sh 스크립트가 사용할 환경 변수 파일 생성
+            echo "AWS_REGION=${{ env.AWS_REGION }}" > env.vars
+            echo "AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> env.vars
+            echo "ECR_REPOSITORY=${{ env.ECR_REPOSITORY }}" >> env.vars
+            echo "IMAGE_TAG=${{ github.sha }}" >> env.vars
 
+            # appspec.yml, scripts 폴더, 그리고 방금 만든 env.vars 파일을 함께 압축
+            zip -r deploy.zip appspec.yml scripts/ env.vars
+
+            aws s3 cp deploy.zip s3://$S3_BUCKET_NAME/soomsoom-backend/${{ github.sha }}.zip
       # 9. AWS CodeDeploy 배포 생성
       - name: Create CodeDeploy Deployment
         run: |
