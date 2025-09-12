@@ -1,6 +1,7 @@
 package com.soomsoom.backend.adapter.`in`.security.service
 
 import com.soomsoom.backend.domain.user.model.Account
+import com.soomsoom.backend.domain.user.model.aggregate.Role
 import com.soomsoom.backend.domain.user.model.aggregate.User
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -13,14 +14,6 @@ class CustomUserDetails(
     private val authorities: MutableCollection<out GrantedAuthority>,
 ) : UserDetails {
 
-    // 로그인 시 사용될 생성자
-    constructor(user: User) : this(
-        id = user.id!!,
-        username = (user.account as Account.IdPassword).username,
-        password = (user.account as Account.IdPassword).password,
-        authorities = mutableListOf(SimpleGrantedAuthority(user.role.name))
-    )
-
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> = authorities
     override fun getPassword(): String = password
     override fun getUsername(): String = username
@@ -29,4 +22,21 @@ class CustomUserDetails(
     override fun isAccountNonLocked(): Boolean = true
     override fun isCredentialsNonExpired(): Boolean = true
     override fun isEnabled(): Boolean = true
+
+    companion object {
+        fun of(user: User, sessionRole: Role): CustomUserDetails {
+            val username = when (val acc = user.account) {
+                is Account.IdPassword -> acc.username
+                else -> user.id!!.toString()
+            }
+            val password = (user.account as? Account.IdPassword)?.password ?: ""
+
+            return CustomUserDetails(
+                id = user.id!!,
+                username = username,
+                password = password,
+                authorities = mutableListOf(SimpleGrantedAuthority(sessionRole.name))
+            )
+        }
+    }
 }

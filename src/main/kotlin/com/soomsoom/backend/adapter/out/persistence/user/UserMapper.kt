@@ -19,7 +19,7 @@ fun User.toEntity(): UserJpaEntity {
             is Account.Social -> UserJpaEntity.AccountType.SOCIAL
             is Account.IdPassword -> UserJpaEntity.AccountType.ID_PASSWORD
         },
-        deviceId = if (this.account is Account.Anonymous) this.account.deviceId else (this.account as? Account.Social)?.deviceId,
+        deviceId = (this.account as? Account.Anonymous)?.let { it.deviceId } ?: (this.account as? Account.Social)?.deviceId,
         socialProvider = (this.account as? Account.Social)?.socialProvider,
         socialId = (this.account as? Account.Social)?.socialId,
         username = (this.account as? Account.IdPassword)?.username,

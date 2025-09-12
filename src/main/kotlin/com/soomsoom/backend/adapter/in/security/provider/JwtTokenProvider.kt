@@ -2,8 +2,10 @@ package com.soomsoom.backend.adapter.`in`.security.provider
 
 import com.soomsoom.backend.adapter.`in`.security.service.CustomUserDetails
 import com.soomsoom.backend.application.port.out.auth.TokenGeneratorPort
+import com.soomsoom.backend.application.port.out.auth.TokenResult
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.JwtParser
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
@@ -20,47 +22,29 @@ import javax.crypto.SecretKey
 class JwtTokenProvider(
     @Value("\${jwt.secret}") private val secretKey: String,
     @Value("\${jwt.access.expiration}") private val accessTokenExpiration: Long,
+    @Value("\${jwt.refresh.expiration}") private val refreshTokenExpiration: Long,
 ) : TokenGeneratorPort {
-    private val key: SecretKey
-
-    init {
-        val keyBytes = Decoders.BASE64.decode(secretKey)
-        key = Keys.hmacShaKeyFor(keyBytes)
-    }
+    private val key: SecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey))
+    private val parser: JwtParser = Jwts.parser().verifyWith(key).build()
 
     /**
      * 인증 객체로 액세스 토큰 생성
      */
 
-    override fun generateToken(authentication: Authentication): String {
-        val authorities = authentication.authorities.joinToString(",") { it.authority }
-        val now = Date()
-        val validity = Date(now.time + accessTokenExpiration)
+    override fun generateToken(authentication: Authentication): TokenResult {
+        val accessToken = createAccessToken(authentication)
+        val refreshToken = createRefreshToken(authentication)
+        val refreshTokenExpiry = parser.parseSignedClaims(refreshToken).payload.expiration.toInstant()
 
-        val userId = (authentication.principal as? CustomUserDetails)?.id
-            ?: throw IllegalStateException("Authentication principal is not CustomUserDetails")
-
-        return Jwts.builder()
-            .subject(authentication.name)
-            .claim("auth", authorities)
-            .claim("userId", userId)
-            .issuedAt(now)
-            .expiration(validity)
-            .signWith(key)
-            .compact()
+        return TokenResult(accessToken, refreshToken, refreshTokenExpiry)
     }
 
     /**
      * Token 유효성 검증
      */
 
-    fun validateToken(token: String): Boolean {
-        return runCatching {
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(token)
-            true
-        }.getOrElse {
-            false
-        }
+    fun validateToken(token: String) {
+        parser.parseSignedClaims(token)
     }
 
     /**
@@ -91,9 +75,49 @@ class JwtTokenProvider(
 
     private fun parseClaims(token: String): Claims {
         return try {
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(token).payload
+            parser.parseSignedClaims(token).payload
         } catch (e: ExpiredJwtException) {
             e.claims
         }
+    }
+
+    /**
+     * accessToken 생성
+     */
+    private fun createAccessToken(authentication: Authentication): String {
+        val authorities = authentication.authorities.joinToString(",") { it.authority }
+        val now = Date()
+        val validity = Date(now.time + accessTokenExpiration)
+
+        val userId = (authentication.principal as? CustomUserDetails)?.id
+            ?: throw IllegalStateException("Authentication principal is not CustomUserDetails")
+
+        return Jwts.builder()
+            .subject(authentication.name)
+            .claim("auth", authorities)
+            .claim("userId", userId)
+            .issuedAt(now)
+            .expiration(validity)
+            .signWith(key)
+            .compact()
+    }
+
+    /**
+     * refreshToken 생성
+     */
+    private fun createRefreshToken(authentication: Authentication): String {
+        val now = Date()
+        val validity = Date(now.time + refreshTokenExpiration)
+
+        val userDetails = authentication.principal as? CustomUserDetails
+            ?: throw IllegalStateException("Authentication principal is not CustomUserDetails")
+        val userId = userDetails.id
+
+        return Jwts.builder()
+            .subject(userId.toString())
+            .issuedAt(now)
+            .expiration(validity)
+            .signWith(key)
+            .compact()
     }
 }
