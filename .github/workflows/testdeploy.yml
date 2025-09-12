@@ -3,12 +3,12 @@ name: CI/CD for SoomSoom Backend
 
 on:
   push:
-    branches: [ "main" ] # main 브랜치에 푸시될 때 실행됩니다.
+    branches: [ "main" ]
 
 # 워크플로우에서 공통으로 사용할 변수 설정
 env:
   AWS_REGION: ap-northeast-2
-  S3_BUCKET_NAME: sumsum-bucket # 🚨 S3 버킷 이름 (직접 생성 필요)
+  S3_BUCKET_NAME: sumsum-bucket
   CODE_DEPLOY_APP_NAME: soomsoom-backend
   CODE_DEPLOY_GROUP_NAME: test-deploy-group
   ECR_REPOSITORY: soomsoom-backend
@@ -58,7 +58,7 @@ jobs:
 
           # AWS
           echo "cloud.aws.credentials.access-key=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ./src/main/resources/application.properties
-          echo "cloud.aws.credentials.secret-key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ./src/main/resources/application.properties
+          echo "cloud.aws.credentials.secret-key=${{ secrets.AWS_SECRET_KEY }}" >> ./src/main/resources/application.properties
           echo "cloud.aws.region.static=${{ env.AWS_REGION }}" >> ./src/main/resources/application.properties
           echo "cloud.aws.s3.bucket=${{ secrets.AWS_S3_BUCKET }}" >> ./src/main/resources/application.properties
           echo "cloud.aws.s3.base-url=${{ secrets.BASE_URL }}" >> ./src/main/resources/application.properties
