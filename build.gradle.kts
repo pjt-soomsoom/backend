@@ -22,6 +22,11 @@ repositories {
 }
 
 dependencies {
+
+    // Google ID Token 검증 라이브러리
+    implementation("com.google.api-client:google-api-client:2.2.0")
+    implementation("com.google.http-client:google-http-client-gson:1.43.3")
+
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
     // security
     implementation("org.springframework.boot:spring-boot-starter-security")

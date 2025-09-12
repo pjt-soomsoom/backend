@@ -12,12 +12,14 @@ import com.soomsoom.backend.application.port.`in`.item.dto.CollectionDto
 import com.soomsoom.backend.application.port.`in`.item.dto.ItemDto
 import com.soomsoom.backend.application.port.`in`.user.command.UpdateEquippedItemsCommand
 import com.soomsoom.backend.application.port.`in`.user.dto.EquippedItemsDto
+import com.soomsoom.backend.application.port.`in`.user.dto.UserPoints
 import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedCollectionsCriteria
 import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedItemsCriteria
 import com.soomsoom.backend.application.port.`in`.user.usecase.command.UpdateEquippedItemsUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindEquippedItemsUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindOwnedCollectionsUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindOwnedItemsUseCase
+import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindUserPointsUseCase
 import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.item.model.enums.ItemType
 import jakarta.validation.Valid
@@ -26,6 +28,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -43,6 +46,7 @@ class UserController(
     private val findOwnedItemsUseCase: FindOwnedItemsUseCase,
     private val findEquippedItemsUseCase: FindEquippedItemsUseCase,
     private val findOwnedCollectionsUseCase: FindOwnedCollectionsUseCase,
+    private val findUserPointsUseCase: FindUserPointsUseCase,
 ) {
 
     /**
@@ -146,5 +150,30 @@ class UserController(
             pageable = pageable
         )
         return findOwnedCollectionsUseCase.findOwnedCollections(criteria)
+    }
+
+    /**
+     * heartPoints 조회
+     */
+    @GetMapping("/points")
+    @ResponseStatus(HttpStatus.OK)
+    fun getMyPoints(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+        @RequestParam(required = false) userId: Long?,
+    ): UserPoints {
+        val targetUserId = userId ?: userDetails.id
+        return findUserPointsUseCase.findUserPoints(targetUserId)
+    }
+
+    /**
+     * Points 제공
+     */
+    @PostMapping("/points")
+    @ResponseStatus(HttpStatus.OK)
+    fun addPoints(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+        @RequestParam(required = false) userId : Long?,
+    ) {
+
     }
 }

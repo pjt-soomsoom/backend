@@ -4,6 +4,7 @@ import com.soomsoom.backend.adapter.out.persistence.common.entity.PointsEmbeddab
 import com.soomsoom.backend.common.entity.BaseTimeEntity
 import com.soomsoom.backend.domain.user.model.aggregate.Role
 import com.soomsoom.backend.domain.user.model.aggregate.User
+import com.soomsoom.backend.domain.user.model.enums.SocialProvider
 import jakarta.persistence.AttributeOverride
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
@@ -33,7 +34,8 @@ class UserJpaEntity(
     @Enumerated(EnumType.STRING)
     var accountType: AccountType,
 
-    var socialProvider: String?,
+    @Enumerated(EnumType.STRING)
+    var socialProvider: SocialProvider?,
     var socialId: String?,
 
     @Column(unique = true)

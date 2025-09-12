@@ -2,6 +2,7 @@ package com.soomsoom.backend.adapter.`in`.security.config
 
 import com.soomsoom.backend.adapter.`in`.security.filter.JwtAuthenticationFilter
 import com.soomsoom.backend.adapter.`in`.security.provider.JwtTokenProvider
+import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -21,6 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableMethodSecurity
 class SecurityConfig(
     private val jwtTokenProvider: JwtTokenProvider,
+    private val messageSource: MessageSource,
     private val domainSecurityConfigurer: List<DomainSecurityConfigurer>,
 ) {
 
@@ -38,7 +40,11 @@ class SecurityConfig(
                         "/v3/api-docs/**",
                         "/swagger-resources/**",
                         "/auth/admin/login",
-                        "/auth/admin/sign-up"
+                        "/auth/admin/sign-up",
+                        "/auth/device",
+                        "/auth/social",
+                        "/auth/refresh",
+                        "/auth/logout",
                     ).permitAll()
 
                 domainSecurityConfigurer.forEach { it.configure(authorize) }
@@ -46,7 +52,7 @@ class SecurityConfig(
                 authorize.anyRequest().authenticated()
             }
             .addFilterBefore(
-                JwtAuthenticationFilter(jwtTokenProvider),
+                JwtAuthenticationFilter(jwtTokenProvider, messageSource),
                 UsernamePasswordAuthenticationFilter::class.java
             )
         return http.build()

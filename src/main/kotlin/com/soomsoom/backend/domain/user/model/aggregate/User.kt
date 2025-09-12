@@ -5,6 +5,7 @@ import com.soomsoom.backend.common.exception.DomainErrorReason.ITEM_ALREADY_OWNE
 import com.soomsoom.backend.domain.common.vo.Points
 import com.soomsoom.backend.domain.item.model.enums.EquipSlot
 import com.soomsoom.backend.domain.user.model.Account
+import com.soomsoom.backend.domain.user.model.enums.SocialProvider
 import com.soomsoom.backend.domain.user.model.vo.EquippedItems
 
 enum class Role {
@@ -13,8 +14,8 @@ enum class Role {
 
 class User private constructor(
     val id: Long?,
-    val account: Account,
-    val role: Role,
+    var account: Account,
+    var role: Role,
     var points: Points,
     ownedItems: MutableSet<Long> = mutableSetOf(),
     ownedCollections: MutableSet<Long> = mutableSetOf(),
@@ -73,6 +74,16 @@ class User private constructor(
         this._equippedCollections.addAll(completedCollectionIds)
     }
 
+    fun linkSocialAccount(socialProvider: SocialProvider, socialId: String) {
+        require(this.account is Account.Anonymous) { "Only anonymous accounts can be linked." }
+
+        this.account = Account.Social(
+            socialProvider = socialProvider,
+            socialId = socialId,
+            deviceId = (this.account as Account.Anonymous).deviceId
+        )
+        this.role = Role.ROLE_USER
+    }
     companion object {
         fun from(
             id: Long?,
@@ -105,7 +116,7 @@ class User private constructor(
             )
         }
 
-        fun createSocial(socialProvider: String, socialId: String, deviceId: String): User {
+        fun createSocial(socialProvider: SocialProvider, socialId: String, deviceId: String): User {
             return User(
                 id = null,
                 account = Account.Social(socialProvider, socialId, deviceId),
