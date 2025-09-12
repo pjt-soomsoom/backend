@@ -17,7 +17,6 @@ import com.soomsoom.backend.application.port.`in`.banner.usecase.command.UpdateB
 import com.soomsoom.backend.application.port.`in`.banner.usecase.command.UpdateBannerInfoUseCase
 import com.soomsoom.backend.application.port.`in`.banner.usecase.command.UpdateBannerOrderUseCase
 import com.soomsoom.backend.application.port.`in`.banner.usecase.query.BannerQueryUseCase
-import com.soomsoom.backend.common.argumentresolvers.pageble.CustomPageRequest
 import com.soomsoom.backend.domain.common.DeletionStatus
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -42,7 +41,7 @@ class BannerController(
     private val updateBannerImageUseCase: UpdateBannerImageUseCase,
     private val updateBannerOrderUseCase: UpdateBannerOrderUseCase,
     private val deleteBannerUseCase: DeleteBannerUseCase,
-    private val bannerQueryUseCase: BannerQueryUseCase
+    private val bannerQueryUseCase: BannerQueryUseCase,
 ) {
     // 사용자용 API
     @GetMapping
@@ -54,7 +53,8 @@ class BannerController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createBanner(
-        @Valid @RequestBody request: CreateBannerRequest
+        @Valid @RequestBody
+        request: CreateBannerRequest,
     ): CreateBannerResult {
         return createBannerUseCase.create(request.toCommand())
     }
@@ -63,7 +63,8 @@ class BannerController(
     @ResponseStatus(HttpStatus.OK)
     fun completeUpload(
         @PathVariable bannerId: Long,
-        @Valid @RequestBody request: CompleteBannerUploadRequest
+        @Valid @RequestBody
+        request: CompleteBannerUploadRequest,
     ) {
         createBannerUseCase.completeUpload(request.toCommand(bannerId))
     }
@@ -72,7 +73,7 @@ class BannerController(
     @ResponseStatus(HttpStatus.OK)
     fun getAllBanners(
         @RequestParam(defaultValue = "ACTIVE") deletionStatus: DeletionStatus,
-        pageable: Pageable
+        pageable: Pageable,
     ): Page<BannerAdminResult> {
         val criteria = FindBannersCriteria(deletionStatus)
         return bannerQueryUseCase.findAllBanners(criteria, pageable)
@@ -81,7 +82,9 @@ class BannerController(
     @PutMapping("/{bannerId}/info")
     @ResponseStatus(HttpStatus.OK)
     fun updateBannerInfo(
-        @PathVariable bannerId: Long, @Valid @RequestBody request: UpdateBannerInfoRequest
+        @PathVariable bannerId: Long,
+        @Valid @RequestBody
+        request: UpdateBannerInfoRequest,
     ): BannerAdminResult {
         return updateBannerInfoUseCase.updateInfo(request.toCommand(bannerId))
     }
@@ -89,7 +92,8 @@ class BannerController(
     @PutMapping("/order")
     @ResponseStatus(HttpStatus.OK)
     fun updateBannerOrder(
-        @Valid @RequestBody request: UpdateBannerOrderRequest
+        @Valid @RequestBody
+        request: UpdateBannerOrderRequest,
     ): List<BannerAdminResult> {
         return updateBannerOrderUseCase.updateOrder(request.toCommand())
     }
@@ -98,7 +102,8 @@ class BannerController(
     @ResponseStatus(HttpStatus.OK)
     fun updateBannerImage(
         @PathVariable bannerId: Long,
-        @Valid @RequestBody request: UpdateBannerImageRequest
+        @Valid @RequestBody
+        request: UpdateBannerImageRequest,
     ): UpdateBannerImageResult {
         return updateBannerImageUseCase.updateImage(request.toCommand(bannerId))
     }
@@ -107,7 +112,8 @@ class BannerController(
     @ResponseStatus(HttpStatus.OK)
     fun completeImageUpdate(
         @PathVariable bannerId: Long,
-        @Valid @RequestBody request: CompleteBannerImageUpdateRequest
+        @Valid @RequestBody
+        request: CompleteBannerImageUpdateRequest,
     ) {
         updateBannerImageUseCase.completeImageUpdate(request.toCommand(bannerId))
     }
@@ -115,7 +121,7 @@ class BannerController(
     @DeleteMapping("/{bannerId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteBanner(
-        @PathVariable bannerId: Long
+        @PathVariable bannerId: Long,
     ) {
         deleteBannerUseCase.delete(bannerId)
     }

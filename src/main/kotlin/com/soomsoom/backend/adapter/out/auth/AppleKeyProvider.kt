@@ -25,7 +25,7 @@ data class ApplePublicKeys(val keys: List<ApplePublicKey>)
 @Component
 class AppleKeyProvider(
     private val restTemplate: RestTemplate,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) {
     private val appleAuthKeysUrl = "https://appleid.apple.com/auth/keys"
     private val keyCache: ConcurrentHashMap<String, PublicKey> = ConcurrentHashMap()

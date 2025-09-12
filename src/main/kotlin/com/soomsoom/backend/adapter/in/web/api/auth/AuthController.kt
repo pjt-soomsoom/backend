@@ -16,7 +16,6 @@ import com.soomsoom.backend.application.port.`in`.auth.usecase.command.LogoutUse
 import com.soomsoom.backend.application.port.`in`.auth.usecase.command.RefreshTokenUseCase
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -54,26 +53,37 @@ class AuthController(
 
     @PostMapping("/device")
     @ResponseStatus(HttpStatus.OK)
-    fun authenticateWithDevice(@Valid @RequestBody request: DeviceAuthenticationRequest): TokenInfo {
+    fun authenticateWithDevice(
+        @Valid @RequestBody
+        request: DeviceAuthenticationRequest,
+    ): TokenInfo {
         return authenticateWithDeviceUseCase.authenticate(request.toCommand())
     }
 
     @PostMapping("/social")
     @ResponseStatus(HttpStatus.OK)
-    fun authenticateWithSocial(@Valid @RequestBody request: SocialAuthenticationRequest): TokenInfo {
+    fun authenticateWithSocial(
+        @Valid @RequestBody
+        request: SocialAuthenticationRequest,
+    ): TokenInfo {
         return authenticateWithSocialUseCase.authenticate(request.toCommand())
     }
 
     @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.OK)
-    fun refreshToken(@Valid @RequestBody request: RefreshTokenRequest): TokenInfo {
+    fun refreshToken(
+        @Valid @RequestBody
+        request: RefreshTokenRequest,
+    ): TokenInfo {
         return refreshTokenUseCase.refreshToken(request.refreshToken)
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun logout(@Valid @RequestBody request: LogoutRequest) {
+    fun logout(
+        @Valid @RequestBody
+        request: LogoutRequest,
+    ) {
         logoutUseCase.logout(request.refreshToken)
     }
-
 }

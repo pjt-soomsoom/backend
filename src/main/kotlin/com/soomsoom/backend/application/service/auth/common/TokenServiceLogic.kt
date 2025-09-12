@@ -8,11 +8,10 @@ import org.springframework.transaction.annotation.Transactional
 
 @Component
 class TokenServiceLogic(
-    private val refreshTokenPort: RefreshTokenPort
+    private val refreshTokenPort: RefreshTokenPort,
 ) {
     @Transactional
     fun manageRefreshToken(userId: Long, tokenResult: TokenResult) {
-
         // 새로운 리프레시 토큰을 저장
         val newRefreshToken = RefreshToken(
             token = tokenResult.refreshToken,

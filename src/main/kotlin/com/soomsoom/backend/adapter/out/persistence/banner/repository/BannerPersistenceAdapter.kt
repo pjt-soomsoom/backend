@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 class BannerPersistenceAdapter(
     private val bannerJpaRepository: BannerJpaRepository,
     private val bannerQueryDslRepository: BannerQueryDslRepository,
-) : BannerPort{
+) : BannerPort {
     override fun save(banner: Banner): Banner {
         val savedEntity = bannerJpaRepository.save(banner.toEntity())
         return savedEntity.toDomain()

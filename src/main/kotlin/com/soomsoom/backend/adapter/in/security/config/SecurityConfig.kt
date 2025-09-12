@@ -44,7 +44,7 @@ class SecurityConfig(
                         "/auth/device",
                         "/auth/social",
                         "/auth/refresh",
-                        "/auth/logout",
+                        "/auth/logout"
                     ).permitAll()
 
                 domainSecurityConfigurer.forEach { it.configure(authorize) }

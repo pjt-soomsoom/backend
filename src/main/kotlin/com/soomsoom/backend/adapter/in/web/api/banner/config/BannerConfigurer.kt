@@ -19,4 +19,3 @@ class BannerConfigurer : DomainSecurityConfigurer {
         authorize.requestMatchers(HttpMethod.DELETE, "/banners/**").hasRole("ADMIN")
     }
 }
-

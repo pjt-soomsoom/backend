@@ -1,19 +1,19 @@
- package com.soomsoom.backend.adapter.out.persistence.banner.repository.jpa
+package com.soomsoom.backend.adapter.out.persistence.banner.repository.jpa
 
- import com.querydsl.core.types.dsl.BooleanExpression
- import com.querydsl.jpa.impl.JPAQueryFactory
- import com.soomsoom.backend.adapter.out.persistence.banner.repository.jpa.entity.BannerJpaEntity
- import com.soomsoom.backend.adapter.out.persistence.banner.repository.jpa.entity.QBannerJpaEntity.bannerJpaEntity
- import com.soomsoom.backend.domain.common.DeletionStatus
- import org.springframework.data.domain.Page
- import org.springframework.data.domain.Pageable
- import org.springframework.data.support.PageableExecutionUtils
- import org.springframework.stereotype.Repository
+import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.jpa.impl.JPAQueryFactory
+import com.soomsoom.backend.adapter.out.persistence.banner.repository.jpa.entity.BannerJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.banner.repository.jpa.entity.QBannerJpaEntity.bannerJpaEntity
+import com.soomsoom.backend.domain.common.DeletionStatus
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.support.PageableExecutionUtils
+import org.springframework.stereotype.Repository
 
- @Repository
- class BannerQueryDslRepository(
-    private val queryFactory: JPAQueryFactory
- ) {
+@Repository
+class BannerQueryDslRepository(
+    private val queryFactory: JPAQueryFactory,
+) {
     fun findActiveBannerByDisplayOrder(order: Int): BannerJpaEntity? {
         return queryFactory.selectFrom(bannerJpaEntity)
             .where(
@@ -88,4 +88,4 @@
             DeletionStatus.ALL -> null
         }
     }
- }
+}

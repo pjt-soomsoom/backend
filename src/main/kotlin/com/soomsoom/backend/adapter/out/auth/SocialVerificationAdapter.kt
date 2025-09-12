@@ -81,5 +81,4 @@ class SocialVerificationAdapter(
             throw IllegalArgumentException("유효하지 않은 Apple Identity Token입니다.", e)
         }
     }
-
 }

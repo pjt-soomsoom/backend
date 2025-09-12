@@ -17,5 +17,4 @@ class RefreshTokenJpaEntity(
 
     @Column(nullable = false)
     val expiryDate: Instant,
-) {
-}
+)

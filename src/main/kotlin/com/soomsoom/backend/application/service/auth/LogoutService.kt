@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class LogoutService(
-    private val refreshTokenPort: RefreshTokenPort
-) : LogoutUseCase{
+    private val refreshTokenPort: RefreshTokenPort,
+) : LogoutUseCase {
     override fun logout(refreshToken: String) {
         refreshTokenPort.findByToken(refreshToken)?.let {
             refreshTokenPort.delete(it)

@@ -20,8 +20,8 @@ class RefreshTokenService(
     private val refreshTokenPort: RefreshTokenPort,
     private val userPort: UserPort,
     private val tokenGeneratorPort: TokenGeneratorPort,
-    private val tokenServiceLogic: TokenServiceLogic
-) : RefreshTokenUseCase{
+    private val tokenServiceLogic: TokenServiceLogic,
+) : RefreshTokenUseCase {
     override fun refreshToken(refreshToken: String): TokenInfo {
         val oldRefreshToken = refreshTokenPort.findByToken(refreshToken)
             ?: throw SoomSoomException(UserErrorCode.REFRESH_TOKEN_NOT_FOUND)
@@ -46,5 +46,4 @@ class RefreshTokenService(
 
         return TokenInfo(newTokenResult.accessToken, newTokenResult.refreshToken)
     }
-
 }

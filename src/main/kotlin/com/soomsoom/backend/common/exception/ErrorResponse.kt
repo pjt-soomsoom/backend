@@ -2,7 +2,7 @@ package com.soomsoom.backend.common.exception
 
 import org.springframework.context.MessageSource
 
-data class ErrorResponse (
+data class ErrorResponse(
     val code: String,
     val message: String,
 ) {
