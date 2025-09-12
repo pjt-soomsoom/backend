@@ -15,5 +15,4 @@ interface UserPort {
     fun findByUsername(username: String): User?
 
     fun findByIdWithCollections(userId: Long): User?
-
 }

@@ -10,7 +10,6 @@ import com.soomsoom.backend.application.service.auth.common.TokenServiceLogic
 import com.soomsoom.backend.domain.user.model.aggregate.Role
 import com.soomsoom.backend.domain.user.model.aggregate.User
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,7 +19,7 @@ class DeviceAuthenticationService(
     private val userPort: UserPort,
     private val tokenGeneratorPort: TokenGeneratorPort,
     private val tokenServiceLogic: TokenServiceLogic,
-) : AuthenticateWithDeviceUseCase{
+) : AuthenticateWithDeviceUseCase {
     override fun authenticate(command: DeviceAuthenticationCommand): TokenInfo {
         val user = userPort.findByDeviceId(command.deviceId)
             ?: userPort.save(User.createAnonymous(command.deviceId))
@@ -33,6 +32,5 @@ class DeviceAuthenticationService(
         tokenServiceLogic.manageRefreshToken(user.id!!, tokenResult)
 
         return TokenInfo(tokenResult.accessToken, tokenResult.refreshToken)
-
     }
 }

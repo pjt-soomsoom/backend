@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class FindUserPointsService(
-    private val userPort: UserPort
-) : FindUserPointsUseCase{
+    private val userPort: UserPort,
+) : FindUserPointsUseCase {
 
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     override fun findUserPoints(userId: Long): UserPoints {
@@ -21,5 +21,4 @@ class FindUserPointsService(
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
         return UserPoints(user.points.value)
     }
-
 }

@@ -19,7 +19,7 @@ data class SocialAuthenticationRequest(
         return SocialAuthenticationCommand(
             provider = this.provider,
             providerToken = this.providerToken,
-            deviceId = this.deviceId,
+            deviceId = this.deviceId
         )
     }
 }

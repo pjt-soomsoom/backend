@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class RefreshTokenPersistenceAdapter(
-    private val refreshTokenJpaRepository: RefreshTokenJpaRepository
-) : RefreshTokenPort{
+    private val refreshTokenJpaRepository: RefreshTokenJpaRepository,
+) : RefreshTokenPort {
     override fun findByToken(token: String): RefreshToken? = refreshTokenJpaRepository.findById(token).orElse(null)?.toDomain()
     override fun save(refreshToken: RefreshToken): RefreshToken = refreshTokenJpaRepository.save(refreshToken.toEntity()).toDomain()
     override fun delete(refreshToken: RefreshToken) = refreshTokenJpaRepository.delete(refreshToken.toEntity())

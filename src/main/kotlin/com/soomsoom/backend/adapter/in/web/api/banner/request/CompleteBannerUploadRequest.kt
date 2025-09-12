@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank
 
 data class CompleteBannerUploadRequest(
     @field:NotBlank
-    val imageFileKey: String?
+    val imageFileKey: String?,
 ) {
     fun toCommand(bannerId: Long): CompleteBannerUploadCommand {
         return CompleteBannerUploadCommand(bannerId = bannerId, imageFileKey = this.imageFileKey!!)

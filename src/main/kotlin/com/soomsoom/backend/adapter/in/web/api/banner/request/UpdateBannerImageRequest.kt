@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull
 
 data class UpdateBannerImageRequest(
     @field:NotNull @field:Valid
-    val imageMetadata: FileMetadata?
+    val imageMetadata: FileMetadata?,
 ) {
     fun toCommand(bannerId: Long): UpdateBannerImageCommand {
         return UpdateBannerImageCommand(

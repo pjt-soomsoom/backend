@@ -172,8 +172,7 @@ class UserController(
     @ResponseStatus(HttpStatus.OK)
     fun addPoints(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-        @RequestParam(required = false) userId : Long?,
+        @RequestParam(required = false) userId: Long?,
     ) {
-
     }
 }

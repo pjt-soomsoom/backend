@@ -24,7 +24,7 @@ class SocialAuthenticationService(
     private val tokenGeneratorPort: TokenGeneratorPort,
     private val verifySocialTokenPort: VerifySocialTokenPort,
     private val tokenServiceLogic: TokenServiceLogic,
-) : AuthenticateWithSocialUseCase{
+) : AuthenticateWithSocialUseCase {
     override fun authenticate(command: SocialAuthenticationCommand): TokenInfo {
         val socialProfile = verifySocialTokenPort.verify(command.provider, command.providerToken)
         val finalUser = processUserAuthentication(command.deviceId, socialProfile)
@@ -39,8 +39,7 @@ class SocialAuthenticationService(
         return TokenInfo(tokenResult.accessToken, tokenResult.refreshToken)
     }
 
-    private fun processUserAuthentication(deviceId: String, socialProfile: SocialProfileInfo) : User{
-
+    private fun processUserAuthentication(deviceId: String, socialProfile: SocialProfileInfo): User {
         // 이미 소셜 계정으로 가입된 사용자인지 확인 (재로그인)
         userPort.findBySocialId(socialProfile.provider, socialProfile.socialId)?. let {
             return it
@@ -59,7 +58,6 @@ class SocialAuthenticationService(
                 throw SoomSoomException(UserErrorCode.DEVICE_ALREADY_LINKED)
             }
         }
-
 
         // 완전히 새로운 사용자 (신규 소설 가입)
         return userPort.save(User.createSocial(socialProfile.provider, socialProfile.socialId, deviceId))
