@@ -26,6 +26,6 @@ class CustomUserDetailsService(
         }
 
         // 이 시점부터 user는 IdPassword 계정을 가진 것이 보장됨
-        return CustomUserDetails.of(user, user.role)
+        return CustomUserDetails.of(user = user, sessionRole = user.role)
     }
 }

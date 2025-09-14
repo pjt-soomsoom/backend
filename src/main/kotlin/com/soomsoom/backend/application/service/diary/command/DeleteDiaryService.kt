@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 class DeleteDiaryService(
     private val diaryPort: DiaryPort,
 ) : DeleteDiaryUseCase {
+
     override fun softDelete(command: DeleteDiaryCommand) {
         val diary = diaryPort.findById(command.diaryId)
             ?.also {

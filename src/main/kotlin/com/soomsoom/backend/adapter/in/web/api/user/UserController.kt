@@ -10,6 +10,8 @@ import com.soomsoom.backend.application.port.`in`.follow.dto.FollowingInstructor
 import com.soomsoom.backend.application.port.`in`.follow.usecase.query.FindFollowingInstructorsUseCase
 import com.soomsoom.backend.application.port.`in`.item.dto.CollectionDto
 import com.soomsoom.backend.application.port.`in`.item.dto.ItemDto
+import com.soomsoom.backend.application.port.`in`.todaymission.dto.TodayMissionResult
+import com.soomsoom.backend.application.port.`in`.todaymission.usecase.query.FindTodayMissionUseCase
 import com.soomsoom.backend.application.port.`in`.user.command.UpdateEquippedItemsCommand
 import com.soomsoom.backend.application.port.`in`.user.dto.EquippedItemsDto
 import com.soomsoom.backend.application.port.`in`.user.dto.UserPoints
@@ -28,7 +30,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -47,6 +48,8 @@ class UserController(
     private val findEquippedItemsUseCase: FindEquippedItemsUseCase,
     private val findOwnedCollectionsUseCase: FindOwnedCollectionsUseCase,
     private val findUserPointsUseCase: FindUserPointsUseCase,
+    private val todayMissionUseCase: FindTodayMissionUseCase,
+    private val findTodayMissionUseCase: FindTodayMissionUseCase,
 ) {
 
     /**
@@ -166,13 +169,13 @@ class UserController(
     }
 
     /**
-     * Points 제공
+     * 오늘의 미션 상태 조회(홈 화면용)
      */
-    @PostMapping("/points")
+    @GetMapping("/today-missions")
     @ResponseStatus(HttpStatus.OK)
-    fun addPoints(
+    fun getTodayMissions(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-        @RequestParam(required = false) userId: Long?,
-    ) {
+    ): TodayMissionResult {
+        return findTodayMissionUseCase.find(userDetails.id)
     }
 }

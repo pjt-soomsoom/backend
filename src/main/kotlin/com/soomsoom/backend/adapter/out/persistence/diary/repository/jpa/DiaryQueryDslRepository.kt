@@ -8,26 +8,30 @@ import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.dto.QDa
 import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.dto.QEmotionCount
 import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.entity.DiaryJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.entity.QDiaryJpaEntity.diaryJpaEntity
-import com.soomsoom.backend.application.port.`in`.diary.query.GetDailyDiaryRecordCriteria
-import com.soomsoom.backend.application.port.`in`.diary.query.GetMonthlyDiaryStatsCriteria
-import com.soomsoom.backend.application.port.`in`.diary.query.SearchDiariesCriteria
 import com.soomsoom.backend.common.utils.QueryDslSortUtil
 import com.soomsoom.backend.domain.common.DeletionStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.support.PageableExecutionUtils
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
 @Repository
 class DiaryQueryDslRepository(
     private val queryFactory: JPAQueryFactory,
 ) {
-    fun search(criteria: SearchDiariesCriteria, pageable: Pageable): Page<DiaryJpaEntity> {
+    fun search(
+        userId: Long,
+        from: LocalDateTime,
+        to: LocalDateTime,
+        deletionStatus: DeletionStatus,
+        pageable: Pageable,
+    ): Page<DiaryJpaEntity> {
         val content = queryFactory.selectFrom(diaryJpaEntity)
             .where(
-                diaryJpaEntity.userId.eq(criteria.userId),
-                diaryJpaEntity.recordDate.between(criteria.from, criteria.to),
-                deletionStatusEq(criteria.deletionStatus)
+                diaryJpaEntity.userId.eq(userId),
+                diaryJpaEntity.createdAt.between(from, to),
+                deletionStatusEq(deletionStatus)
             )
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
@@ -37,9 +41,9 @@ class DiaryQueryDslRepository(
         val countQuery = queryFactory.select(diaryJpaEntity.count())
             .from(diaryJpaEntity)
             .where(
-                diaryJpaEntity.userId.eq(criteria.userId),
-                diaryJpaEntity.recordDate.between(criteria.from, criteria.to),
-                deletionStatusEq(criteria.deletionStatus)
+                diaryJpaEntity.userId.eq(userId),
+                diaryJpaEntity.createdAt.between(from, to),
+                deletionStatusEq(deletionStatus)
             )
 
         return PageableExecutionUtils.getPage(content, pageable) { countQuery.fetchOne() ?: 0L }
@@ -48,22 +52,29 @@ class DiaryQueryDslRepository(
     /**
      * 특정 기간 동안의 일별 요약 기록 목록을 조회
      */
-    fun findDailyDiaryRecords(criteria: GetDailyDiaryRecordCriteria): List<DailyDiaryRecordAdapterDto> {
+    fun findDailyDiaryRecords(
+        userId: Long,
+        from: LocalDateTime,
+        to: LocalDateTime,
+        deletionStatus: DeletionStatus,
+    ): List<DailyDiaryRecordAdapterDto> {
         return queryFactory
             .select(
                 QDailyDiaryRecordAdapterDto(
                     diaryJpaEntity.id,
                     diaryJpaEntity.emotion,
-                    diaryJpaEntity.recordDate
+                    diaryJpaEntity.createdAt,
+                    diaryJpaEntity.modifiedAt,
+                    diaryJpaEntity.deletedAt
                 )
             )
             .from(diaryJpaEntity)
             .where(
-                diaryJpaEntity.userId.eq(criteria.userId),
-                diaryJpaEntity.recordDate.between(criteria.from, criteria.to),
-                deletionStatusEq(criteria.deletionStatus)
+                diaryJpaEntity.userId.eq(userId),
+                diaryJpaEntity.createdAt.between(from, to),
+                deletionStatusEq(deletionStatus)
             )
-            .orderBy(diaryJpaEntity.recordDate.asc())
+            .orderBy(diaryJpaEntity.createdAt.asc())
             .fetch()
     }
 
@@ -75,17 +86,18 @@ class DiaryQueryDslRepository(
             .from(diaryJpaEntity)
             .where(
                 diaryJpaEntity.userId.eq(userId),
-                deletionStatusEq(deletionStatus) // 기존 헬퍼 메서드 재사용
+                deletionStatusEq(deletionStatus)
             )
             .fetchOne() ?: 0L
     }
 
     // 월 별 감정 통계
-    fun findMonthlyEmotionCounts(criteria: GetMonthlyDiaryStatsCriteria): List<EmotionCount> {
-        val yearMonth = criteria.yearMonth
-        val startDate = yearMonth.atDay(1)
-        val endDate = yearMonth.atEndOfMonth()
-
+    fun findEmotionCountsByPeriod(
+        userId: Long,
+        from: LocalDateTime,
+        to: LocalDateTime,
+        deletionStatus: DeletionStatus,
+    ): List<EmotionCount> {
         return queryFactory
             .select(
                 QEmotionCount(
@@ -95,12 +107,50 @@ class DiaryQueryDslRepository(
             )
             .from(diaryJpaEntity)
             .where(
-                diaryJpaEntity.userId.eq(criteria.userId),
-                diaryJpaEntity.recordDate.between(startDate, endDate),
-                deletionStatusEq(criteria.deletionStatus)
+                diaryJpaEntity.userId.eq(userId),
+                diaryJpaEntity.createdAt.between(from, to),
+                deletionStatusEq(deletionStatus)
             )
             .groupBy(diaryJpaEntity.emotion)
             .fetch()
+    }
+
+    /**
+     * 특정 비즈니스 날짜에 이미 일기를 썼는지 확인
+     */
+    fun existsByUserIdAndCreatedAtBetween(
+        userId: Long,
+        from: LocalDateTime,
+        to: LocalDateTime,
+        deletionStatus: DeletionStatus,
+    ): Boolean {
+        return queryFactory.selectOne()
+            .from(diaryJpaEntity)
+            .where(
+                diaryJpaEntity.userId.eq(userId),
+                diaryJpaEntity.createdAt.between(from, to),
+                deletionStatusEq(deletionStatus)
+            )
+            .fetchFirst() != null
+    }
+
+    /**
+     * 두 날짜 사이의 일기 개수 세기
+     */
+    fun countByUserIdAndCreatedAtBetween(
+        userId: Long,
+        from: LocalDateTime,
+        to: LocalDateTime,
+        deletionStatus: DeletionStatus,
+    ): Long {
+        return queryFactory.select(diaryJpaEntity.count())
+            .from(diaryJpaEntity)
+            .where(
+                diaryJpaEntity.userId.eq(userId),
+                diaryJpaEntity.createdAt.between(from, to),
+                diaryJpaEntity.deletedAt.isNull
+            )
+            .fetchOne() ?: 0L
     }
 
     private fun deletionStatusEq(deletionStatus: DeletionStatus): BooleanExpression? {

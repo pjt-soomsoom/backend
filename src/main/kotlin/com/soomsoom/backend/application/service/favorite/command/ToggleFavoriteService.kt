@@ -3,18 +3,27 @@ package com.soomsoom.backend.application.service.favorite.command
 import com.soomsoom.backend.application.port.`in`.favorite.command.ToggleFavoriteCommand
 import com.soomsoom.backend.application.port.`in`.favorite.dto.ToggleFavoriteResult
 import com.soomsoom.backend.application.port.`in`.favorite.usecase.command.ToggleFavoriteUseCase
+import com.soomsoom.backend.application.port.out.activity.ActivityPort
 import com.soomsoom.backend.application.port.out.favorite.FavoritePort
+import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.activity.ActivityErrorCode
 import com.soomsoom.backend.domain.favoriote.model.Favorite
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional
 class ToggleFavoriteService(
     private val favoritePort: FavoritePort,
+    private val activityPort: ActivityPort,
 ) : ToggleFavoriteUseCase {
 
-    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == command.userId")
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #command.userId")
     override fun toggle(command: ToggleFavoriteCommand): ToggleFavoriteResult {
+        activityPort.findById(command.activityId)
+            ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
+
         val existingFavorite = favoritePort.findByUserIdAndActivityId(command.userId, command.activityId)
 
         return existingFavorite?.let { favorite ->

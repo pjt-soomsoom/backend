@@ -4,7 +4,10 @@ import com.soomsoom.backend.application.port.`in`.follow.command.ToggleFollowCom
 import com.soomsoom.backend.application.port.`in`.follow.dto.ToggleFollowResult
 import com.soomsoom.backend.application.port.`in`.follow.usecase.command.ToggleFollowUseCase
 import com.soomsoom.backend.application.port.out.follow.FollowPort
+import com.soomsoom.backend.application.port.out.instructor.InstructorPort
+import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.follow.model.Follow
+import com.soomsoom.backend.domain.instructor.InstructorErrorCode
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,10 +16,14 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class ToggleFollowService(
     private val followPort: FollowPort,
+    private val instructorPort: InstructorPort,
 ) : ToggleFollowUseCase {
 
-    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == command.followerId")
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #command.followerId")
     override fun toggle(command: ToggleFollowCommand): ToggleFollowResult {
+        instructorPort.findById(command.followeeId)
+            ?: throw SoomSoomException(InstructorErrorCode.NOT_FOUND)
+
         val existingFollow = followPort.findByFollowerIdAndFolloweeId(command.followerId, command.followeeId)
 
         return existingFollow?.let { follow ->

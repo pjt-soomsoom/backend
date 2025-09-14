@@ -30,7 +30,13 @@ class SocialAuthenticationService(
         val finalUser = processUserAuthentication(command.deviceId, socialProfile)
 
         val sessionRole = finalUser.role
-        val principal = CustomUserDetails.of(finalUser, sessionRole)
+        val account = finalUser.account
+        val deviceId = when (account) {
+            is Account.Anonymous -> account.deviceId
+            is Account.Social -> account.deviceId
+            else -> null
+        }
+        val principal = CustomUserDetails.of(user = finalUser, deviceId = deviceId, sessionRole = sessionRole)
         val authentication = UsernamePasswordAuthenticationToken(principal, "", principal.authorities)
 
         val tokenResult = tokenGeneratorPort.generateToken(authentication)

@@ -9,7 +9,6 @@ fun DiaryJpaEntity.toDomain(): Diary {
         userId = this.userId,
         emotion = this.emotion,
         memo = this.memo,
-        recordDate = this.recordDate,
         createdAt = this.createdAt,
         modifiedAt = this.modifiedAt,
         deletedAt = this.deletedAt
@@ -22,7 +21,6 @@ fun Diary.toEntity(): DiaryJpaEntity {
         id = this.id ?: 0,
         userId = this.userId,
         emotion = this.emotion,
-        memo = this.memo,
-        recordDate = this.recordDate
+        memo = this.memo
     )
 }

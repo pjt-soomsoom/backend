@@ -1,6 +1,5 @@
 package com.soomsoom.backend.domain.diary.model
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 class Diary(
@@ -8,7 +7,6 @@ class Diary(
     val userId: Long,
     var emotion: Emotion,
     var memo: String?,
-    val recordDate: LocalDate,
 
     val createdAt: LocalDateTime? = null,
     val modifiedAt: LocalDateTime? = null,
