@@ -11,6 +11,7 @@ class CustomUserDetails(
     val id: Long,
     private val username: String,
     private val password: String,
+    val deviceId: String? = null,
     private val authorities: MutableCollection<out GrantedAuthority>,
 ) : UserDetails {
 
@@ -24,7 +25,7 @@ class CustomUserDetails(
     override fun isEnabled(): Boolean = true
 
     companion object {
-        fun of(user: User, sessionRole: Role): CustomUserDetails {
+        fun of(user: User, deviceId: String? = null, sessionRole: Role): CustomUserDetails {
             val username = when (val acc = user.account) {
                 is Account.IdPassword -> acc.username
                 else -> user.id!!.toString()
@@ -35,6 +36,7 @@ class CustomUserDetails(
                 id = user.id!!,
                 username = username,
                 password = password,
+                deviceId = deviceId,
                 authorities = mutableListOf(SimpleGrantedAuthority(sessionRole.name))
             )
         }

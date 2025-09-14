@@ -5,25 +5,37 @@ import com.soomsoom.backend.application.port.out.achievement.AchievementPort
 import com.soomsoom.backend.application.port.out.achievement.UserProgressPort
 import com.soomsoom.backend.application.port.out.activityhistory.ActivityHistoryPort
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
+import com.soomsoom.backend.common.utils.DateHelper
 import com.soomsoom.backend.domain.achievement.model.ConditionType
 import com.soomsoom.backend.domain.achievement.model.UserProgress
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
+import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 
 @Component
+@Transactional
 class MeditationCompletedProgressUpdateStrategy(
     private val userProgressPort: UserProgressPort,
     private val achievementPort: AchievementPort,
     private val activityHistoryPort: ActivityHistoryPort,
     private val checkAndGrantAchievementsUseCase: CheckAndGrantAchievementsUseCase,
+    private val dateHelper: DateHelper,
 ) : ActivityTypeProgressUpdateStrategy {
     override fun supports(): ActivityType = ActivityType.MEDITATION
 
     override fun update(payload: ActivityCompletedPayload) {
+        // 누적 횟수
         handleProgress(payload.userId, ConditionType.MEDITATION_COUNT) { p, t -> p.increase(t) }
+
+        // 일반 연속
         handleStreak(payload, ConditionType.MEDITATION_STREAK)
+
+        // 심야 연속
         handleLateNightStreak(payload)
+
+        // 월간 누적
         handleMonthlyCount(payload, ConditionType.MEDITATION_MONTHLY_COUNT)
     }
 
@@ -39,8 +51,14 @@ class MeditationCompletedProgressUpdateStrategy(
     }
 
     private fun handleStreak(payload: ActivityCompletedPayload, type: ConditionType) {
-        val lastLog = activityHistoryPort.findLatestCompletionLog(payload.userId, payload.activityType, payload.completedAt.toLocalDate())
-        val isStreak = lastLog != null && ChronoUnit.DAYS.between(lastLog.createdAt!!.toLocalDate(), payload.completedAt.toLocalDate()) == 1L
+        val lastLog = activityHistoryPort.findLatestCompletionLogBefore(payload.userId, payload.activityType, payload.completedAt.toLocalDate())
+        val isStreak = if (lastLog?.createdAt != null) {
+            val lastBusinessDate = dateHelper.getBusinessDate(lastLog.createdAt)
+            val currentBusinessDate = dateHelper.getBusinessDate(payload.completedAt)
+            ChronoUnit.DAYS.between(lastBusinessDate, currentBusinessDate) == 1L
+        } else {
+            false
+        }
 
         handleProgress(payload.userId, type) { progress, maxTarget ->
             if (isStreak) progress.increase(maxTarget) else progress.updateTo(1, maxTarget)
@@ -60,9 +78,16 @@ class MeditationCompletedProgressUpdateStrategy(
     }
 
     private fun handleMonthlyCount(payload: ActivityCompletedPayload, type: ConditionType) {
-        val date = payload.completedAt.toLocalDate()
-        val firstDayOfMonth = date.withDayOfMonth(1)
-        val monthlyCount = activityHistoryPort.countMonthlyCompletion(payload.userId, payload.activityType, firstDayOfMonth, date)
+        val currentBusinessDate = dateHelper.getBusinessDate(payload.completedAt)
+        val currentYearMonth = YearMonth.from(currentBusinessDate)
+        val period = dateHelper.getBusinessPeriod(currentYearMonth)
+
+        val monthlyCount = activityHistoryPort.countCompletionByPeriod(
+            payload.userId,
+            payload.activityType,
+            period.start,
+            period.end
+        )
 
         handleProgress(payload.userId, type) { progress, maxTarget ->
             progress.updateTo(monthlyCount.toInt(), maxTarget)

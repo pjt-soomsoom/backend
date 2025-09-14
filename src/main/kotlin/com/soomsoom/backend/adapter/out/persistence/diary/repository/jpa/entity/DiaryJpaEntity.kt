@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import java.time.LocalDate
 
 @Entity
 @Table(name = "diaries")
@@ -22,7 +21,6 @@ class DiaryJpaEntity(
     @Enumerated(EnumType.STRING)
     var emotion: Emotion,
     var memo: String?,
-    val recordDate: LocalDate,
 ) : BaseTimeEntity() {
 
     /**

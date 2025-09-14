@@ -18,13 +18,13 @@ data class FindDiaryResult(
     val deletedAt: LocalDateTime?,
 ) {
     companion object {
-        fun from(diary: Diary): FindDiaryResult {
+        fun from(diary: Diary, recordDate: LocalDate): FindDiaryResult {
             return FindDiaryResult(
                 diaryId = diary.id ?: throw SoomSoomException(DiaryErrorCode.ID_CANNOT_BE_NULL),
                 userId = diary.userId,
                 emotion = diary.emotion,
                 memo = diary.memo,
-                recordDate = diary.recordDate,
+                recordDate = recordDate,
                 createdAt = diary.createdAt ?: throw SoomSoomException(DiaryErrorCode.CREATED_AT_CANNOT_BE_NULL),
                 modifiedAt = diary.modifiedAt,
                 deletedAt = diary.deletedAt

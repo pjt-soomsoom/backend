@@ -5,18 +5,22 @@ import com.soomsoom.backend.application.port.out.achievement.AchievementPort
 import com.soomsoom.backend.application.port.out.achievement.UserProgressPort
 import com.soomsoom.backend.application.port.out.activityhistory.ActivityHistoryPort
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
+import com.soomsoom.backend.common.utils.DateHelper
 import com.soomsoom.backend.domain.achievement.model.ConditionType
 import com.soomsoom.backend.domain.achievement.model.UserProgress
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import java.time.temporal.ChronoUnit
 
 @Component
+@Transactional
 class BreathingCompletedProgressUpdateStrategy(
     private val userProgressPort: UserProgressPort,
     private val achievementPort: AchievementPort,
     private val activityHistoryPort: ActivityHistoryPort,
     private val checkAndGrantAchievementsUseCase: CheckAndGrantAchievementsUseCase,
+    private val dateHelper: DateHelper,
 ) : ActivityTypeProgressUpdateStrategy {
     override fun supports(): ActivityType = ActivityType.BREATHING
 
@@ -38,8 +42,14 @@ class BreathingCompletedProgressUpdateStrategy(
     }
 
     private fun handleStreak(payload: ActivityCompletedPayload, type: ConditionType) {
-        val lastLog = activityHistoryPort.findLatestCompletionLog(payload.userId, payload.activityType, payload.completedAt.toLocalDate())
-        val isStreak = lastLog != null && ChronoUnit.DAYS.between(lastLog.createdAt!!.toLocalDate(), payload.completedAt.toLocalDate()) == 1L
+        val lastLog = activityHistoryPort.findLatestCompletionLogBefore(payload.userId, payload.activityType, payload.completedAt.toLocalDate())
+        val isStreak = if (lastLog?.createdAt != null) {
+            val lastBusinessDate = dateHelper.getBusinessDate(lastLog.createdAt!!)
+            val currentBusinessDate = dateHelper.getBusinessDate(payload.completedAt)
+            ChronoUnit.DAYS.between(lastBusinessDate, currentBusinessDate) == 1L
+        } else {
+            false
+        }
 
         handleProgress(payload.userId, type) { progress, maxTarget ->
             if (isStreak) progress.increase(maxTarget) else progress.updateTo(1, maxTarget)

@@ -33,7 +33,7 @@ class AdminSignUpService(
             .let { userPort.save(it) }
 
         val sessionRole = savedUser.role
-        val principal = CustomUserDetails.of(savedUser, sessionRole)
+        val principal = CustomUserDetails.of(user = savedUser, sessionRole = sessionRole)
         val authentication = UsernamePasswordAuthenticationToken(principal, "", principal.authorities)
 
         val tokenResult = tokenGeneratorPort.generateToken(authentication)

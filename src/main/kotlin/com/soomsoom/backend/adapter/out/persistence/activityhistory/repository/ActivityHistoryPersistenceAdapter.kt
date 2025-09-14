@@ -13,6 +13,7 @@ import com.soomsoom.backend.domain.activityhistory.model.ActivityProgress
 import com.soomsoom.backend.domain.activityhistory.model.UserActivitySummary
 import org.springframework.stereotype.Component
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Component
 class ActivityHistoryPersistenceAdapter(
@@ -49,15 +50,29 @@ class ActivityHistoryPersistenceAdapter(
         return activityCompletionLogJpaRepository.countByUserId(userId)
     }
 
-    override fun findLatestCompletionLog(userId: Long, activityType: ActivityType, targetDate: LocalDate): ActivityCompletionLog? {
+    override fun findLatestCompletionLogBefore(userId: Long, activityType: ActivityType, targetDate: LocalDate): ActivityCompletionLog? {
         return activityCompletionLogQueryDslRepository.findLatestCompletionLog(userId, activityType, targetDate)?.toDomain()
     }
 
-    override fun countMonthlyCompletion(userId: Long, activityType: ActivityType, from: LocalDate, to: LocalDate): Long {
-        return activityCompletionLogQueryDslRepository.countMonthlyCompletion(userId, activityType, from, to)
+    override fun countCompletionByPeriod(userId: Long, activityType: ActivityType, from: LocalDateTime, to: LocalDateTime): Long {
+        return activityCompletionLogQueryDslRepository.countByUserIdAndActivityTypeAndCreatedAtBetween(userId, activityType, from, to)
     }
 
     override fun countDistinctActivity(userId: Long, activityType: ActivityType): Long {
         return activityCompletionLogQueryDslRepository.countDistinctActivity(userId, activityType)
+    }
+
+    override fun existsByUserIdAndTypesAndCreatedAtBetween(
+        userId: Long,
+        activityTypes: List<ActivityType>,
+        from: LocalDateTime,
+        to: LocalDateTime,
+    ): Boolean {
+        return activityCompletionLogQueryDslRepository.existsByUserIdAndTypesAndCreatedAtBetween(
+            userId = userId,
+            activityTypes = activityTypes,
+            from = from,
+            to = to
+        )
     }
 }

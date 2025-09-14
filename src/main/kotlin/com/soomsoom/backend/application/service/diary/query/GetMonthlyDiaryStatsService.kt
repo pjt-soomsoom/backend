@@ -5,6 +5,7 @@ import com.soomsoom.backend.application.port.`in`.diary.dto.GetMonthlyDiaryStats
 import com.soomsoom.backend.application.port.`in`.diary.query.GetMonthlyDiaryStatsCriteria
 import com.soomsoom.backend.application.port.`in`.diary.usecase.query.GetMonthlyDiaryStatsUseCase
 import com.soomsoom.backend.application.port.out.diary.DiaryPort
+import com.soomsoom.backend.common.utils.DateHelper
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,11 +14,22 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class GetMonthlyDiaryStatsService(
     private val diaryPort: DiaryPort,
+    private val dateHelper: DateHelper,
 ) : GetMonthlyDiaryStatsUseCase {
 
+    /**
+     * 마음 리포트의 감정 순위, 감정 분포 조회
+     */
     @PreAuthorize("hasRole('ADMIN') or (#criteria.userId == authentication.principal.userId and #criteria.deletionStatus.name() == 'ACTIVE')")
     override fun findStats(criteria: GetMonthlyDiaryStatsCriteria): GetMonthlyDiaryStatsResult {
-        val emotionCounts = diaryPort.getMonthlyEmotionCounts(criteria)
+        val businessPeriod = dateHelper.getBusinessPeriod(criteria.yearMonth)
+
+        val emotionCounts = diaryPort.findEmotionCountsByPeriod(
+            criteria.userId,
+            businessPeriod.start,
+            businessPeriod.end,
+            criteria.deletionStatus
+        )
 
         val totalCount = emotionCounts.sumOf { it.count }
 

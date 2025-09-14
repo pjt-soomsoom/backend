@@ -35,7 +35,7 @@ class RefreshTokenService(
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
         val sessionRole = user.role
-        val principal = CustomUserDetails.of(user, sessionRole)
+        val principal = CustomUserDetails.of(user, null, sessionRole)
         val authentication = UsernamePasswordAuthenticationToken(principal, "", principal.authorities)
 
         val newTokenResult = tokenGeneratorPort.generateToken(authentication)

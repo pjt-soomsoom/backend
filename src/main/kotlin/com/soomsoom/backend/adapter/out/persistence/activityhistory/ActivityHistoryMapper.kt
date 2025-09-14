@@ -27,13 +27,15 @@ fun ActivityProgressJpaEntity.toDomain(): ActivityProgress = ActivityProgress(
 fun ActivityCompletionLog.toEntity(): ActivityCompletionLogJpaEntity = ActivityCompletionLogJpaEntity(
     id = this.id ?: 0,
     userId = this.userId,
-    activityId = this.activityId
+    activityId = this.activityId,
+    activityType = this.activityType
 )
 fun ActivityCompletionLogJpaEntity.toDomain(): ActivityCompletionLog = ActivityCompletionLog(
     id = this.id,
     userId = this.userId,
     activityId = this.activityId,
-    createdAt = this.createdAt
+    createdAt = this.createdAt,
+    activityType = this.activityType
 )
 
 // Mappers for UserActivitySummary

@@ -21,13 +21,13 @@ data class RegisterDiaryResult(
         /**
          * Diary 도메인 객체로 dto 생성
          */
-        fun from(diary: Diary): RegisterDiaryResult {
+        fun from(diary: Diary, recordDate: LocalDate): RegisterDiaryResult {
             return RegisterDiaryResult(
                 diaryId = diary.id ?: throw SoomSoomException(DiaryErrorCode.ID_CANNOT_BE_NULL),
                 userId = diary.userId,
                 emotion = diary.emotion,
                 memo = diary.memo,
-                recordDate = diary.recordDate,
+                recordDate = recordDate,
                 createdAt = diary.createdAt ?: throw SoomSoomException(DiaryErrorCode.CREATED_AT_CANNOT_BE_NULL),
                 modifiedAt = diary.modifiedAt,
                 deletedAt = diary.deletedAt

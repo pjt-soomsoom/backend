@@ -5,6 +5,7 @@ import com.soomsoom.backend.domain.activityhistory.model.ActivityCompletionLog
 import com.soomsoom.backend.domain.activityhistory.model.ActivityProgress
 import com.soomsoom.backend.domain.activityhistory.model.UserActivitySummary
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 interface ActivityHistoryPort {
     // ActivityProgress (이어듣기) 관련
@@ -24,15 +25,25 @@ interface ActivityHistoryPort {
     /**
      * 특정 날짜를 제외하고, 해당 날짜 이전에 가장 최근의 활동 완료 기록을 조회 (연속 달성 체크용)
      */
-    fun findLatestCompletionLog(userId: Long, activityType: ActivityType, targetDate: LocalDate): ActivityCompletionLog?
+    fun findLatestCompletionLogBefore(userId: Long, activityType: ActivityType, targetDate: LocalDate): ActivityCompletionLog?
 
     /**
-     * 특정 월의 활동 완료 횟수를 조회 (월간 달성 체크용)
+     * 특정 기간 동안의 활동 완료 횟수를 조회 (월간 달성 체크용)
      */
-    fun countMonthlyCompletion(userId: Long, activityType: ActivityType, from: LocalDate, to: LocalDate): Long
+    fun countCompletionByPeriod(userId: Long, activityType: ActivityType, from: LocalDateTime, to: LocalDateTime): Long
 
     /**
      * 완료한 활동의 종류(개수)를 조회 (다양한 종류 활동 완료 체크용)
      */
     fun countDistinctActivity(userId: Long, activityType: ActivityType): Long
+
+    /**
+     * 특정 기간 동안 특정 종류의 activity를 완료한 적이 있는지 확인
+     */
+    fun existsByUserIdAndTypesAndCreatedAtBetween(
+        userId: Long,
+        activityTypes: List<ActivityType>,
+        from: LocalDateTime,
+        to: LocalDateTime,
+    ): Boolean
 }

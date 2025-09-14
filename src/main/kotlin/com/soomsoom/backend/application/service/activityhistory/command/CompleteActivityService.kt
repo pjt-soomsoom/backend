@@ -34,7 +34,7 @@ class CompleteActivityService(
         val activity = activityPort.findById(command.activityId) ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
 
         // 완료 기록(ActivityCompletionLog)을 DB에 새로 생성하여 저장
-        val log = ActivityCompletionLog(null, command.userId, command.activityId, null)
+        val log = ActivityCompletionLog(null, command.userId, command.activityId, activity.type, null)
         activityHistoryPort.saveCompletionLog(log)
 
         // 활동이 완료되었음을 시스템에 알리는 이벤트를 발행 (업적 시스템 및 알림 시스템이 이 이벤트를 수신)

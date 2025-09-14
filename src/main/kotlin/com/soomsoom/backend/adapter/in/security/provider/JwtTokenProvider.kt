@@ -64,6 +64,7 @@ class JwtTokenProvider(
             id = (claims["userId"] as Number).toLong(),
             username = claims.subject,
             password = "",
+            deviceId = claims["deviceId"]?.toString(),
             authorities = authorities.toMutableList()
         )
         return UsernamePasswordAuthenticationToken(principal, "", authorities)
@@ -92,10 +93,13 @@ class JwtTokenProvider(
         val userId = (authentication.principal as? CustomUserDetails)?.id
             ?: throw IllegalStateException("Authentication principal is not CustomUserDetails")
 
+        val deviceId = (authentication.principal as? CustomUserDetails)?.deviceId
+
         return Jwts.builder()
             .subject(authentication.name)
             .claim("auth", authorities)
             .claim("userId", userId)
+            .claim("deviceId", deviceId)
             .issuedAt(now)
             .expiration(validity)
             .signWith(key)

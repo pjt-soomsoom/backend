@@ -7,6 +7,7 @@ import com.soomsoom.backend.application.port.`in`.auth.usecase.command.Authentic
 import com.soomsoom.backend.application.port.out.auth.TokenGeneratorPort
 import com.soomsoom.backend.application.port.out.user.UserPort
 import com.soomsoom.backend.application.service.auth.common.TokenServiceLogic
+import com.soomsoom.backend.domain.user.model.Account
 import com.soomsoom.backend.domain.user.model.aggregate.Role
 import com.soomsoom.backend.domain.user.model.aggregate.User
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -25,7 +26,14 @@ class DeviceAuthenticationService(
             ?: userPort.save(User.createAnonymous(command.deviceId))
 
         val sessionRole = Role.ROLE_ANONYMOUS
-        val principal = CustomUserDetails.of(user, sessionRole)
+        val account = user.account
+        val deviceId = when (account) {
+            is Account.Anonymous -> account.deviceId
+            is Account.Social -> account.deviceId
+            else -> null
+        }
+
+        val principal = CustomUserDetails.of(user = user, deviceId = deviceId, sessionRole = sessionRole)
         val authentication = UsernamePasswordAuthenticationToken(principal, "", principal.authorities)
 
         val tokenResult = tokenGeneratorPort.generateToken(authentication)
