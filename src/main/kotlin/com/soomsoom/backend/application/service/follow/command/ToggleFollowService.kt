@@ -19,7 +19,7 @@ class ToggleFollowService(
     private val instructorPort: InstructorPort,
 ) : ToggleFollowUseCase {
 
-    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == command.followerId")
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #command.followerId")
     override fun toggle(command: ToggleFollowCommand): ToggleFollowResult {
         instructorPort.findById(command.followeeId)
             ?: throw SoomSoomException(InstructorErrorCode.NOT_FOUND)

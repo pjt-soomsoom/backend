@@ -20,7 +20,7 @@ class GetMonthlyDiaryStatsService(
     /**
      * 마음 리포트의 감정 순위, 감정 분포 조회
      */
-    @PreAuthorize("hasRole('ADMIN') or (#criteria.userId == authentication.principal.userId and #criteria.deletionStatus.name() == 'ACTIVE')")
+    @PreAuthorize("hasRole('ADMIN') or (#criteria.userId == authentication.principal.id and #criteria.deletionStatus.name() == 'ACTIVE')")
     override fun findStats(criteria: GetMonthlyDiaryStatsCriteria): GetMonthlyDiaryStatsResult {
         val businessPeriod = dateHelper.getBusinessPeriod(criteria.yearMonth)
 

@@ -8,6 +8,6 @@ data class DailyDiaryRecordAdapterDto @QueryProjection constructor(
     val diaryId: Long,
     val emotion: Emotion,
     val createdAt: LocalDateTime,
-    val modifiedAt: LocalDateTime,
-    val deletedAt: LocalDateTime,
+    val modifiedAt: LocalDateTime?,
+    val deletedAt: LocalDateTime?,
 )

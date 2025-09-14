@@ -10,8 +10,8 @@ data class GetDailyDiaryRecordResult(
     val emotion: Emotion,
     val recordDate: LocalDate,
     val createdAt: LocalDateTime,
-    val modifiedAt: LocalDateTime,
-    val deletedAT: LocalDateTime,
+    val modifiedAt: LocalDateTime?,
+    val deletedAt: LocalDateTime?,
 ) {
     companion object {
         fun from(summary: DailyDiaryRecordAdapterDto, recordDate: LocalDate): GetDailyDiaryRecordResult {
@@ -21,7 +21,7 @@ data class GetDailyDiaryRecordResult(
                 recordDate = recordDate,
                 createdAt = summary.createdAt,
                 modifiedAt = summary.modifiedAt,
-                deletedAT = summary.deletedAt
+                deletedAt = summary.deletedAt
             )
         }
     }

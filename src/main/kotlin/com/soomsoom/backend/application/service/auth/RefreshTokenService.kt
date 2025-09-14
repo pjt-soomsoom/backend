@@ -9,6 +9,7 @@ import com.soomsoom.backend.application.port.out.user.UserPort
 import com.soomsoom.backend.application.service.auth.common.TokenServiceLogic
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.user.UserErrorCode
+import com.soomsoom.backend.domain.user.model.Account
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -35,7 +36,13 @@ class RefreshTokenService(
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
         val sessionRole = user.role
-        val principal = CustomUserDetails.of(user, null, sessionRole)
+        val account = user.account
+        val deviceId = when (account) {
+            is Account.Anonymous -> account.deviceId
+            is Account.Social -> account.deviceId
+            else -> null
+        }
+        val principal = CustomUserDetails.of(user, deviceId, sessionRole)
         val authentication = UsernamePasswordAuthenticationToken(principal, "", principal.authorities)
 
         val newTokenResult = tokenGeneratorPort.generateToken(authentication)

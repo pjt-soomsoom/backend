@@ -65,7 +65,7 @@ class DiaryQueryDslRepository(
                     diaryJpaEntity.emotion,
                     diaryJpaEntity.createdAt,
                     diaryJpaEntity.modifiedAt,
-                    diaryJpaEntity.modifiedAt
+                    diaryJpaEntity.deletedAt
                 )
             )
             .from(diaryJpaEntity)
@@ -129,7 +129,6 @@ class DiaryQueryDslRepository(
             .where(
                 diaryJpaEntity.userId.eq(userId),
                 diaryJpaEntity.createdAt.between(from, to),
-                diaryJpaEntity.deletedAt.isNull,
                 deletionStatusEq(deletionStatus)
             )
             .fetchFirst() != null
@@ -149,8 +148,7 @@ class DiaryQueryDslRepository(
             .where(
                 diaryJpaEntity.userId.eq(userId),
                 diaryJpaEntity.createdAt.between(from, to),
-                diaryJpaEntity.deletedAt.isNull,
-                deletionStatusEq(deletionStatus)
+                diaryJpaEntity.deletedAt.isNull
             )
             .fetchOne() ?: 0L
     }

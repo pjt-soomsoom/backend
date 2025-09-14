@@ -19,7 +19,7 @@ class GetDailyDiaryRecordService(
     /**
      *  마음 리포트 하단의 요일별 감정 기록
      */
-    @PreAuthorize("hasRole('ADMIN') or (#criteria.userId == authentication.principal.userId and #criteria.deletionStatus.name() == 'ACTIVE')")
+    @PreAuthorize("hasRole('ADMIN') or (#criteria.userId == authentication.principal.id and #criteria.deletionStatus.name() == 'ACTIVE')")
     override fun getDailyDiaryRecord(criteria: GetDailyDiaryRecordCriteria): List<GetDailyDiaryRecordResult> {
         val businessPeriod = dateHelper.getBusinessPeriod(criteria.from, criteria.to)
         val dailyRecords = diaryPort.getDailyDiaryRecords(
