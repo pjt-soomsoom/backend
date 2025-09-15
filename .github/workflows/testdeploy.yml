@@ -67,6 +67,8 @@ jobs:
           echo "oauth.google.client-id=${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}" >> ./src/main/resources/application.properties
           echo "oauth.apple.client-id=${{ secrets.OAUTH_APPLE_CLIENT_ID }}" >> ./src/main/resources/application.properties
 
+          # Cutoff Time
+            echo "app.daily-cutoff-hour=${{ secrets.APP_DAILY_CUTOFF_HOUT }}" >> ./src/main/resources/application.properties
       # 4. Gradle 빌드 권한 부여 및 실행
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
