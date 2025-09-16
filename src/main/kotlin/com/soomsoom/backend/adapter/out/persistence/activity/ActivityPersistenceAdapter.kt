@@ -1,11 +1,9 @@
-package com.soomsoom.backend.adapter.out.persistence.activity.repository
+package com.soomsoom.backend.adapter.out.persistence.activity
 
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.ActivityJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.ActivityQueryDslRepository
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.ActivityWithFavoriteStatusDto
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.ActivityWithInstructorsDto
-import com.soomsoom.backend.adapter.out.persistence.activity.toDomain
-import com.soomsoom.backend.adapter.out.persistence.activity.toJpaEntity
 import com.soomsoom.backend.application.port.`in`.activity.query.SearchActivitiesCriteria
 import com.soomsoom.backend.application.port.`in`.activity.query.SearchInstructorActivitiesCriteria
 import com.soomsoom.backend.application.port.out.activity.ActivityPort

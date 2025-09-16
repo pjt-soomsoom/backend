@@ -1,4 +1,4 @@
-package com.soomsoom.backend.adapter.`in`.web.api.user.config
+package com.soomsoom.backend.adapter.`in`.web.api.useractivity.config
 
 import com.soomsoom.backend.adapter.`in`.security.config.DomainSecurityConfigurer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity

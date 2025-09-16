@@ -1,6 +1,6 @@
-package com.soomsoom.backend.adapter.out.persistence.useractive.repository
+package com.soomsoom.backend.adapter.out.persistence.useractivity
 
-import com.soomsoom.backend.adapter.out.persistence.useractive.repository.jpa.entity.ScreenTimeLogJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.entity.ScreenTimeLogJpaEntity
 import com.soomsoom.backend.domain.useractivity.model.aggregate.ScreenTimeLog
 
 fun ScreenTimeLog.toEntity(): ScreenTimeLogJpaEntity {

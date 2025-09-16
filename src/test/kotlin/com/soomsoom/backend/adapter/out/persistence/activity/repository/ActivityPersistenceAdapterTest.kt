@@ -1,6 +1,7 @@
 package com.soomsoom.backend.adapter.out.persistence.activity.repository
 
 import com.soomsoom.backend.IntegrationTest
+import com.soomsoom.backend.adapter.out.persistence.activity.ActivityPersistenceAdapter
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.ActivityJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.InstructorJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.entity.InstructorJpaEntity

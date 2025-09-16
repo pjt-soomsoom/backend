@@ -1,6 +1,6 @@
-package com.soomsoom.backend.adapter.out.persistence.useractive.repository
+package com.soomsoom.backend.adapter.out.persistence.useractivity
 
-import com.soomsoom.backend.adapter.out.persistence.useractive.repository.jpa.ScreenTimeLogJpaRepository
+import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.ScreenTimeLogJpaRepository
 import com.soomsoom.backend.application.port.out.useractivity.ScreenTimeLogPort
 import com.soomsoom.backend.domain.useractivity.model.aggregate.ScreenTimeLog
 import org.springframework.stereotype.Component

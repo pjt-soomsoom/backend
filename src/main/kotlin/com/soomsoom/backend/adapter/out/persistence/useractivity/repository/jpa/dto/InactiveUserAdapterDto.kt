@@ -1,4 +1,4 @@
-package com.soomsoom.backend.adapter.out.persistence.useractive.repository.jpa.dto
+package com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto
 
 import com.querydsl.core.annotations.QueryProjection
 

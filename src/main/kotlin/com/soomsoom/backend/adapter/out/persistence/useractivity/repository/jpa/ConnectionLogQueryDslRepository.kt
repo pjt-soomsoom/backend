@@ -1,12 +1,12 @@
-package com.soomsoom.backend.adapter.out.persistence.useractive.repository.jpa
+package com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa
 
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.CaseBuilder
 import com.querydsl.core.types.dsl.NumberExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
-import com.soomsoom.backend.adapter.out.persistence.useractive.repository.jpa.dto.InactiveUserAdapterDto
-import com.soomsoom.backend.adapter.out.persistence.useractive.repository.jpa.dto.QInactiveUserAdapterDto
-import com.soomsoom.backend.adapter.out.persistence.useractive.repository.jpa.entity.QConnectionLogJpaEntity.connectionLogJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
+import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.QInactiveUserAdapterDto
+import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.entity.QConnectionLogJpaEntity.connectionLogJpaEntity
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
@@ -39,7 +39,6 @@ class ConnectionLogQueryDslRepository(
 
         val lastCreatedAt = connectionLogJpaEntity.createdAt.max()
 
-        // [오류 수정] CaseBuilder.Cases 타입을 사용하여 동적으로 when-then 체인을 구성합니다.
         var caseWhenChain: CaseBuilder.Cases<Int, NumberExpression<Int>>? = null
         inactivityConditions.forEach { (days, range) ->
             caseWhenChain = if (caseWhenChain == null) {
@@ -69,6 +68,7 @@ class ConnectionLogQueryDslRepository(
                 )
             )
             .from(connectionLogJpaEntity)
+            .where(connectionLogJpaEntity.deletedAt.isNull)
             .groupBy(connectionLogJpaEntity.userId)
             .having(havingExpression)
             .orderBy(connectionLogJpaEntity.userId.asc())

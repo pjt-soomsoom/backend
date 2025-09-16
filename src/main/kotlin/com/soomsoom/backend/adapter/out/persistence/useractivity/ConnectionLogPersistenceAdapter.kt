@@ -1,8 +1,8 @@
-package com.soomsoom.backend.adapter.out.persistence.useractive // package com.soomsoom.backend.adapter.out.persistence.connectionlog
+package com.soomsoom.backend.adapter.out.persistence.useractivity // package com.soomsoom.backend.adapter.out.persistence.connectionlog
 
-import com.soomsoom.backend.adapter.out.persistence.useractive.repository.jpa.ConnectionLogJpaRepository
-import com.soomsoom.backend.adapter.out.persistence.useractive.repository.jpa.ConnectionLogQueryDslRepository
-import com.soomsoom.backend.adapter.out.persistence.useractive.repository.jpa.dto.InactiveUserAdapterDto
+import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.ConnectionLogJpaRepository
+import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.ConnectionLogQueryDslRepository
+import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
 import com.soomsoom.backend.application.port.out.useractivity.ConnectionLogPort
 import com.soomsoom.backend.domain.useractivity.model.aggregate.ConnectionLog
 import org.springframework.stereotype.Component

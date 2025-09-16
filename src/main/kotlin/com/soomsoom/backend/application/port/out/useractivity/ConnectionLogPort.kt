@@ -1,6 +1,6 @@
 package com.soomsoom.backend.application.port.out.useractivity
 
-import com.soomsoom.backend.adapter.out.persistence.useractive.repository.jpa.dto.InactiveUserAdapterDto
+import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
 import com.soomsoom.backend.domain.useractivity.model.aggregate.ConnectionLog
 import java.time.LocalDateTime
 

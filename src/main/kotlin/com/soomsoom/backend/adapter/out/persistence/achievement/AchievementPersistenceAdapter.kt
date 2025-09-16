@@ -1,4 +1,4 @@
-package com.soomsoom.backend.adapter.out.persistence.achievement.repository
+package com.soomsoom.backend.adapter.out.persistence.achievement
 
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.AchievementConditionJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.AchievementJpaRepository
@@ -6,8 +6,6 @@ import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.A
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.UserAchievedJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.UserProgressJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.dto.AchievementWithProgressDto
-import com.soomsoom.backend.adapter.out.persistence.achievement.toDomain
-import com.soomsoom.backend.adapter.out.persistence.achievement.toEntity
 import com.soomsoom.backend.application.port.`in`.achievement.query.FindAllAchievementsCriteria
 import com.soomsoom.backend.application.port.`in`.achievement.query.FindMyAchievementsCriteria
 import com.soomsoom.backend.application.port.out.achievement.AchievementPort

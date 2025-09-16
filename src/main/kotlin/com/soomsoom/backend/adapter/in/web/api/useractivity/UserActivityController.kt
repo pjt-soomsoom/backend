@@ -1,5 +1,6 @@
 package com.soomsoom.backend.adapter.`in`.web.api.useractivity
 
+import com.soomsoom.backend.adapter.`in`.security.service.CustomUserDetails
 import com.soomsoom.backend.adapter.`in`.web.api.useractivity.request.AccumulateScreenTimeRequest
 import com.soomsoom.backend.application.port.`in`.useractivity.command.AccumulateScreenTimeCommand
 import com.soomsoom.backend.application.port.`in`.useractivity.usecase.command.AccumulateScreenTimeUseCase
@@ -19,11 +20,11 @@ class UserActivityController(
     @PostMapping("/screen-time")
     @ResponseStatus(HttpStatus.OK)
     fun accumulateScreenTime(
-        @AuthenticationPrincipal userId: Long,
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
         @RequestBody request: AccumulateScreenTimeRequest,
     ) {
         val command = AccumulateScreenTimeCommand(
-            userId = userId,
+            userId = userDetails.id,
             durationInSeconds = request.durationInSeconds
         )
         accumulateScreenTimeUseCase.accumulate(command)

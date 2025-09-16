@@ -1,11 +1,9 @@
-package com.soomsoom.backend.adapter.out.persistence.diary.repository
+package com.soomsoom.backend.adapter.out.persistence.diary
 
 import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.DiaryJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.DiaryQueryDslRepository
 import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.dto.DailyDiaryRecordAdapterDto
 import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.dto.EmotionCount
-import com.soomsoom.backend.adapter.out.persistence.diary.toDomain
-import com.soomsoom.backend.adapter.out.persistence.diary.toEntity
 import com.soomsoom.backend.application.port.out.diary.DiaryPort
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.common.DeletionStatus
