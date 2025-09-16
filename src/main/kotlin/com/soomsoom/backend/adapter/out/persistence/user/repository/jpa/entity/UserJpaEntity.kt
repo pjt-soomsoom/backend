@@ -4,6 +4,8 @@ import com.soomsoom.backend.adapter.out.persistence.common.entity.PointsEmbeddab
 import com.soomsoom.backend.common.entity.BaseTimeEntity
 import com.soomsoom.backend.domain.user.model.aggregate.Role
 import com.soomsoom.backend.domain.user.model.aggregate.User
+import com.soomsoom.backend.domain.user.model.enums.DailyDuration
+import com.soomsoom.backend.domain.user.model.enums.FocusGoal
 import com.soomsoom.backend.domain.user.model.enums.SocialProvider
 import jakarta.persistence.AttributeOverride
 import jakarta.persistence.CollectionTable
@@ -67,6 +69,12 @@ class UserJpaEntity(
     @Column(name = "collection_id")
     var equippedCollectionIds: MutableSet<Long> = mutableSetOf(),
 
+    @Enumerated(EnumType.STRING)
+    var focusGoal: FocusGoal?,
+
+    @Enumerated(EnumType.STRING)
+    var dailyDuration: DailyDuration?,
+
 ) : BaseTimeEntity() {
     enum class AccountType {
         ANONYMOUS, SOCIAL, ID_PASSWORD
@@ -89,5 +97,8 @@ class UserJpaEntity(
 
         this.equippedCollectionIds.clear()
         this.equippedCollectionIds.addAll(domain.equippedCollections)
+
+        this.focusGoal = domain.focusGoal
+        this.dailyDuration = domain.dailyDuration
     }
 }

@@ -23,7 +23,9 @@ fun User.toEntity(): UserJpaEntity {
         socialProvider = (this.account as? Account.Social)?.socialProvider,
         socialId = (this.account as? Account.Social)?.socialId,
         username = (this.account as? Account.IdPassword)?.username,
-        password = (this.account as? Account.IdPassword)?.password
+        password = (this.account as? Account.IdPassword)?.password,
+        focusGoal = this.focusGoal,
+        dailyDuration = this.dailyDuration
     )
     entity.ownedItemIds.clear()
     entity.ownedItemIds.addAll(this.ownedItems)
@@ -57,6 +59,8 @@ fun UserJpaEntity.toDomain(): User {
             floor = equippedItemsEmbeddable.floor,
             shelf = equippedItemsEmbeddable.shelf
         ),
-        equippedCollections = this.equippedCollectionIds
+        equippedCollections = this.equippedCollectionIds,
+        focusGoal = this.focusGoal,
+        dailyDuration = this.dailyDuration
     )
 }

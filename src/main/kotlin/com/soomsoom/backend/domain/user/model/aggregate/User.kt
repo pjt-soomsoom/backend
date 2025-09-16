@@ -5,6 +5,8 @@ import com.soomsoom.backend.common.exception.DomainErrorReason.ITEM_ALREADY_OWNE
 import com.soomsoom.backend.domain.common.vo.Points
 import com.soomsoom.backend.domain.item.model.enums.EquipSlot
 import com.soomsoom.backend.domain.user.model.Account
+import com.soomsoom.backend.domain.user.model.enums.DailyDuration
+import com.soomsoom.backend.domain.user.model.enums.FocusGoal
 import com.soomsoom.backend.domain.user.model.enums.SocialProvider
 import com.soomsoom.backend.domain.user.model.vo.EquippedItems
 
@@ -21,6 +23,9 @@ class User private constructor(
     ownedCollections: MutableSet<Long> = mutableSetOf(),
     var equippedItems: EquippedItems = EquippedItems(),
     equippedCollections: MutableSet<Long> = mutableSetOf(),
+
+    var focusGoal: FocusGoal?,
+    var dailyDuration: DailyDuration?,
 ) {
     private val _ownedItems: MutableSet<Long> = ownedItems
     val ownedItems: Set<Long> get() = _ownedItems.toSet()
@@ -84,6 +89,12 @@ class User private constructor(
         )
         this.role = Role.ROLE_USER
     }
+
+    fun answerOnboardingQuestions(goal: FocusGoal, duration: DailyDuration) {
+        this.focusGoal = goal
+        this.dailyDuration = duration
+    }
+
     companion object {
         fun from(
             id: Long?,
@@ -94,6 +105,8 @@ class User private constructor(
             ownedCollections: Set<Long> = setOf(),
             equippedItems: EquippedItems = EquippedItems(),
             equippedCollections: Set<Long> = setOf(),
+            focusGoal: FocusGoal? = null,
+            dailyDuration: DailyDuration? = null,
         ): User {
             return User(
                 id,
@@ -103,7 +116,9 @@ class User private constructor(
                 ownedItems.toMutableSet(),
                 ownedCollections.toMutableSet(),
                 equippedItems,
-                equippedCollections.toMutableSet()
+                equippedCollections.toMutableSet(),
+                focusGoal,
+                dailyDuration
             )
         }
 
@@ -112,7 +127,9 @@ class User private constructor(
                 id = null,
                 account = Account.Anonymous(deviceId),
                 role = Role.ROLE_ANONYMOUS,
-                points = Points(0)
+                points = Points(0),
+                focusGoal = null,
+                dailyDuration = null
             )
         }
 
@@ -121,7 +138,9 @@ class User private constructor(
                 id = null,
                 account = Account.Social(socialProvider, socialId, deviceId),
                 role = Role.ROLE_USER,
-                points = Points(0)
+                points = Points(0),
+                focusGoal = null,
+                dailyDuration = null
             )
         }
 
@@ -130,7 +149,9 @@ class User private constructor(
                 id = null,
                 account = Account.IdPassword(username, password),
                 role = Role.ROLE_ADMIN,
-                points = Points(10000000)
+                points = Points(10000000),
+                focusGoal = null,
+                dailyDuration = null
             )
         }
     }

@@ -1,6 +1,7 @@
 package com.soomsoom.backend.adapter.`in`.web.api.user
 
 import com.soomsoom.backend.adapter.`in`.security.service.CustomUserDetails
+import com.soomsoom.backend.adapter.`in`.web.api.user.request.AnswerOnboardingRequest
 import com.soomsoom.backend.adapter.`in`.web.api.user.request.UpdateEquippedItemsRequest
 import com.soomsoom.backend.application.port.`in`.activityhistory.dto.FindMySummaryResult
 import com.soomsoom.backend.application.port.`in`.activityhistory.usecase.query.FindMySummaryUseCase
@@ -17,6 +18,7 @@ import com.soomsoom.backend.application.port.`in`.user.dto.EquippedItemsDto
 import com.soomsoom.backend.application.port.`in`.user.dto.UserPoints
 import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedCollectionsCriteria
 import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedItemsCriteria
+import com.soomsoom.backend.application.port.`in`.user.usecase.command.AnswerOnboardingUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.command.UpdateEquippedItemsUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindEquippedItemsUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindOwnedCollectionsUseCase
@@ -30,6 +32,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -48,8 +51,8 @@ class UserController(
     private val findEquippedItemsUseCase: FindEquippedItemsUseCase,
     private val findOwnedCollectionsUseCase: FindOwnedCollectionsUseCase,
     private val findUserPointsUseCase: FindUserPointsUseCase,
-    private val todayMissionUseCase: FindTodayMissionUseCase,
     private val findTodayMissionUseCase: FindTodayMissionUseCase,
+    private val answerOnboardingUseCase: AnswerOnboardingUseCase,
 ) {
 
     /**
@@ -177,5 +180,18 @@ class UserController(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
     ): TodayMissionResult {
         return findTodayMissionUseCase.find(userDetails.id)
+    }
+
+    /**
+     * 온보딩 질문 답변 저장
+     */
+    @PostMapping("/onboarding-answers")
+    @ResponseStatus(HttpStatus.OK)
+    fun answerOnboarding(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+        @Valid @RequestBody
+        request: AnswerOnboardingRequest,
+    ) {
+        answerOnboardingUseCase.answer(request.toCommand(userDetails.id))
     }
 }
