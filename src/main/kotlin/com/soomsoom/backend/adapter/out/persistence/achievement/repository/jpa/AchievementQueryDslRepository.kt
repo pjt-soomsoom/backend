@@ -143,6 +143,31 @@ class AchievementQueryDslRepository(
             .fetch()
     }
 
+    /**
+     * 특정 사용자가 아직 달성하지 않은 특정 타입의 업적 조건 목록을 조회
+     * achievement_conditions 테이블과 user_achieved 테이블을 LEFT JOIN 하여
+     * user_achieved 기록이 없는 (즉, 달성하지 않은) 조건만 필터링링
+     */
+    fun findUnachievedConditionsByType(userId: Long, type: ConditionType): List<AchievementConditionJpaEntity> {
+        return queryFactory
+            .select(achievementConditionJpaEntity)
+            .from(achievementConditionJpaEntity)
+            // achievement_conditions 테이블과 achievements 테이블을 achievementId를 기준으로 INNER JOIN
+            .join(achievementJpaEntity).on(achievementConditionJpaEntity.achievementId.eq(achievementJpaEntity.id))
+            .leftJoin(userAchievedJpaEntity)
+            .on(
+                // 조인 조건은 achievement의 id를 사용
+                achievementJpaEntity.id.eq(userAchievedJpaEntity.achievementId)
+                    .and(userAchievedJpaEntity.userId.eq(userId))
+            )
+            .where(
+                achievementConditionJpaEntity.type.eq(type),
+                userAchievedJpaEntity.id.isNull, // 달성하지 않은 것만 필터링
+                achievementJpaEntity.deletedAt.isNull // 삭제되지 않은 것만 필터링
+            )
+            .fetch()
+    }
+
     private fun statusFilter(statusFilter: AchievementStatusFilter): BooleanExpression? {
         return when (statusFilter) {
             AchievementStatusFilter.ACHIEVED -> userAchievedJpaEntity.id.isNotNull

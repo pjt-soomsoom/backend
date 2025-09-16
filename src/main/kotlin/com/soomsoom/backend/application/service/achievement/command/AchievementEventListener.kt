@@ -6,6 +6,7 @@ import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.payload.AchievementAchievedNotificationPayload
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
 import com.soomsoom.backend.common.event.payload.DiaryCreatedPayload
+import com.soomsoom.backend.common.event.payload.ScreenTimeAccumulatedPayload
 import com.soomsoom.backend.common.event.payload.UserPlayTimeAccumulatedPayload
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
@@ -51,6 +52,17 @@ class ProgressUpdateEventListener(
     )
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleUserPlayTimeAccumulatedEvent(event: Event<UserPlayTimeAccumulatedPayload>) {
+        updateUserProgressUseCase.updateProgress(event)
+    }
+
+    @Async("threadPoolTaskExecutor")
+    @TransactionalEventListener(
+        classes = [Event::class],
+        condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).SCREEN_TIME_ACCUMULATED",
+        phase = TransactionPhase.AFTER_COMMIT
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun handleScreenTimeAccumulatedEvent(event: Event<ScreenTimeAccumulatedPayload>) {
         updateUserProgressUseCase.updateProgress(event)
     }
 }

@@ -18,4 +18,13 @@ enum class EventType {
 
     // 아이템 착용
     ITEMS_EQUIPPED,
+
+    // 오늘의 첫 접속
+    FIRST_CONNECTION_OF_THE_DAY,
+
+    // 사용자 인증 성공 이벤트
+    USER_AUTHENTICATED,
+
+    // 홈 화면 누적 시간
+    SCREEN_TIME_ACCUMULATED,
 }

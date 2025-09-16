@@ -9,8 +9,6 @@ import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.payload.UserPlayTimeAccumulatedPayload
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
-import com.soomsoom.backend.domain.activity.model.BreathingActivity
-import com.soomsoom.backend.domain.activity.model.MeditationActivity
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.activityhistory.model.ActivityProgress
 import com.soomsoom.backend.domain.activityhistory.model.UserActivitySummary
@@ -36,11 +34,16 @@ class RecordActivityProgressService(
         // 이어듣기를 위한 진행 상황(ActivityProgress)을 저장하거나 갱신
         updateActivityProgress(command)
 
-        // 누적 시간 통계(UserActivitySummary)를 갱신
-        val summary = updateUserActivitySummary(command.userId, command.actualPlayTimeInSeconds)
+        val activity = activityPort.findById(command.activityId)
+            ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
+
+        // 누적 시간 통계(UserActivitySummary)를 갱신 -> MEDITATION, BREATHING 만 적용
+        if (activity.type != ActivityType.SOUND_EFFECT) {
+            updateUserActivitySummary(command.userId, command.actualPlayTimeInSeconds)
+        }
 
         // 누적 시간이 갱신되었음을 시스템에 알리는 이벤트를 발행 (업적 시스템이 이 이벤트를 수신)
-        publishUserPlayTimeAccumulatedEvent(summary, command.activityId)
+        publishUserPlayTimeAccumulatedEvent(activity.type, command.userId, command.actualPlayTimeInSeconds)
     }
 
     /**
@@ -68,19 +71,12 @@ class RecordActivityProgressService(
     /**
      * 누적 시간 갱신 이벤트를 발행
      */
-    private fun publishUserPlayTimeAccumulatedEvent(summary: UserActivitySummary, activityId: Long) {
-        val activity = activityPort.findById(activityId) ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
-        val activityType = when (activity) {
-            is MeditationActivity -> ActivityType.MEDITATION
-            is BreathingActivity -> ActivityType.BREATHING
-            else -> throw SoomSoomException(ActivityErrorCode.UNSUPPORTED_ACTIVITY_TYPE)
-        }
-
+    private fun publishUserPlayTimeAccumulatedEvent(activityType: ActivityType, userId: Long, actualPlayTimeInSeconds: Int) {
         val event = Event(
             eventType = EventType.USER_PLAY_TIME_ACCUMULATED,
             payload = UserPlayTimeAccumulatedPayload(
-                userId = summary.userId,
-                totalPlaySeconds = summary.totalPlaySeconds,
+                userId = userId,
+                actualPlayTimeInSeconds = actualPlayTimeInSeconds,
                 activityType = activityType
             )
         )

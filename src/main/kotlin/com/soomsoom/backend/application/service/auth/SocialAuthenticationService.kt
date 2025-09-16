@@ -9,10 +9,14 @@ import com.soomsoom.backend.application.port.out.auth.TokenGeneratorPort
 import com.soomsoom.backend.application.port.out.auth.VerifySocialTokenPort
 import com.soomsoom.backend.application.port.out.user.UserPort
 import com.soomsoom.backend.application.service.auth.common.TokenServiceLogic
+import com.soomsoom.backend.common.event.Event
+import com.soomsoom.backend.common.event.EventType
+import com.soomsoom.backend.common.event.payload.UserAuthenticatedPayload
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.user.UserErrorCode
 import com.soomsoom.backend.domain.user.model.Account
 import com.soomsoom.backend.domain.user.model.aggregate.User
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,6 +28,7 @@ class SocialAuthenticationService(
     private val tokenGeneratorPort: TokenGeneratorPort,
     private val verifySocialTokenPort: VerifySocialTokenPort,
     private val tokenServiceLogic: TokenServiceLogic,
+    private val eventPublisher: ApplicationEventPublisher,
 ) : AuthenticateWithSocialUseCase {
     override fun authenticate(command: SocialAuthenticationCommand): TokenInfo {
         val socialProfile = verifySocialTokenPort.verify(command.provider, command.providerToken)
@@ -41,6 +46,13 @@ class SocialAuthenticationService(
 
         val tokenResult = tokenGeneratorPort.generateToken(authentication)
         tokenServiceLogic.manageRefreshToken(finalUser.id!!, tokenResult)
+
+        eventPublisher.publishEvent(
+            Event(
+                eventType = EventType.USER_AUTHENTICATED,
+                payload = UserAuthenticatedPayload(userId = finalUser.id!!)
+            )
+        )
 
         return TokenInfo(tokenResult.accessToken, tokenResult.refreshToken)
     }

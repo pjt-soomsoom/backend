@@ -61,6 +61,10 @@ class AchievementPersistenceAdapter(
         return conditionJpaRepository.findByType(type).map { it.toDomain() }
     }
 
+    override fun findUnachievedConditionsByType(userId: Long, type: ConditionType): List<AchievementCondition> {
+        return queryDslRepository.findUnachievedConditionsByType(userId, type).map { it.toDomain() }
+    }
+
     override fun findAchievementsWithProgress(criteria: FindMyAchievementsCriteria, pageable: Pageable): Page<AchievementDetailsDto> {
         val resultPage: Page<AchievementWithProgressDto> = queryDslRepository.findAchievementsWithProgress(criteria, pageable)
 

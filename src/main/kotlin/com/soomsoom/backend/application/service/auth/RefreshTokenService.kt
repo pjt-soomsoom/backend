@@ -7,9 +7,13 @@ import com.soomsoom.backend.application.port.out.auth.RefreshTokenPort
 import com.soomsoom.backend.application.port.out.auth.TokenGeneratorPort
 import com.soomsoom.backend.application.port.out.user.UserPort
 import com.soomsoom.backend.application.service.auth.common.TokenServiceLogic
+import com.soomsoom.backend.common.event.Event
+import com.soomsoom.backend.common.event.EventType
+import com.soomsoom.backend.common.event.payload.UserAuthenticatedPayload
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.user.UserErrorCode
 import com.soomsoom.backend.domain.user.model.Account
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,6 +26,7 @@ class RefreshTokenService(
     private val userPort: UserPort,
     private val tokenGeneratorPort: TokenGeneratorPort,
     private val tokenServiceLogic: TokenServiceLogic,
+    private val eventPublisher: ApplicationEventPublisher,
 ) : RefreshTokenUseCase {
     override fun refreshToken(refreshToken: String): TokenInfo {
         val oldRefreshToken = refreshTokenPort.findByToken(refreshToken)
@@ -50,6 +55,13 @@ class RefreshTokenService(
         // Refresh Token Rotation
         refreshTokenPort.delete(oldRefreshToken)
         tokenServiceLogic.manageRefreshToken(user.id!!, newTokenResult)
+
+        eventPublisher.publishEvent(
+            Event(
+                eventType = EventType.USER_AUTHENTICATED,
+                payload = UserAuthenticatedPayload(userId = user.id!!)
+            )
+        )
 
         return TokenInfo(newTokenResult.accessToken, newTokenResult.refreshToken)
     }

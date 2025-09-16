@@ -36,7 +36,7 @@ class FindTodayMissionService(
         // 일기를 썼을 경우에만 활동 완료 여부를 확인
         val hasCompletedActivityToday = activityHistoryPort.existsByUserIdAndTypesAndCreatedAtBetween(
             userId = userId,
-            activityTypes = listOf(ActivityType.MEDITATION, ActivityType.MEDITATION),
+            activityTypes = listOf(ActivityType.BREATHING),
             from = today.start,
             to = today.end
         )
