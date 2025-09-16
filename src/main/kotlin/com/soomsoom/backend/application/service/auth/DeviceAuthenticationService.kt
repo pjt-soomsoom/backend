@@ -7,9 +7,13 @@ import com.soomsoom.backend.application.port.`in`.auth.usecase.command.Authentic
 import com.soomsoom.backend.application.port.out.auth.TokenGeneratorPort
 import com.soomsoom.backend.application.port.out.user.UserPort
 import com.soomsoom.backend.application.service.auth.common.TokenServiceLogic
+import com.soomsoom.backend.common.event.Event
+import com.soomsoom.backend.common.event.EventType
+import com.soomsoom.backend.common.event.payload.UserAuthenticatedPayload
 import com.soomsoom.backend.domain.user.model.Account
 import com.soomsoom.backend.domain.user.model.aggregate.Role
 import com.soomsoom.backend.domain.user.model.aggregate.User
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,6 +24,7 @@ class DeviceAuthenticationService(
     private val userPort: UserPort,
     private val tokenGeneratorPort: TokenGeneratorPort,
     private val tokenServiceLogic: TokenServiceLogic,
+    private val eventPublisher: ApplicationEventPublisher,
 ) : AuthenticateWithDeviceUseCase {
     override fun authenticate(command: DeviceAuthenticationCommand): TokenInfo {
         val user = userPort.findByDeviceId(command.deviceId)
@@ -38,6 +43,13 @@ class DeviceAuthenticationService(
 
         val tokenResult = tokenGeneratorPort.generateToken(authentication)
         tokenServiceLogic.manageRefreshToken(user.id!!, tokenResult)
+
+        eventPublisher.publishEvent(
+            Event(
+                eventType = EventType.USER_AUTHENTICATED,
+                payload = UserAuthenticatedPayload(userId = user.id!!)
+            )
+        )
 
         return TokenInfo(tokenResult.accessToken, tokenResult.refreshToken)
     }

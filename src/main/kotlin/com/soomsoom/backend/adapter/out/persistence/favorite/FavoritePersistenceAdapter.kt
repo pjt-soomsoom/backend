@@ -1,10 +1,8 @@
-package com.soomsoom.backend.adapter.out.persistence.favorite.repository
+package com.soomsoom.backend.adapter.out.persistence.favorite
 
 import com.soomsoom.backend.adapter.out.persistence.activity.toDomain
 import com.soomsoom.backend.adapter.out.persistence.favorite.repository.jpa.FavoriteJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.favorite.repository.jpa.FavoriteQueryDslRepository
-import com.soomsoom.backend.adapter.out.persistence.favorite.toDomain
-import com.soomsoom.backend.adapter.out.persistence.favorite.toEntity
 import com.soomsoom.backend.application.port.out.favorite.FavoritePort
 import com.soomsoom.backend.domain.activity.model.Activity
 import com.soomsoom.backend.domain.favoriote.model.Favorite

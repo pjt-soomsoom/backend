@@ -1,11 +1,9 @@
-package com.soomsoom.backend.adapter.out.persistence.activityhistory.repository
+package com.soomsoom.backend.adapter.out.persistence.activityhistory
 
 import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.ActivityCompletionLogJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.ActivityCompletionLogQueryDslRepository
 import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.ActivityProgressJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.entity.UserActivitySummaryJpaRepository
-import com.soomsoom.backend.adapter.out.persistence.activityhistory.toDomain
-import com.soomsoom.backend.adapter.out.persistence.activityhistory.toEntity
 import com.soomsoom.backend.application.port.out.activityhistory.ActivityHistoryPort
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.activityhistory.model.ActivityCompletionLog

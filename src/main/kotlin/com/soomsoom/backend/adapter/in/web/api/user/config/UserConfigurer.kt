@@ -11,7 +11,7 @@ class UserConfigurer : DomainSecurityConfigurer {
     override fun configure(
         authorize: AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry,
     ) {
-        authorize.requestMatchers(HttpMethod.GET, "/users/me/**").hasAnyRole("USER", "ADMIN")
-        authorize.requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
+        authorize.requestMatchers(HttpMethod.GET, "/users/me/**").authenticated()
+        authorize.requestMatchers("/users/**").authenticated()
     }
 }

@@ -1,9 +1,7 @@
-package com.soomsoom.backend.adapter.out.persistence.follow.repository
+package com.soomsoom.backend.adapter.out.persistence.follow
 
 import com.soomsoom.backend.adapter.out.persistence.follow.repository.jpa.FollowJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.follow.repository.jpa.FollowQueryDslRepository
-import com.soomsoom.backend.adapter.out.persistence.follow.toDomain
-import com.soomsoom.backend.adapter.out.persistence.follow.toEntity
 import com.soomsoom.backend.application.port.out.follow.FollowPort
 import com.soomsoom.backend.domain.follow.model.Follow
 import com.soomsoom.backend.domain.instructor.model.Instructor

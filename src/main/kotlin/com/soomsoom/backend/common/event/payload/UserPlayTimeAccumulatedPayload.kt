@@ -9,6 +9,6 @@ import com.soomsoom.backend.domain.activity.model.enums.ActivityType
  */
 data class UserPlayTimeAccumulatedPayload(
     val userId: Long,
-    val totalPlaySeconds: Long,
+    val actualPlayTimeInSeconds: Int,
     val activityType: ActivityType,
 ) : Payload

@@ -3,9 +3,9 @@ package com.soomsoom.backend.adapter.out.persistence.user.repository.jpa
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.entity.QUserJpaEntity.userJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.entity.UserJpaEntity
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Repository
 
-@Service
+@Repository
 class UserQueryDslRepository(
     private val queryFactory: JPAQueryFactory,
 ) {

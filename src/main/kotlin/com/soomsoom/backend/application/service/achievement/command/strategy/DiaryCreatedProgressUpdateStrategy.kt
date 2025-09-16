@@ -43,7 +43,7 @@ class DiaryCreatedProgressUpdateStrategy(
     }
 
     private fun handleProgress(userId: Long, type: ConditionType, updateLogic: (UserProgress, Int) -> Unit) {
-        val conditions = achievementPort.findConditionsByType(type)
+        val conditions = achievementPort.findUnachievedConditionsByType(userId, type)
         if (conditions.isEmpty()) return
         val progress = userProgressPort.findByUserIdAndType(userId, type)
             ?: UserProgress(id = null, userId = userId, type = type, currentValue = 0)

@@ -28,6 +28,11 @@ interface AchievementPort {
     fun findConditionsByType(type: ConditionType): List<AchievementCondition>
 
     /**
+     * 특정 행동 타입(ConditionType)을 조건으로 갖으며, 아직 달성되지 않은 업적 목록을 조회
+     */
+    fun findUnachievedConditionsByType(userId: Long, type: ConditionType): List<AchievementCondition>
+
+    /**
      * 사용자의 업적 현황(업적 정보, 달성 여부, 진행도)을 조회
      */
     fun findAchievementsWithProgress(criteria: FindMyAchievementsCriteria, pageable: Pageable): Page<AchievementDetailsDto>

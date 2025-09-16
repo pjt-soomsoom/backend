@@ -1,4 +1,4 @@
-package com.soomsoom.backend.adapter.out.persistence.auth.repository
+package com.soomsoom.backend.adapter.out.persistence.auth
 
 import com.soomsoom.backend.adapter.out.persistence.auth.repository.jpa.RefreshTokenJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.auth.repository.jpa.entity.RefreshTokenJpaEntity

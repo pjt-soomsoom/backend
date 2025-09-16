@@ -1,9 +1,7 @@
-package com.soomsoom.backend.adapter.out.persistence.banner.repository
+package com.soomsoom.backend.adapter.out.persistence.banner
 
 import com.soomsoom.backend.adapter.out.persistence.banner.repository.jpa.BannerJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.banner.repository.jpa.BannerQueryDslRepository
-import com.soomsoom.backend.adapter.out.persistence.banner.toDomain
-import com.soomsoom.backend.adapter.out.persistence.banner.toEntity
 import com.soomsoom.backend.application.port.`in`.banner.query.FindBannersCriteria
 import com.soomsoom.backend.application.port.out.banner.BannerPort
 import com.soomsoom.backend.domain.banner.model.Banner

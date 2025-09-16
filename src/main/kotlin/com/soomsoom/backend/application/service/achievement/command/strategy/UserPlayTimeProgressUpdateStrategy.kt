@@ -11,8 +11,10 @@ import com.soomsoom.backend.domain.achievement.model.ConditionType
 import com.soomsoom.backend.domain.achievement.model.UserProgress
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
+@Transactional
 class UserPlayTimeProgressUpdateStrategy(
     private val userProgressPort: UserProgressPort,
     private val achievementPort: AchievementPort,
@@ -31,14 +33,15 @@ class UserPlayTimeProgressUpdateStrategy(
             ActivityType.SOUND_EFFECT -> ConditionType.SOUND_EFFECT_TOTAL_SECONDS
         }
 
-        val conditions = achievementPort.findConditionsByType(type)
+        val conditions = achievementPort.findUnachievedConditionsByType(payload.userId, type)
         if (conditions.isEmpty()) return
 
         val progress = userProgressPort.findByUserIdAndType(payload.userId, type)
             ?: UserProgress(id = null, userId = payload.userId, type = type, currentValue = 0)
 
         val maxTarget = conditions.maxOfOrNull { it.targetValue } ?: 0
-        progress.updateTo(payload.totalPlaySeconds.toInt(), maxTarget)
+        val nextValue = progress.currentValue + payload.actualPlayTimeInSeconds
+        progress.updateTo(nextValue, maxTarget)
 
         userProgressPort.save(progress)
         checkAndGrantAchievementsUseCase.checkAndGrant(payload.userId, type)

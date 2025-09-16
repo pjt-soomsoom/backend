@@ -11,6 +11,7 @@ import com.soomsoom.backend.domain.achievement.model.UserProgress
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 
 @Component
@@ -27,11 +28,12 @@ class BreathingCompletedProgressUpdateStrategy(
     override fun update(payload: ActivityCompletedPayload) {
         handleProgress(payload.userId, ConditionType.BREATHING_COUNT) { p, t -> p.increase(t) }
         handleStreak(payload, ConditionType.BREATHING_STREAK)
+        handleMonthlyCount(payload, ConditionType.BREATHING_MONTHLY_COUNT)
         handleMultiTypeCount(payload.userId)
     }
 
     private fun handleProgress(userId: Long, type: ConditionType, updateLogic: (UserProgress, Int) -> Unit) {
-        val conditions = achievementPort.findConditionsByType(type)
+        val conditions = achievementPort.findUnachievedConditionsByType(userId, type)
         if (conditions.isEmpty()) return
         val progress = userProgressPort.findByUserIdAndType(userId, type)
             ?: UserProgress(id = null, userId = userId, type = type, currentValue = 0)
@@ -53,6 +55,23 @@ class BreathingCompletedProgressUpdateStrategy(
 
         handleProgress(payload.userId, type) { progress, maxTarget ->
             if (isStreak) progress.increase(maxTarget) else progress.updateTo(1, maxTarget)
+        }
+    }
+
+    private fun handleMonthlyCount(payload: ActivityCompletedPayload, type: ConditionType) {
+        val currentBusinessDate = dateHelper.getBusinessDate(payload.completedAt)
+        val currentYearMonth = YearMonth.from(currentBusinessDate)
+        val period = dateHelper.getBusinessPeriod(currentYearMonth)
+
+        val monthlyCount = activityHistoryPort.countCompletionByPeriod(
+            payload.userId,
+            payload.activityType,
+            period.start,
+            period.end
+        )
+
+        handleProgress(payload.userId, type) { progress, maxTarget ->
+            progress.updateTo(monthlyCount.toInt(), maxTarget)
         }
     }
 

@@ -18,7 +18,7 @@ class FindDiaryService(
     private val dateHelper: DateHelper,
 ) : FindDiaryByIdUseCase {
 
-    @PostAuthorize("hasRole('ADMIN') or (#returnObject.userId == authentication.principal.id and #deletionStatus.name() == 'ACTIVE')")
+    @PostAuthorize("hasRole('ADMIN') or (returnObject.userId == authentication.principal.id and #deletionStatus.name() == 'ACTIVE')")
     override fun findById(diaryId: Long, deletionStatus: DeletionStatus): FindDiaryResult {
         val diary = diaryPort.findById(diaryId, deletionStatus)
             ?: throw SoomSoomException(DiaryErrorCode.NOT_FOUND)
