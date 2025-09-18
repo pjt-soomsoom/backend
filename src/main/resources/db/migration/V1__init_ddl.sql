@@ -7,6 +7,9 @@ CREATE TABLE shedlock (
 ) engine=InnoDB;
 
 
+
+
+
 create table achievement_conditions (
                                         target_value integer not null,
                                         achievement_id bigint not null,
@@ -75,6 +78,17 @@ create table activity_progress (
                                    modified_at datetime(6),
                                    user_id bigint not null,
                                    primary key (id)
+) engine=InnoDB;
+
+create table announcements (
+                               created_at datetime(6) not null,
+                               deleted_at datetime(6),
+                               id bigint not null auto_increment,
+                               modified_at datetime(6),
+                               sent_at datetime(6),
+                               title varchar(255),
+                               content longtext,
+                               primary key (id)
 ) engine=InnoDB;
 
 create table banners (
@@ -314,6 +328,19 @@ create table user_activity_summary (
                                        primary key (id)
 ) engine=InnoDB;
 
+create table user_announcements (
+                                    is_read bit not null,
+                                    announcement_id bigint not null,
+                                    created_at datetime(6) not null,
+                                    deleted_at datetime(6),
+                                    id bigint not null auto_increment,
+                                    modified_at datetime(6),
+                                    read_at datetime(6),
+                                    received_at datetime(6),
+                                    user_id bigint not null,
+                                    primary key (id)
+) engine=InnoDB;
+
 create table user_devices (
                               created_at datetime(6) not null,
                               deleted_at datetime(6),
@@ -393,6 +420,15 @@ alter table connection_logs
 
 alter table user_activity_summary
     add constraint UK2hy0knhpjdqu9dro0jyf8higj unique (user_id);
+
+create index idx_user_announcements_user_id
+    on user_announcements (user_id);
+
+create index idx_user_announcements_unread
+    on user_announcements (user_id, is_read, deleted_at);
+
+create index idx_user_announcements_announcement_id
+    on user_announcements (announcement_id);
 
 alter table user_devices
     add constraint UKo6vhn2gmiutbtiqk0ljgt5us0 unique (fcm_token);

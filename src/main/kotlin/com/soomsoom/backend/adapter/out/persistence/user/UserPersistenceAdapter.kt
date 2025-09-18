@@ -40,4 +40,8 @@ class UserPersistenceAdapter(
     override fun findByIdWithCollections(userId: Long): User? {
         return userQueryDslRepository.findByIdWithCollections(userId)?.toDomain()
     }
+
+    override fun findAllUserIds(pageNumber: Int, pageSize: Int): List<Long> {
+        return userQueryDslRepository.findAllUserIds(pageNumber, pageSize)
+    }
 }

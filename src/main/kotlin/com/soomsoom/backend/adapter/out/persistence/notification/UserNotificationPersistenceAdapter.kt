@@ -6,9 +6,11 @@ import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.
 import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.UserNotificationSettingJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
 import com.soomsoom.backend.application.port.out.notification.UserNotificationPort
+import com.soomsoom.backend.application.port.out.notification.dto.UserNotificationPushInfo
 import com.soomsoom.backend.domain.notification.model.entity.NotificationHistory
 import com.soomsoom.backend.domain.notification.model.entity.UserDevice
 import com.soomsoom.backend.domain.notification.model.entity.UserNotificationSetting
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -90,5 +92,17 @@ class UserNotificationPersistenceAdapter(
             pageNumber = pageNumber,
             pageSize = pageSize
         )
+    }
+
+    override fun findUserNotificationPushInfos(pageable: Pageable): List<UserNotificationPushInfo> {
+        val queryResults = userNotificationQueryDslRepository.findUserNotificationPushQueryResults(pageable)
+
+        return queryResults.map { result ->
+            UserNotificationPushInfo(
+                userId = result.userId,
+                isNewsNotificationEnabled = result.isNewsNotificationEnabled,
+                unreadAnnouncementCount = result.unreadAnnouncementCount
+            )
+        }
     }
 }

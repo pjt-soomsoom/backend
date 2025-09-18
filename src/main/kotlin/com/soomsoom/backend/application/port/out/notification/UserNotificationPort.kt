@@ -1,9 +1,11 @@
 package com.soomsoom.backend.application.port.out.notification
 
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
+import com.soomsoom.backend.application.port.out.notification.dto.UserNotificationPushInfo
 import com.soomsoom.backend.domain.notification.model.entity.NotificationHistory
 import com.soomsoom.backend.domain.notification.model.entity.UserDevice
 import com.soomsoom.backend.domain.notification.model.entity.UserNotificationSetting
+import org.springframework.data.domain.Pageable
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -58,4 +60,9 @@ interface UserNotificationPort {
         pageNumber: Int,
         pageSize: Int,
     ): List<InactiveUserAdapterDto>
+
+    /**
+     * 공지 사항 푸시 알림 발송에 필요한 사용자 정보를 페이지네이션하여 한 번에 조회
+     */
+    fun findUserNotificationPushInfos(pageable: Pageable): List<UserNotificationPushInfo>
 }

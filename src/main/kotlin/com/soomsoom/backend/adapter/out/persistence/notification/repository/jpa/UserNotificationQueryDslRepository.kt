@@ -8,13 +8,18 @@ import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.entity.QActivityCompletionLogJpaEntity.activityCompletionLogJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.entity.QDiaryJpaEntity.diaryJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.mailbox.repository.jpa.entity.QUserAnnouncementJpaEntity.userAnnouncementJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.dto.QUserNotificationPushQueryResult
+import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.dto.UserNotificationPushQueryResult
 import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.entity.QUserDeviceJpaEntity.userDeviceJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.entity.QUserNotificationSettingJpaEntity.userNotificationSettingJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.entity.UserDeviceJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.entity.QUserJpaEntity.userJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.QInactiveUserAdapterDto
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.entity.QConnectionLogJpaEntity.connectionLogJpaEntity
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -142,6 +147,56 @@ class UserNotificationQueryDslRepository(
             }
         }
         return caseWhenChain!!.otherwise(0)
+    }
+
+    /**
+     * 푸시 알림 발송에 필요한 사용자 정보를 페이지네이션하여 한 번에 조회
+     * 1. 모든 활성 사용자를 기준으로
+     * 2. 각 사용자의 '숨숨 소식' 알림 설정 여부와
+     * 3. 각 사용자의 '안 읽은 공지 개수'를 JOIN을 통해 한 번의 쿼리로 가져옵니다.
+     */
+
+    fun findUserNotificationPushQueryResults(pageable: Pageable): List<UserNotificationPushQueryResult> {
+        return queryFactory
+            .select(
+                QUserNotificationPushQueryResult(
+                    userJpaEntity.id,
+
+                    // 1. CASE 문으로 BIT 타입을 안전하게 1 또는 0으로 변환하고,
+                    CaseBuilder()
+                        .`when`(userNotificationSettingJpaEntity.soomsoomNewsNotificationEnabled.isNotNull)
+                        .then(
+                            CaseBuilder()
+                                .`when`(userNotificationSettingJpaEntity.soomsoomNewsNotificationEnabled.isTrue)
+                                .then(1)
+                                .otherwise(0)
+                        )
+                        .otherwise(1)
+                        .eq(1),
+
+                    userAnnouncementJpaEntity.count().intValue()
+                )
+            )
+            .from(userJpaEntity)
+            // UserNotificationSetting 정보가 없는 사용자도 포함시키기 위해 LEFT JOIN
+            .leftJoin(userNotificationSettingJpaEntity)
+            .on(userJpaEntity.id.eq(userNotificationSettingJpaEntity.userId))
+            // 안 읽은 공지사항을 처음부터 LEFT JOIN으로 가져옵니다.
+            .leftJoin(userAnnouncementJpaEntity).on(
+                userAnnouncementJpaEntity.userId.eq(userJpaEntity.id),
+                userAnnouncementJpaEntity.isRead.isFalse,
+                userAnnouncementJpaEntity.deletedAt.isNull
+            )
+            .where(userJpaEntity.deletedAt.isNull)
+            // select 절에 있는 집계 함수(count) 외의 모든 컬럼을 기준으로 그룹화합니다.
+            .groupBy(
+                userJpaEntity.id,
+                userNotificationSettingJpaEntity.soomsoomNewsNotificationEnabled
+            )
+            .orderBy(userJpaEntity.id.asc())
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+            .fetch()
     }
 
     // BooleanBuilder를 사용하지 않고 BooleanExpression을 직접 조합하도록 수정

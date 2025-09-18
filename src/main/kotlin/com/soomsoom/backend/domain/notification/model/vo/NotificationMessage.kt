@@ -12,8 +12,8 @@ package com.soomsoom.backend.domain.notification.model.vo
  */
 data class NotificationMessage(
     val targetUserId: Long,
-    val title: String,
-    val body: String,
+    val title: String?,
+    val body: String?,
     val imageUrl: String? = null,
     val badgeCount: Int,
     val payload: Map<String, String>,

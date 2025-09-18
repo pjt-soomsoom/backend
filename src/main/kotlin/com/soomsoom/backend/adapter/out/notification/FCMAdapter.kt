@@ -115,20 +115,24 @@ class FCMAdapter(
     private fun buildFcmMessage(device: UserDevice, domainMessage: NotificationMessage): Message {
         val messageBuilder = Message.builder()
             .setToken(device.fcmToken)
-            .putAllData(domainMessage.payload)
+            .putAllData(domainMessage.payload) // 데이터 페이로드는 항상 포함
 
-        val notification = Notification.builder()
-            .setTitle(domainMessage.title)
-            .setBody(domainMessage.body)
-            .build()
-        messageBuilder.setNotification(notification)
+        // title과 body가 있을 때만 OS 알림을 생성
+        // '보이는 푸시'와 '데이터 전용 푸시'를 구분
+        if (domainMessage.title != null && domainMessage.body != null) {
+            val notification = Notification.builder()
+                .setTitle(domainMessage.title)
+                .setBody(domainMessage.body)
+                .build()
+            messageBuilder.setNotification(notification)
+        }
 
         if (device.osType == OSType.IOS) {
             messageBuilder.setApnsConfig(
                 ApnsConfig.builder()
                     .setAps(
                         Aps.builder()
-                            .setBadge(domainMessage.badgeCount)
+                            .setBadge(domainMessage.badgeCount) // iOS의 뱃지 카운트는 여기에 설정
                             .setSound("default")
                             .build()
                     ).build()
