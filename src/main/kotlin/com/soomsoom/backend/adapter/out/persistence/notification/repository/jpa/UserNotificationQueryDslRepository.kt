@@ -14,6 +14,7 @@ import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.QInactiveUserAdapterDto
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.entity.QConnectionLogJpaEntity.connectionLogJpaEntity
+import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -42,15 +43,34 @@ class UserNotificationQueryDslRepository(
         pageNumber: Int,
         pageSize: Int,
     ): List<Long> {
+        // 오늘 일기를 작성했는지 확인하는 서브쿼리 (Boolean)
+        val hasDiaryToday = JPAExpressions.selectOne()
+            .from(diaryJpaEntity)
+            .where(
+                diaryJpaEntity.userId.eq(userNotificationSettingJpaEntity.userId),
+                diaryJpaEntity.createdAt.between(todayStart, todayEnd)
+            ).exists()
+
+        // 오늘 호흡 또는 명상을 했는지 확인하는 서브쿼리 (Boolean)
+        val hasActivityToday = JPAExpressions.selectOne()
+            .from(activityCompletionLogJpaEntity)
+            .where(
+                activityCompletionLogJpaEntity.userId.eq(userNotificationSettingJpaEntity.userId),
+                activityCompletionLogJpaEntity.createdAt.between(todayStart, todayEnd),
+                // ✨ 호흡 또는 명상 타입만 필터링
+                activityCompletionLogJpaEntity.activityType.`in`(ActivityType.BREATHING, ActivityType.MEDITATION)
+            ).exists()
+
         return queryFactory
             .select(userNotificationSettingJpaEntity.userId)
             .from(userNotificationSettingJpaEntity)
             .where(
-                // 1. [기본 조건] 알림 설정이 켜져 있고, 현재 시간과 일치하는 사용자
+                // 1. [기본 조건] 알림 설정 ON, 시간 일치
                 userNotificationSettingJpaEntity.diaryNotificationEnabled.isTrue,
                 userNotificationSettingJpaEntity.diaryNotificationTime.eq(targetTime),
 
-                // 2. [존재 조건] 어제 접속 기록이 '존재하는' 사용자 (EXISTS)
+                // 2. [접속 조건] 어제 접속 기록이 있는 사용자
+                // (이 조건이 여전히 필요한지 확인이 필요합니다. 일단 유지했습니다.)
                 JPAExpressions.selectOne()
                     .from(connectionLogJpaEntity)
                     .where(
@@ -58,23 +78,11 @@ class UserNotificationQueryDslRepository(
                         connectionLogJpaEntity.createdAt.between(yesterdayStart, yesterdayEnd)
                     ).exists(),
 
-                // 3. [미존재 조건] 오늘 일기를 쓴 기록이 '존재하지 않는' 사용자 (NOT EXISTS)
-                JPAExpressions.selectOne()
-                    .from(diaryJpaEntity)
-                    .where(
-                        diaryJpaEntity.userId.eq(userNotificationSettingJpaEntity.userId),
-                        diaryJpaEntity.createdAt.between(todayStart, todayEnd)
-                    ).notExists(),
-
-                // 4. [미존재 조건] 오늘 활동을 완료한 기록이 '존재하지 않는' 사용자 (NOT EXISTS)
-                JPAExpressions.selectOne()
-                    .from(activityCompletionLogJpaEntity)
-                    .where(
-                        activityCompletionLogJpaEntity.userId.eq(userNotificationSettingJpaEntity.userId),
-                        activityCompletionLogJpaEntity.createdAt.between(todayStart, todayEnd)
-                    ).notExists()
+                // 3. ✨ [새로운 핵심 조건] '일기를 썼다' 와 '호흡/명상을 했다' 가 동시에 참인 경우가 아닌 사용자
+                //    즉, 둘 다 한 사용자는 제외하고, 하나만 했거나 아무것도 안 한 사용자는 포함합니다.
+                hasDiaryToday.and(hasActivityToday).isFalse
             )
-            .orderBy(userNotificationSettingJpaEntity.userId.asc()) // 페이징을 위한 정렬 추가
+            .orderBy(userNotificationSettingJpaEntity.userId.asc())
             .offset((pageNumber * pageSize).toLong())
             .limit(pageSize.toLong())
             .fetch()
