@@ -44,7 +44,7 @@ class NotificationEventListener(
             userId = payload.userId,
             diaryNotificationEnabled = true,
             soomsoomNewsNotificationEnabled = true,
-            reEngagementNotificationEnabled = true,
+            reEngagementNotificationEnabled = true
         )
         createdNotificationSettingUseCase.create(command)
     }

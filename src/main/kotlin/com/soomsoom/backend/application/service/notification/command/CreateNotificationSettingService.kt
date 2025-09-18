@@ -14,8 +14,8 @@ import java.time.LocalTime
 class CreateNotificationSettingService(
     private val userNotificationPort: UserNotificationPort,
     @Value("\${diary.default-time}")
-    val diaryDefaultTime: LocalTime
-) : CreateNotificationSettingUseCase{
+    val diaryDefaultTime: LocalTime,
+) : CreateNotificationSettingUseCase {
 
     override fun create(command: CreateNotificationSettingCommand): Long {
         val userNotificationSetting = UserNotificationSetting(

@@ -51,7 +51,7 @@ class AchievementUnlockedStrategy(
             )
         )
 
-        log.info("업적 달성 메시지 송신 요청, title = ${title}")
+        log.info("업적 달성 메시지 송신 요청, title = $title")
         notificationPort.send(message)
     }
 }

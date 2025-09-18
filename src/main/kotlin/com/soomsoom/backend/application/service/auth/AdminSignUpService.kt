@@ -14,7 +14,6 @@ import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.user.UserErrorCode
 import com.soomsoom.backend.domain.user.model.aggregate.User
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.security.authentication.AuthenticationEventPublisher
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service

@@ -32,5 +32,5 @@ enum class EventType {
     SCHEDULER_TICK,
 
     // 유저 생성,
-    USER_CREATED
+    USER_CREATED,
 }
