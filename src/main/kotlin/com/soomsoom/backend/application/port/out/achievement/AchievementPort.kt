@@ -40,7 +40,7 @@ interface AchievementPort {
     /**
      * 새로 달성 가능한 업적이 있는지 조회
      */
-    fun findNewlyAchievableIds(userId: Long, type: ConditionType): List<Long>
+    fun findNewlyAchievableEntities(userId: Long, type: ConditionType): List<Achievement>
 
     /**
      * [ADMIN] 업적 저장 (생성/수정)

@@ -10,6 +10,7 @@ import com.soomsoom.backend.application.service.auth.common.TokenServiceLogic
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.payload.UserAuthenticatedPayload
+import com.soomsoom.backend.common.event.payload.UserCreatedPayload
 import com.soomsoom.backend.domain.user.model.Account
 import com.soomsoom.backend.domain.user.model.aggregate.Role
 import com.soomsoom.backend.domain.user.model.aggregate.User
@@ -27,8 +28,22 @@ class DeviceAuthenticationService(
     private val eventPublisher: ApplicationEventPublisher,
 ) : AuthenticateWithDeviceUseCase {
     override fun authenticate(command: DeviceAuthenticationCommand): TokenInfo {
-        val user = userPort.findByDeviceId(command.deviceId)
-            ?: userPort.save(User.createAnonymous(command.deviceId))
+        val existingUser = userPort.findByDeviceId(command.deviceId)
+
+        val user: User
+        if (existingUser == null) {
+            val newUser = userPort.save(User.createAnonymous(command.deviceId))
+            user = newUser
+
+            eventPublisher.publishEvent(
+                Event(
+                    eventType = EventType.USER_CREATED,
+                    payload = UserCreatedPayload(userId = newUser.id!!)
+                )
+            )
+        } else {
+            user = existingUser
+        }
 
         val sessionRole = Role.ROLE_ANONYMOUS
         val account = user.account

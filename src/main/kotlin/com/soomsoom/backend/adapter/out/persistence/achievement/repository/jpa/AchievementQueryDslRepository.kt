@@ -1,6 +1,7 @@
 package com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.Expressions
+import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.dto.AchievementWithProgressDto
 import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.dto.QAchievementWithProgressDto
@@ -73,27 +74,22 @@ class AchievementQueryDslRepository(
         return PageableExecutionUtils.getPage(content, pageable) { countQuery.fetchOne() ?: 0L }
     }
 
-    fun findNewlyAchievableIds(userId: Long, type: ConditionType): List<Long> {
-        val subquery = queryFactory
+    fun findNewlyAchievableEntities(userId: Long, type: ConditionType): List<AchievementJpaEntity> {
+        val achievableIdsSubquery = queryFactory
             .select(achievementConditionJpaEntity.achievementId)
             .from(achievementConditionJpaEntity)
             .join(achievementJpaEntity).on(achievementConditionJpaEntity.achievementId.eq(achievementJpaEntity.id))
-            .where(
-                achievementConditionJpaEntity.type.eq(type),
-                achievementJpaEntity.deletedAt.isNull // 활성 상태(삭제되지 않음)인 업적만 필터링
-            )
-            .where(achievementConditionJpaEntity.type.eq(type))
-
-        return queryFactory
-            .select(achievementConditionJpaEntity.achievementId)
-            .from(achievementConditionJpaEntity)
             .leftJoin(userProgressJpaEntity).on(
                 achievementConditionJpaEntity.type.eq(userProgressJpaEntity.type).and(userProgressJpaEntity.userId.eq(userId))
             )
             .where(
-                achievementConditionJpaEntity.achievementId.`in`(subquery),
-                achievementConditionJpaEntity.achievementId.notIn(
-                    queryFactory
+                // 1. 특정 조건 타입에 해당하는 업적만 필터링
+                achievementConditionJpaEntity.type.eq(type),
+                // 2. 활성화된(삭제되지 않은) 업적만 필터링
+                achievementJpaEntity.deletedAt.isNull,
+                // 3. 사용자가 이미 달성한 업적은 제외
+                achievementJpaEntity.id.notIn(
+                    JPAExpressions
                         .select(userAchievedJpaEntity.achievementId)
                         .from(userAchievedJpaEntity)
                         .where(userAchievedJpaEntity.userId.eq(userId))
@@ -101,6 +97,7 @@ class AchievementQueryDslRepository(
             )
             .groupBy(achievementConditionJpaEntity.achievementId)
             .having(
+                // 4. 업적의 모든 조건을 만족했는지 검증
                 achievementConditionJpaEntity.id.count().eq(
                     Expressions.cases()
                         .`when`(userProgressJpaEntity.currentValue.goe(achievementConditionJpaEntity.targetValue))
@@ -109,6 +106,11 @@ class AchievementQueryDslRepository(
                         .sum().longValue()
                 )
             )
+
+        // 메인쿼리: 서브쿼리에서 찾은 ID 목록을 사용하여 전체 AchievementJpaEntity를 조회합니다.
+        return queryFactory
+            .selectFrom(achievementJpaEntity)
+            .where(achievementJpaEntity.id.`in`(achievableIdsSubquery))
             .fetch()
     }
 

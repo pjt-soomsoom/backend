@@ -23,6 +23,17 @@ repositories {
 
 dependencies {
 
+    // flyway
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-mysql")
+
+    // firebase 의존성 추가
+    implementation("com.google.firebase:firebase-admin:9.4.3")
+
+    // 분산 환경에서 database의 락을 위한 의존성
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.9.2")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.2")
+
     // Google ID Token 검증 라이브러리
     implementation("com.google.api-client:google-api-client:2.2.0")
     implementation("com.google.http-client:google-http-client-gson:1.43.3")

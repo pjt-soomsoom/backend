@@ -27,4 +27,10 @@ enum class EventType {
 
     // 홈 화면 누적 시간
     SCREEN_TIME_ACCUMULATED,
+
+    // 스케줄러가 주기적으로 실행될 때 발생하는 이벤트
+    SCHEDULER_TICK,
+
+    // 유저 생성,
+    USER_CREATED
 }

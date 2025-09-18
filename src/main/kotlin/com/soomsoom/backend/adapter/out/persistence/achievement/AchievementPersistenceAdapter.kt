@@ -76,8 +76,8 @@ class AchievementPersistenceAdapter(
         }
     }
 
-    override fun findNewlyAchievableIds(userId: Long, type: ConditionType): List<Long> {
-        return queryDslRepository.findNewlyAchievableIds(userId, type)
+    override fun findNewlyAchievableEntities(userId: Long, type: ConditionType): List<Achievement> {
+        return queryDslRepository.findNewlyAchievableEntities(userId, type).map { it.toDomain() }
     }
 
     override fun save(achievement: Achievement): Achievement {
