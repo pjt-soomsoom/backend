@@ -1,9 +1,7 @@
 package com.soomsoom.backend.application.port.out.useractivity
 
-import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
 import com.soomsoom.backend.domain.useractivity.model.aggregate.ConnectionLog
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 interface ConnectionLogPort {
     /**
@@ -16,40 +14,4 @@ interface ConnectionLogPort {
      */
     fun existsByUserIdAndCreatedAtBetween(userId: Long, from: LocalDateTime, to: LocalDateTime): Boolean
     fun save(connectionLog: ConnectionLog): ConnectionLog
-
-    /**
-     * '시간 범위 조건 맵'을 기반으로, 조건에 맞는 미접속 사용자 목록과
-     * 각자의 미접속 일수를 페이징하여 조회
-     *
-     * @param inactivityConditions Key: 미접속 일수, Value: 해당 미접속 일수에 해당하는 마지막 접속 시간 범위(from, to)
-     * @param pageNumber 페이지 번호
-     * @param pageSize 페이지 크기
-     * @return InactiveUserAdapterDto 목록 (userId, inactiveDays)
-     */
-    fun findInactiveUsers(
-        inactivityConditions: Map<Int, Pair<LocalDateTime, LocalDateTime>>,
-        pageNumber: Int,
-        pageSize: Int,
-    ): List<InactiveUserAdapterDto>
-
-    /**
-     * '마음일기 알림(인게이지먼트 넛지)' 발송 대상을 조회
-     * - 어제는 접속했지만, 오늘 일기나 활동을 하지 않은 사용자
-     * @param yesterdayStart 어제 날짜 시작 시간
-     * @param yesterdayEnd 어제 날짜 종료 시간
-     * @param todayStart 오늘 날짜 시작 시간
-     * @param todayEnd 오늘 날짜 종료 시간
-     * @param pageNumber 페이지 번호
-     * @param pageSize 페이지 크기
-     * @return 대상 사용자 ID 리스트
-     */
-    fun findDiaryReminderTargetUserIds(
-        targetTime: LocalTime,
-        yesterdayStart: LocalDateTime,
-        yesterdayEnd: LocalDateTime,
-        todayStart: LocalDateTime,
-        todayEnd: LocalDateTime,
-        pageNumber: Int,
-        pageSize: Int,
-    ): List<Long>
 }

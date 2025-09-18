@@ -4,6 +4,7 @@ import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.payload.SchedulerTickNotificationPayload
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
+import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -13,6 +14,8 @@ import java.time.LocalDateTime
 class NotificationScheduler(
     private val eventPublisher: ApplicationEventPublisher,
 ) {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     /**
      * 매 분 0초에 실행됩니다.
      */

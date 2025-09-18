@@ -1,8 +1,10 @@
 package com.soomsoom.backend.adapter.`in`.web.api.notification
 
-import com.soomsoom.backend.application.port.`in`.notification.command.message.AddMessageVariationCommand
+import com.soomsoom.backend.adapter.`in`.web.api.notification.request.admin.AddMessageVariationRequest
+import com.soomsoom.backend.adapter.`in`.web.api.notification.request.admin.CreateNotificationTemplateRequest
+import com.soomsoom.backend.adapter.`in`.web.api.notification.request.admin.UpdateMessageVariationRequest
+import com.soomsoom.backend.adapter.`in`.web.api.notification.request.admin.UpdateNotificationTemplateRequest
 import com.soomsoom.backend.application.port.`in`.notification.command.template.CreateNotificationTemplateCommand
-import com.soomsoom.backend.application.port.`in`.notification.dto.MessageVariationDto
 import com.soomsoom.backend.application.port.`in`.notification.dto.NotificationTemplateDto
 import com.soomsoom.backend.application.port.`in`.notification.usecase.command.message.AddMessageVariationUseCase
 import com.soomsoom.backend.application.port.`in`.notification.usecase.command.message.DeleteMessageVariationUseCase
@@ -12,7 +14,6 @@ import com.soomsoom.backend.application.port.`in`.notification.usecase.command.t
 import com.soomsoom.backend.application.port.`in`.notification.usecase.command.template.UpdateNotificationTemplateUseCase
 import com.soomsoom.backend.application.port.`in`.notification.usecase.query.message.FindMessageVariationsUseCase
 import com.soomsoom.backend.application.port.`in`.notification.usecase.query.template.FindNotificationTemplatesUseCase
-import com.soomsoom.backend.domain.notification.model.enums.NotificationType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -46,14 +47,21 @@ class AdminNotificationController(
     @Operation(summary = "알림 템플릿 그룹 생성")
     @PostMapping("/templates")
     @ResponseStatus(HttpStatus.CREATED)
-    fun createTemplate(@Valid @RequestBody command: CreateNotificationTemplateCommand): Long {
-        return createNotificationTemplateUseCase.command(command)
+    fun createTemplate(
+        @Valid @RequestBody
+        request: CreateNotificationTemplateRequest,
+    ): Long {
+        return createNotificationTemplateUseCase.command(request.toCommand())
     }
 
     @Operation(summary = "알림 템플릿 그룹 수정")
     @PutMapping("/templates/{id}")
     @ResponseStatus(HttpStatus.OK)
-    fun updateTemplate(@PathVariable id: Long, @Valid @RequestBody request: UpdateNotificationTemplateRequest) {
+    fun updateTemplate(
+        @PathVariable id: Long,
+        @Valid @RequestBody
+        request: UpdateNotificationTemplateRequest,
+    ) {
         updateNotificationTemplateUseCase.command(request.toCommand(id))
     }
 
@@ -80,14 +88,21 @@ class AdminNotificationController(
     @Operation(summary = "메시지 후보군(Variation) 추가")
     @PostMapping("/variations")
     @ResponseStatus(HttpStatus.CREATED)
-    fun addVariation(@Valid @RequestBody command: AddMessageVariationCommand): Long {
-        return addMessageVariationUseCase.command(command)
+    fun addVariation(
+        @Valid @RequestBody
+        request: AddMessageVariationRequest,
+    ): Long {
+        return addMessageVariationUseCase.command(request.toCommand())
     }
 
     @Operation(summary = "메시지 후보군(Variation) 수정")
     @PutMapping("/variations/{id}")
     @ResponseStatus(HttpStatus.OK)
-    fun updateVariation(@PathVariable id: Long, @Valid @RequestBody request: UpdateMessageVariationRequest) {
+    fun updateVariation(
+        @PathVariable id: Long,
+        @Valid @RequestBody
+        request: UpdateMessageVariationRequest,
+    ) {
         updateMessageVariationUseCase.command(request.toCommand(id))
     }
 

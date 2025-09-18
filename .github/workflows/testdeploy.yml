@@ -69,6 +69,30 @@ jobs:
 
           # Cutoff Time
             echo "app.daily-cutoff-hour=${{ secrets.APP_DAILY_CUTOFF_HOUR }}" >> ./src/main/resources/application.properties
+
+          # Alarm
+            echo "diary.default-time=${{ secrets.DIARY_DEFAULT_TIME }}" >> ./src/main/resources/application.properties
+            echo "alarm.inactive-user.default-time=${{ secrets.ALARM_INACTIVE_USER_DEFAULT_TIME }}" >> ./src/main/resources/application.properties
+            echo "alarm.batch-size=${{ secrets.ALARM_BATCH_SIZE }}" >> ./src/main/resources/application.properties
+
+          # Flyway
+            echo "spring.flyway.enabled=true" >> ./src/main/resources/application.properties
+
+          #  Firebase
+            echo "firebase.service-account-key-path=${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_PATH }}" ./src/main/resources/application.properties
+
+      - name: Create firebase directory
+        run: mkdir -p src/main/resources/firebase
+
+          # create serviceAccountKey.json
+      - name: create serviceAccountKey.json
+        id: create-json
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+            name: "serviceAccountKey.json"
+            json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+            dir: 'src/main/resources/firebase'
+
       # 4. Gradle 빌드 권한 부여 및 실행
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew

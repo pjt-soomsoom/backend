@@ -7,13 +7,17 @@ import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.payload.AchievementAchievedNotificationPayload
 import com.soomsoom.backend.domain.notification.model.enums.NotificationType
 import com.soomsoom.backend.domain.notification.model.vo.NotificationMessage
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class AchievementUnlockedStrategy(
     private val notificationTemplatePort: NotificationTemplatePort,
     private val notificationPort: NotificationPort,
 ) : NotificationStrategy<AchievementAchievedNotificationPayload> {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     /**
      * 이 전략은 'ACHIEVEMENT_ACHIEVED' 타입의 이벤트만 처리하도록 명시
@@ -23,9 +27,11 @@ class AchievementUnlockedStrategy(
     /**
      * 업적 달성 이벤트를 기반으로 푸시 알림 메시지를 생성
      */
+    @Transactional
     override fun execute(event: Event<AchievementAchievedNotificationPayload>) {
         val payload = event.payload
 
+        log.info("업적 달성 처리 시작, achievementName = ${payload.achievementName}")
         val activeTemplates = notificationTemplatePort.findActiveTemplatesWithActiveVariationsByType(NotificationType.ACHIEVEMENT_UNLOCKED)
 
         val variation = activeTemplates.firstOrNull()?.variations?.firstOrNull()
@@ -45,6 +51,7 @@ class AchievementUnlockedStrategy(
             )
         )
 
+        log.info("업적 달성 메시지 송신 요청, title = ${title}")
         notificationPort.send(message)
     }
 }

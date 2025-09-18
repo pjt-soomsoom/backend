@@ -21,8 +21,7 @@ import org.springframework.stereotype.Component
 class FCMAdapter(
     private val firebaseMessaging: FirebaseMessaging,
     private val userNotificationPort: UserNotificationPort,
-    private val notificationPort: NotificationPort,
-) : NotificationPort{
+) : NotificationPort {
 
     private val log = LoggerFactory.getLogger(javaClass)
 

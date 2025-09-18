@@ -66,6 +66,7 @@ fun MessageVariation.toEntity(templateEntity: NotificationTemplateJpaEntity): Me
         isActive = this.isActive
     )
 }
+
 // UserNotificationSetting <-> UserNotificationSettingJpaEntity
 fun UserNotificationSetting.toEntity(): UserNotificationSettingJpaEntity {
     return UserNotificationSettingJpaEntity(

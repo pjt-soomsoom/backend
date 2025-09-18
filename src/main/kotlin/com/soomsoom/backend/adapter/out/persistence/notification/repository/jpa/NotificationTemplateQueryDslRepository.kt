@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class NotificationTemplateQueryDslRepository(
-    private val queryFactory: JPAQueryFactory
+    private val queryFactory: JPAQueryFactory,
 ) {
     fun findActiveTemplatesWithActiveVariationsByType(type: NotificationType): List<NotificationTemplateJpaEntity> {
         return queryFactory

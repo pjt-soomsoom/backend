@@ -30,4 +30,7 @@ enum class EventType {
 
     // 스케줄러가 주기적으로 실행될 때 발생하는 이벤트
     SCHEDULER_TICK,
+
+    // 유저 생성,
+    USER_CREATED
 }

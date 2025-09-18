@@ -17,7 +17,7 @@ class NotificationTemplatePersistenceAdapter(
     private val templateJpaRepository: NotificationTemplateJpaRepository,
     private val variationJpaRepository: MessageVariationJpaRepository,
     private val notificationTemplateQueryDslRepository: NotificationTemplateQueryDslRepository,
-) : NotificationTemplatePort{
+) : NotificationTemplatePort {
     override fun saveTemplate(template: NotificationTemplate): NotificationTemplate {
         val entity = template.toEntity()
         return templateJpaRepository.save(entity).toDomain()
