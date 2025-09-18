@@ -19,4 +19,18 @@ class UserQueryDslRepository(
             .distinct()
             .fetchOne()
     }
+
+    /**
+     * 모든 활성 사용자의 ID를 페이징하여 조회
+     */
+    fun findAllUserIds(pageNumber: Int, pageSize: Int): List<Long> {
+        return queryFactory
+            .select(userJpaEntity.id)
+            .from(userJpaEntity)
+            .where(userJpaEntity.deletedAt.isNull)
+            .orderBy(userJpaEntity.id.asc())
+            .offset((pageNumber * pageSize).toLong())
+            .limit(pageSize.toLong())
+            .fetch()
+    }
 }

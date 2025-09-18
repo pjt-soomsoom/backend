@@ -75,9 +75,6 @@ jobs:
             echo "alarm.inactive-user.default-time=${{ secrets.ALARM_INACTIVE_USER_DEFAULT_TIME }}" >> ./src/main/resources/application.properties
             echo "alarm.batch-size=${{ secrets.ALARM_BATCH_SIZE }}" >> ./src/main/resources/application.properties
 
-          # Flyway
-            echo "spring.flyway.baseline-on-migrate=true" >> ./src/main/resources/application.properties
-
           #  Firebase
             echo "firebase.service-account-key-path=${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_PATH }}" >> ./src/main/resources/application.properties
 

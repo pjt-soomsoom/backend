@@ -6,7 +6,6 @@ import com.soomsoom.backend.application.service.notification.strategy.Notificati
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.NotificationPayload
 import com.soomsoom.backend.common.event.payload.UserCreatedPayload
-import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
@@ -20,7 +19,10 @@ class NotificationEventListener(
     private val createdNotificationSettingUseCase: CreateNotificationSettingUseCase,
 ) {
     @Async("threadPoolTaskExecutor")
-    @EventListener
+    @TransactionalEventListener(
+        phase = TransactionPhase.AFTER_COMMIT
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleEvent(event: Event<*>) {
         if (event.payload is NotificationPayload) {
             val supportedStrategies = strategies.filter { it.supports(event) }
