@@ -4,7 +4,6 @@ import com.soomsoom.backend.adapter.`in`.web.api.notification.request.admin.AddM
 import com.soomsoom.backend.adapter.`in`.web.api.notification.request.admin.CreateNotificationTemplateRequest
 import com.soomsoom.backend.adapter.`in`.web.api.notification.request.admin.UpdateMessageVariationRequest
 import com.soomsoom.backend.adapter.`in`.web.api.notification.request.admin.UpdateNotificationTemplateRequest
-import com.soomsoom.backend.application.port.`in`.notification.command.template.CreateNotificationTemplateCommand
 import com.soomsoom.backend.application.port.`in`.notification.dto.NotificationTemplateDto
 import com.soomsoom.backend.application.port.`in`.notification.usecase.command.message.AddMessageVariationUseCase
 import com.soomsoom.backend.application.port.`in`.notification.usecase.command.message.DeleteMessageVariationUseCase

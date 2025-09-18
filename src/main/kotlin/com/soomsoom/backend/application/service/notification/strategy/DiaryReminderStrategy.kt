@@ -34,7 +34,6 @@ class DiaryReminderStrategy(
 
     @Transactional
     override fun execute(event: Event<SchedulerTickNotificationPayload>) {
-
         // 'DIARY_REMINDER' 타입의 활성화된 템플릿과 Variation들을 미리 조회합니다.
         val activeTemplates = notificationTemplatePort.findActiveTemplatesWithActiveVariationsByType(NotificationType.DIARY_REMINDER)
         val variations = activeTemplates.flatMap { it.variations }
