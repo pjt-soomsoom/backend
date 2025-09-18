@@ -79,7 +79,7 @@ jobs:
             echo "spring.flyway.enabled=true" >> ./src/main/resources/application.properties
 
           #  Firebase
-            echo "firebase.service-account-key-path=${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_PATH }}" ./src/main/resources/application.properties
+            echo "firebase.service-account-key-path=${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_PATH }}" >> ./src/main/resources/application.properties
 
       - name: Create firebase directory
         run: mkdir -p src/main/resources/firebase
