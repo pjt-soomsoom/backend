@@ -10,7 +10,7 @@
 *.sqlite3
 *.db-shm
 *.db-wal
-*.sql
+
 
 ### dotenv ###
 .env.dev
