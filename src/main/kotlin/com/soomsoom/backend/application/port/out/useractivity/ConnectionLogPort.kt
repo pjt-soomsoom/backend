@@ -3,6 +3,7 @@ package com.soomsoom.backend.application.port.out.useractivity
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
 import com.soomsoom.backend.domain.useractivity.model.aggregate.ConnectionLog
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 interface ConnectionLogPort {
     /**
@@ -30,4 +31,25 @@ interface ConnectionLogPort {
         pageNumber: Int,
         pageSize: Int,
     ): List<InactiveUserAdapterDto>
+
+    /**
+     * '마음일기 알림(인게이지먼트 넛지)' 발송 대상을 조회
+     * - 어제는 접속했지만, 오늘 일기나 활동을 하지 않은 사용자
+     * @param yesterdayStart 어제 날짜 시작 시간
+     * @param yesterdayEnd 어제 날짜 종료 시간
+     * @param todayStart 오늘 날짜 시작 시간
+     * @param todayEnd 오늘 날짜 종료 시간
+     * @param pageNumber 페이지 번호
+     * @param pageSize 페이지 크기
+     * @return 대상 사용자 ID 리스트
+     */
+    fun findDiaryReminderTargetUserIds(
+        targetTime: LocalTime,
+        yesterdayStart: LocalDateTime,
+        yesterdayEnd: LocalDateTime,
+        todayStart: LocalDateTime,
+        todayEnd: LocalDateTime,
+        pageNumber: Int,
+        pageSize: Int,
+    ): List<Long>
 }

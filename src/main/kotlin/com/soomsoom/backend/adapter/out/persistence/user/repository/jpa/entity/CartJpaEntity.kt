@@ -23,6 +23,7 @@ class CartJpaEntity(
 
     @OneToMany(mappedBy = "cart", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     val items: MutableList<CartItemJpaEntity> = mutableListOf(),
+
 ) : BaseTimeEntity() {
     fun addItem(itemId: Long) {
         if (this.items.none { it.itemId == itemId }) {

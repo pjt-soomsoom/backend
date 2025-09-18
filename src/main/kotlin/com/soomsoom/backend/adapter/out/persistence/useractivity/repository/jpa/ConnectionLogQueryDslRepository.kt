@@ -1,19 +1,25 @@
-package com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa
+ package com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa
 
-import com.querydsl.core.types.dsl.BooleanExpression
-import com.querydsl.core.types.dsl.CaseBuilder
-import com.querydsl.core.types.dsl.NumberExpression
-import com.querydsl.jpa.impl.JPAQueryFactory
-import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
-import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.QInactiveUserAdapterDto
-import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.entity.QConnectionLogJpaEntity.connectionLogJpaEntity
-import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
+ import com.querydsl.core.types.dsl.BooleanExpression
+ import com.querydsl.core.types.dsl.CaseBuilder
+ import com.querydsl.core.types.dsl.NumberExpression
+ import com.querydsl.jpa.JPAExpressions
+ import com.querydsl.jpa.impl.JPAQueryFactory
+ import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.entity.QActivityCompletionLogJpaEntity.activityCompletionLogJpaEntity
+ import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.entity.QDiaryJpaEntity.diaryJpaEntity
+ import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.entity.QUserNotificationSettingJpaEntity.userNotificationSettingJpaEntity
+ import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
+ import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.QInactiveUserAdapterDto
+ import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.entity.QConnectionLogJpaEntity.connectionLogJpaEntity
+ import org.springframework.data.domain.Pageable
+ import org.springframework.stereotype.Repository
+ import java.time.LocalDateTime
+ import java.time.LocalTime
 
-@Repository
-class ConnectionLogQueryDslRepository(
+ @Repository
+ class ConnectionLogQueryDslRepository(
     private val queryFactory: JPAQueryFactory,
-) {
+ ) {
     fun existsByUserIdAndCreatedAtBetween(userId: Long, from: LocalDateTime, to: LocalDateTime): Boolean {
         val fetchFirst = queryFactory
             .selectOne()
@@ -76,4 +82,51 @@ class ConnectionLogQueryDslRepository(
             .limit(pageSize.toLong())
             .fetch()
     }
-}
+
+     fun findDiaryReminderTargetUserIds(
+         targetTime: LocalTime,
+         yesterdayStart: LocalDateTime,
+         yesterdayEnd: LocalDateTime,
+         todayStart: LocalDateTime,
+         todayEnd: LocalDateTime,
+         pageable: Pageable
+     ): List<Long> {
+
+         return queryFactory
+             .select(userNotificationSettingJpaEntity.userId)
+             .from(userNotificationSettingJpaEntity)
+             .where(
+                 // 1. [기본 조건] 알림 설정이 켜져 있고, 현재 시간과 일치하는 사용자
+                 userNotificationSettingJpaEntity.diaryNotificationEnabled.isTrue,
+                 userNotificationSettingJpaEntity.diaryNotificationTime.eq(targetTime),
+
+                 // 2. [존재 조건] 어제 접속 기록이 '존재하는' 사용자 (EXISTS)
+                 JPAExpressions.selectOne()
+                     .from(connectionLogJpaEntity)
+                     .where(
+                         connectionLogJpaEntity.userId.eq(userNotificationSettingJpaEntity.userId),
+                         connectionLogJpaEntity.createdAt.between(yesterdayStart, yesterdayEnd)
+                     ).exists(),
+
+                 // 3. [미존재 조건] 오늘 일기를 쓴 기록이 '존재하지 않는' 사용자 (NOT EXISTS)
+                 JPAExpressions.selectOne()
+                     .from(diaryJpaEntity)
+                     .where(
+                         diaryJpaEntity.userId.eq(userNotificationSettingJpaEntity.userId),
+                         diaryJpaEntity.createdAt.between(todayStart, todayEnd)
+                     ).notExists(),
+
+                 // 4. [미존재 조건] 오늘 활동을 완료한 기록이 '존재하지 않는' 사용자 (NOT EXISTS)
+                 JPAExpressions.selectOne()
+                     .from(activityCompletionLogJpaEntity)
+                     .where(
+                         activityCompletionLogJpaEntity.userId.eq(userNotificationSettingJpaEntity.userId),
+                         activityCompletionLogJpaEntity.createdAt.between(todayStart, todayEnd)
+                     ).notExists()
+             )
+             .orderBy(userNotificationSettingJpaEntity.userId.asc()) // 페이징을 위한 정렬 추가
+             .offset(pageable.offset)
+             .limit(pageable.pageSize.toLong())
+             .fetch()
+     }
+ }
