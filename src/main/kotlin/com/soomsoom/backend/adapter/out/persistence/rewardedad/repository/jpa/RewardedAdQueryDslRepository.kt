@@ -1,4 +1,3 @@
- 
 package com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa
 
 import com.querydsl.jpa.JPAExpressions
