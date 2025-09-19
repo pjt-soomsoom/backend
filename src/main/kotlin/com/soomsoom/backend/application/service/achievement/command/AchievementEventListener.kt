@@ -14,7 +14,7 @@ import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
-class ProgressUpdateEventListener(
+class AchievementEventListener(
     private val updateUserProgressUseCase: UpdateUserProgressUseCase,
 ) {
     @Async("threadPoolTaskExecutor")
