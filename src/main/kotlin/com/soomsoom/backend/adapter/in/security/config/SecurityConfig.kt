@@ -44,7 +44,8 @@ class SecurityConfig(
                         "/auth/device",
                         "/auth/social",
                         "/auth/refresh",
-                        "/auth/logout"
+                        "/auth/logout",
+                        "/callbacks/admob/ssv"
                     ).permitAll()
 
                 domainSecurityConfigurer.forEach { it.configure(authorize) }

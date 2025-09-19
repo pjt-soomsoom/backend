@@ -42,6 +42,8 @@ class CheckAndGrantAchievementsService(
             eventType = EventType.ACHIEVEMENT_ACHIEVED,
             payload = AchievementAchievedNotificationPayload(userId, achievement.id, achievement.name, achievement.grade)
         )
+
+
         eventPublisher.publishEvent(event)
     }
 }
