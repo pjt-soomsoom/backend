@@ -19,6 +19,6 @@ class FindAllAchievementsService(
     @PreAuthorize("hasRole('ADMIN')")
     override fun findAll(criteria: FindAllAchievementsCriteria, pageable: Pageable): Page<AchievementDto> {
         val achievementsPage = achievementPort.findAll(criteria, pageable)
-        return achievementsPage.map { AchievementDto.from(it, it.conditions) }
+        return achievementsPage.map { AchievementDto.from(it) }
     }
 }

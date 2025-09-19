@@ -21,6 +21,6 @@ class FindAchievementByIdService(
         val achievement = achievementPort.findById(achievementId, DeletionStatus.ALL)
             ?: throw SoomSoomException(AchievementErrorCode.NOT_FOUND)
 
-        return AchievementDto.from(achievement, achievement.conditions)
+        return AchievementDto.from(achievement)
     }
 }

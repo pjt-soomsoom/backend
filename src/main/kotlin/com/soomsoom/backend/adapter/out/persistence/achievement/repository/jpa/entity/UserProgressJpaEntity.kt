@@ -1,6 +1,6 @@
 package com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.entity
 
-import com.soomsoom.backend.domain.achievement.model.ConditionType
+import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType

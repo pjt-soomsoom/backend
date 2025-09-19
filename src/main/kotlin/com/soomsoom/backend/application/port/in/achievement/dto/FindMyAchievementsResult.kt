@@ -1,49 +1,36 @@
 package com.soomsoom.backend.application.port.`in`.achievement.dto
 
-import com.soomsoom.backend.domain.achievement.model.Achievement
-import com.soomsoom.backend.domain.achievement.model.AchievementCategory
-import com.soomsoom.backend.domain.achievement.model.AchievementGrade
-import com.soomsoom.backend.domain.achievement.model.UserAchieved
-import com.soomsoom.backend.domain.achievement.model.UserProgress
+import com.soomsoom.backend.application.helper.ProgressInfo
+import com.soomsoom.backend.domain.achievement.model.aggregate.Achievement
+import com.soomsoom.backend.domain.achievement.model.entity.UserAchieved
+import com.soomsoom.backend.domain.achievement.model.enums.AchievementCategory
+import com.soomsoom.backend.domain.achievement.model.enums.AchievementGrade
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 
+@Schema(description = "내 업적 조회 결과 DTO (사용자용)")
 data class FindMyAchievementsResult(
-    val achievementId: Long,
-    val name: String,
-    val description: String,
-    val phrase: String?,
-    val grade: AchievementGrade,
-    val category: AchievementCategory,
-    val isAchieved: Boolean,
-    val achievedAt: LocalDateTime?,
-    val progress: ProgressInfo?,
+    @field:Schema(description = "업적 ID") val achievementId: Long,
+    @field:Schema(description = "업적 이름") val name: String,
+    @field:Schema(description = "업적 상세 설명 (동적으로 생성됨)", example = "3일 연속 일기 작성") val description: String,
+    @field:Schema(description = "격려 문구") val phrase: String?,
+    @field:Schema(description = "업적 등급") val grade: AchievementGrade,
+    @field:Schema(description = "업적 카테고리") val category: AchievementCategory,
+    @field:Schema(description = "업적 달성 여부") val isAchieved: Boolean,
+    @field:Schema(description = "업적 달성 일시") val achievedAt: LocalDateTime?,
+    @field:Schema(description = "업적 진행도 정보") val progress: ProgressInfo?,
 ) {
-    data class ProgressInfo(
-        val currentValue: Int,
-        val targetValue: Int,
-    )
-
     companion object {
         fun of(
             achievement: Achievement,
             userAchieved: UserAchieved?,
-            userProgress: UserProgress?,
-            targetValue: Int,
+            progressInfo: ProgressInfo,
+            description: String,
         ): FindMyAchievementsResult {
-            val progressInfo = if (userAchieved != null) {
-                // 달성 완료 시, 진행도를 꽉 채워서(예: 10/10) 보여줌
-                ProgressInfo(currentValue = targetValue, targetValue = targetValue)
-            } else {
-                // 미달성 시, 현재 진행도를 보여줌
-                userProgress?.let {
-                    ProgressInfo(currentValue = it.currentValue, targetValue = targetValue)
-                } ?: ProgressInfo(currentValue = 0, targetValue = targetValue)
-            }
-
             return FindMyAchievementsResult(
                 achievementId = achievement.id,
                 name = achievement.name,
-                description = achievement.description,
+                description = description,
                 phrase = achievement.phrase,
                 grade = achievement.grade,
                 category = achievement.category,

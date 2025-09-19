@@ -23,6 +23,9 @@ repositories {
 
 dependencies {
 
+    // AdMob SSV 검증을 위한 라이브러리
+    implementation("com.google.crypto.tink:apps-rewardedads:1.10.0")
+
     // flyway
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-mysql")

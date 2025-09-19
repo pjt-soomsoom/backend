@@ -14,7 +14,7 @@ create table achievement_conditions (
                                         target_value integer not null,
                                         achievement_id bigint not null,
                                         id bigint not null auto_increment,
-                                        type enum ('BREATHING_COUNT','BREATHING_MONTHLY_COUNT','BREATHING_MULTI_TYPE_COUNT','BREATHING_STREAK','BREATHING_TOTAL_SECONDS','CONNECTION_STREAK','DIARY_COUNT','DIARY_MONTHLY_COUNT','DIARY_STREAK','HIDDEN_CUSTOMIZE_CHARACTER','HIDDEN_EMOTION_OVERCOME','HIDDEN_STAY_HOME_SCREEN','MEDITATION_COUNT','MEDITATION_LATE_NIGHT_STREAK','MEDITATION_MONTHLY_COUNT','MEDITATION_STREAK','MEDITATION_TOTAL_SECONDS','SOUND_EFFECT_TOTAL_SECONDS'),
+                                        type enum ('BREATHING_COUNT','BREATHING_MONTHLY_COUNT','BREATHING_MULTI_TYPE_COUNT','BREATHING_STREAK','BREATHING_TOTAL_MINUTES','DIARY_COUNT','DIARY_MONTHLY_COUNT','DIARY_STREAK','HIDDEN_CUSTOMIZE_CHARACTER','HIDDEN_EMOTION_OVERCOME','HIDDEN_STAY_HOME_SCREEN','MEDITATION_COUNT','MEDITATION_LATE_NIGHT_STREAK','MEDITATION_MONTHLY_COUNT','MEDITATION_STREAK','MEDITATION_TOTAL_MINUTES','SOUND_EFFECT_TOTAL_MINUTES'),
                                         primary key (id)
 ) engine=InnoDB;
 
@@ -25,9 +25,12 @@ create table achievements (
                               id bigint not null auto_increment,
                               modified_at datetime(6),
                               reward_item_id bigint,
-                              description varchar(255),
                               name varchar(255),
                               phrase varchar(255),
+                              reward_body_template varchar(255),
+                              reward_title_template varchar(255),
+                              unlocked_body_template varchar(255),
+                              unlocked_title_template varchar(255),
                               category enum ('BREATHING','DIARY','HIDDEN','MEDITATION'),
                               grade enum ('BRONZE','GOLD','SILVER','SPECIAL'),
                               primary key (id)
@@ -78,6 +81,18 @@ create table activity_progress (
                                    modified_at datetime(6),
                                    user_id bigint not null,
                                    primary key (id)
+) engine=InnoDB;
+
+create table ad_reward_logs (
+                                amount integer,
+                                created_at datetime(6) not null,
+                                deleted_at datetime(6),
+                                id bigint not null auto_increment,
+                                modified_at datetime(6),
+                                user_id bigint not null,
+                                ad_unit_id varchar(255),
+                                transaction_id varchar(255),
+                                primary key (id)
 ) engine=InnoDB;
 
 create table announcements (
@@ -284,6 +299,18 @@ create table refresh_tokens (
                                 primary key (token)
 ) engine=InnoDB;
 
+create table rewarded_ads (
+                              active bit not null,
+                              reward_amount integer,
+                              created_at datetime(6) not null,
+                              deleted_at datetime(6),
+                              id bigint not null auto_increment,
+                              modified_at datetime(6),
+                              ad_unit_id varchar(255),
+                              title varchar(255),
+                              primary key (id)
+) engine=InnoDB;
+
 create table screen_time_logs (
                                   duration_in_seconds integer not null,
                                   created_at datetime(6) not null,
@@ -384,7 +411,7 @@ create table user_progress (
                                current_value integer not null,
                                id bigint not null auto_increment,
                                user_id bigint not null,
-                               type enum ('BREATHING_COUNT','BREATHING_MONTHLY_COUNT','BREATHING_MULTI_TYPE_COUNT','BREATHING_STREAK','BREATHING_TOTAL_SECONDS','CONNECTION_STREAK','DIARY_COUNT','DIARY_MONTHLY_COUNT','DIARY_STREAK','HIDDEN_CUSTOMIZE_CHARACTER','HIDDEN_EMOTION_OVERCOME','HIDDEN_STAY_HOME_SCREEN','MEDITATION_COUNT','MEDITATION_LATE_NIGHT_STREAK','MEDITATION_MONTHLY_COUNT','MEDITATION_STREAK','MEDITATION_TOTAL_SECONDS','SOUND_EFFECT_TOTAL_SECONDS'),
+                               type enum ('BREATHING_COUNT','BREATHING_MONTHLY_COUNT','BREATHING_MULTI_TYPE_COUNT','BREATHING_STREAK','BREATHING_TOTAL_MINUTES','DIARY_COUNT','DIARY_MONTHLY_COUNT','DIARY_STREAK','HIDDEN_CUSTOMIZE_CHARACTER','HIDDEN_EMOTION_OVERCOME','HIDDEN_STAY_HOME_SCREEN','MEDITATION_COUNT','MEDITATION_LATE_NIGHT_STREAK','MEDITATION_MONTHLY_COUNT','MEDITATION_STREAK','MEDITATION_TOTAL_MINUTES','SOUND_EFFECT_TOTAL_MINUTES'),
                                primary key (id)
 ) engine=InnoDB;
 
@@ -412,11 +439,20 @@ create table users (
                        primary key (id)
 ) engine=InnoDB;
 
+alter table achievements
+    add constraint UKktpif54u9a3ssn6rpxxqx6jvp unique (name);
+
+alter table ad_reward_logs
+    add constraint UK8tepffuut86g94davf44suyeq unique (transaction_id);
+
 alter table carts
     add constraint UK64t7ox312pqal3p7fg9o503c2 unique (user_id);
 
 alter table connection_logs
     add constraint UKmy6ahkfsjoe0iu3bj1aehpot0 unique (user_id, created_at);
+
+alter table rewarded_ads
+    add constraint UK8jsaf6tall9vhyqyw1b5whu1q unique (ad_unit_id);
 
 alter table user_activity_summary
     add constraint UK2hy0knhpjdqu9dro0jyf8higj unique (user_id);

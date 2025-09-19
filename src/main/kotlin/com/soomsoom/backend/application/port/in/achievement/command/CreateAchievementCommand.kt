@@ -1,17 +1,18 @@
 package com.soomsoom.backend.application.port.`in`.achievement.command
 
-import com.soomsoom.backend.domain.achievement.model.AchievementCategory
-import com.soomsoom.backend.domain.achievement.model.AchievementGrade
-import com.soomsoom.backend.domain.achievement.model.ConditionType
+import com.soomsoom.backend.domain.achievement.model.enums.AchievementCategory
+import com.soomsoom.backend.domain.achievement.model.enums.AchievementGrade
+import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
+import com.soomsoom.backend.domain.achievement.model.vo.AchievementReward
+import com.soomsoom.backend.domain.achievement.model.vo.DisplayInfo
 
 data class CreateAchievementCommand(
     val name: String,
-    val description: String,
     val phrase: String?,
     val grade: AchievementGrade,
     val category: AchievementCategory,
-    val rewardPoints: Int?,
-    val rewardItemId: Long?,
+    val unlockedDisplayInfo: DisplayInfo,
+    val reward: AchievementReward?,
     val conditions: List<ConditionCommand>,
 ) {
     data class ConditionCommand(

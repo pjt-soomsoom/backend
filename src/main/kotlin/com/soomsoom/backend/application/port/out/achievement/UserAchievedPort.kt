@@ -1,6 +1,6 @@
 package com.soomsoom.backend.application.port.out.achievement
 
-import com.soomsoom.backend.domain.achievement.model.UserAchieved
+import com.soomsoom.backend.domain.achievement.model.entity.UserAchieved
 
 interface UserAchievedPort {
     /**

@@ -1,9 +1,7 @@
 package com.soomsoom.backend.application.service.achievement.command
 
-import com.soomsoom.backend.application.port.`in`.achievement.usecase.command.GrantRewardUseCase
 import com.soomsoom.backend.application.port.`in`.achievement.usecase.command.UpdateUserProgressUseCase
 import com.soomsoom.backend.common.event.Event
-import com.soomsoom.backend.common.event.payload.AchievementAchievedNotificationPayload
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
 import com.soomsoom.backend.common.event.payload.DiaryCreatedPayload
 import com.soomsoom.backend.common.event.payload.ScreenTimeAccumulatedPayload
@@ -64,21 +62,5 @@ class ProgressUpdateEventListener(
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleScreenTimeAccumulatedEvent(event: Event<ScreenTimeAccumulatedPayload>) {
         updateUserProgressUseCase.updateProgress(event)
-    }
-}
-
-@Component
-class RewardEventListener(
-    private val grantRewardUseCase: GrantRewardUseCase,
-) {
-    @Async("threadPoolTaskExecutor")
-    @TransactionalEventListener(
-        classes = [Event::class],
-        condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).ACHIEVEMENT_ACHIEVED",
-        phase = TransactionPhase.AFTER_COMMIT
-    )
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun handleAchievementAchievedEvent(event: Event<AchievementAchievedNotificationPayload>) {
-        grantRewardUseCase.grantReward(event.payload.userId, event.payload.achievementId)
     }
 }

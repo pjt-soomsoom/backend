@@ -6,6 +6,7 @@ import com.soomsoom.backend.application.service.notification.strategy.Notificati
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.NotificationPayload
 import com.soomsoom.backend.common.event.payload.UserCreatedPayload
+import org.springframework.core.annotation.Order
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
@@ -23,6 +24,7 @@ class NotificationEventListener(
         phase = TransactionPhase.AFTER_COMMIT
     )
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Order(10)
     fun handleEvent(event: Event<*>) {
         if (event.payload is NotificationPayload) {
             val supportedStrategies = strategies.filter { it.supports(event) }

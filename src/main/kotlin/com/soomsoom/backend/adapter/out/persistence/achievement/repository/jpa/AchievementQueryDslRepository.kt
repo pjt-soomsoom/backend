@@ -14,9 +14,9 @@ import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.e
 import com.soomsoom.backend.application.port.`in`.achievement.query.FindAllAchievementsCriteria
 import com.soomsoom.backend.application.port.`in`.achievement.query.FindMyAchievementsCriteria
 import com.soomsoom.backend.common.utils.QueryDslSortUtil
-import com.soomsoom.backend.domain.achievement.model.AchievementGrade
-import com.soomsoom.backend.domain.achievement.model.AchievementStatusFilter
-import com.soomsoom.backend.domain.achievement.model.ConditionType
+import com.soomsoom.backend.domain.achievement.model.enums.AchievementGrade
+import com.soomsoom.backend.domain.achievement.model.enums.AchievementStatusFilter
+import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
 import com.soomsoom.backend.domain.common.DeletionStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -42,7 +42,7 @@ class AchievementQueryDslRepository(
                 )
             )
             .from(achievementJpaEntity)
-            .leftJoin(achievementConditionJpaEntity).on(achievementJpaEntity.id.eq(achievementConditionJpaEntity.achievementId))
+            .leftJoin(achievementConditionJpaEntity).on(achievementJpaEntity.id.eq(achievementConditionJpaEntity.achievement.id))
             .leftJoin(userAchievedJpaEntity).on(
                 achievementJpaEntity.id.eq(userAchievedJpaEntity.achievementId).and(userAchievedJpaEntity.userId.eq(criteria.userId))
             )
@@ -76,9 +76,9 @@ class AchievementQueryDslRepository(
 
     fun findNewlyAchievableEntities(userId: Long, type: ConditionType): List<AchievementJpaEntity> {
         val achievableIdsSubquery = queryFactory
-            .select(achievementConditionJpaEntity.achievementId)
+            .select(achievementConditionJpaEntity.achievement.id)
             .from(achievementConditionJpaEntity)
-            .join(achievementJpaEntity).on(achievementConditionJpaEntity.achievementId.eq(achievementJpaEntity.id))
+            .join(achievementJpaEntity).on(achievementConditionJpaEntity.achievement.id.eq(achievementJpaEntity.id))
             .leftJoin(userProgressJpaEntity).on(
                 achievementConditionJpaEntity.type.eq(userProgressJpaEntity.type).and(userProgressJpaEntity.userId.eq(userId))
             )
@@ -95,7 +95,7 @@ class AchievementQueryDslRepository(
                         .where(userAchievedJpaEntity.userId.eq(userId))
                 )
             )
-            .groupBy(achievementConditionJpaEntity.achievementId)
+            .groupBy(achievementConditionJpaEntity.achievement.id)
             .having(
                 // 4. 업적의 모든 조건을 만족했는지 검증
                 achievementConditionJpaEntity.id.count().eq(
@@ -141,7 +141,7 @@ class AchievementQueryDslRepository(
         }
         return queryFactory
             .selectFrom(achievementConditionJpaEntity)
-            .where(achievementConditionJpaEntity.achievementId.`in`(achievementIds))
+            .where(achievementConditionJpaEntity.achievement.id.`in`(achievementIds))
             .fetch()
     }
 
@@ -155,7 +155,7 @@ class AchievementQueryDslRepository(
             .select(achievementConditionJpaEntity)
             .from(achievementConditionJpaEntity)
             // achievement_conditions 테이블과 achievements 테이블을 achievementId를 기준으로 INNER JOIN
-            .join(achievementJpaEntity).on(achievementConditionJpaEntity.achievementId.eq(achievementJpaEntity.id))
+            .join(achievementJpaEntity).on(achievementConditionJpaEntity.achievement.id.eq(achievementJpaEntity.id))
             .leftJoin(userAchievedJpaEntity)
             .on(
                 // 조인 조건은 achievement의 id를 사용

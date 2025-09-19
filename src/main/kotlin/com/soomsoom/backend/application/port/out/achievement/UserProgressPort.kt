@@ -1,7 +1,7 @@
 package com.soomsoom.backend.application.port.out.achievement
 
-import com.soomsoom.backend.domain.achievement.model.ConditionType
-import com.soomsoom.backend.domain.achievement.model.UserProgress
+import com.soomsoom.backend.domain.achievement.model.entity.UserProgress
+import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
 
 interface UserProgressPort {
     /**

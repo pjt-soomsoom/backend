@@ -37,4 +37,10 @@ enum class EventType {
     // 공지
     ANNOUNCEMENT_CREATED,
     ANNOUNCEMENT_DELETED,
+
+    // 보상 지급 요청 이벤트
+    REWARD_SOURCE_TRIGGERED,
+
+    // 보상 지급 완료 이벤트
+    REWARD_COMPLETED,
 }

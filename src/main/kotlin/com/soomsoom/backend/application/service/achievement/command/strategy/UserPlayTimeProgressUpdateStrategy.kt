@@ -7,8 +7,8 @@ import com.soomsoom.backend.application.port.out.achievement.UserProgressPort
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.Payload
 import com.soomsoom.backend.common.event.payload.UserPlayTimeAccumulatedPayload
-import com.soomsoom.backend.domain.achievement.model.ConditionType
-import com.soomsoom.backend.domain.achievement.model.UserProgress
+import com.soomsoom.backend.domain.achievement.model.entity.UserProgress
+import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -28,9 +28,9 @@ class UserPlayTimeProgressUpdateStrategy(
 
         // 활동 타입에 따라 적절한 ConditionType을 선택
         val type = when (payload.activityType) {
-            ActivityType.MEDITATION -> ConditionType.MEDITATION_TOTAL_SECONDS
-            ActivityType.BREATHING -> ConditionType.BREATHING_TOTAL_SECONDS
-            ActivityType.SOUND_EFFECT -> ConditionType.SOUND_EFFECT_TOTAL_SECONDS
+            ActivityType.MEDITATION -> ConditionType.MEDITATION_TOTAL_MINUTES
+            ActivityType.BREATHING -> ConditionType.BREATHING_TOTAL_MINUTES
+            ActivityType.SOUND_EFFECT -> ConditionType.SOUND_EFFECT_TOTAL_MINUTES
         }
 
         val conditions = achievementPort.findUnachievedConditionsByType(payload.userId, type)

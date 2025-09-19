@@ -6,8 +6,8 @@ import com.soomsoom.backend.application.port.out.achievement.UserProgressPort
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.Payload
 import com.soomsoom.backend.common.event.payload.ScreenTimeAccumulatedPayload
-import com.soomsoom.backend.domain.achievement.model.ConditionType
-import com.soomsoom.backend.domain.achievement.model.UserProgress
+import com.soomsoom.backend.domain.achievement.model.entity.UserProgress
+import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
