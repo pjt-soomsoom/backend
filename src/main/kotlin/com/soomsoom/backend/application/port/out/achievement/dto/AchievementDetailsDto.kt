@@ -1,8 +1,8 @@
 package com.soomsoom.backend.application.port.out.achievement.dto
 
-import com.soomsoom.backend.domain.achievement.model.Achievement
-import com.soomsoom.backend.domain.achievement.model.UserAchieved
-import com.soomsoom.backend.domain.achievement.model.UserProgress
+import com.soomsoom.backend.domain.achievement.model.aggregate.Achievement
+import com.soomsoom.backend.domain.achievement.model.entity.UserAchieved
+import com.soomsoom.backend.domain.achievement.model.entity.UserProgress
 
 data class AchievementDetailsDto(
     val achievement: Achievement,

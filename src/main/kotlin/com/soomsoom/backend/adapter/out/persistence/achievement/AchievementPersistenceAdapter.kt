@@ -14,11 +14,11 @@ import com.soomsoom.backend.application.port.out.achievement.UserProgressPort
 import com.soomsoom.backend.application.port.out.achievement.dto.AchievementDetailsDto
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.achievement.AchievementErrorCode
-import com.soomsoom.backend.domain.achievement.model.Achievement
-import com.soomsoom.backend.domain.achievement.model.AchievementCondition
-import com.soomsoom.backend.domain.achievement.model.ConditionType
-import com.soomsoom.backend.domain.achievement.model.UserAchieved
-import com.soomsoom.backend.domain.achievement.model.UserProgress
+import com.soomsoom.backend.domain.achievement.model.aggregate.Achievement
+import com.soomsoom.backend.domain.achievement.model.entity.AchievementCondition
+import com.soomsoom.backend.domain.achievement.model.entity.UserAchieved
+import com.soomsoom.backend.domain.achievement.model.entity.UserProgress
+import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
 import com.soomsoom.backend.domain.common.DeletionStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -81,18 +81,20 @@ class AchievementPersistenceAdapter(
     }
 
     override fun save(achievement: Achievement): Achievement {
-        val entity = achievement.id.let { id ->
-            // ID가 0L이면 새로운 엔티티로 간주 (create)
-            if (id == 0L) {
-                achievement.toEntity()
-            } else { // ID가 있으면 기존 엔티티를 찾아 업데이트 (update)
-                val existingEntity = achievementJpaRepository.findByIdOrNull(id)
-                    ?: throw SoomSoomException(AchievementErrorCode.NOT_FOUND)
-                existingEntity.update(achievement)
-                existingEntity
-            }
+        val entity = if (achievement.id == 0L) {
+            achievement.toEntity()
+        } else {
+            val existingEntity = achievementJpaRepository.findByIdOrNull(achievement.id)
+                ?: throw SoomSoomException(AchievementErrorCode.NOT_FOUND)
+
+            existingEntity.update(achievement)
+            existingEntity
         }
-        return achievementJpaRepository.save(entity).toDomain()
+        val savedEntity = achievementJpaRepository.save(entity)
+
+        return savedEntity.toDomain().apply {
+            this.conditions = achievement.conditions
+        }
     }
 
     override fun delete(achievement: Achievement) {
@@ -108,11 +110,11 @@ class AchievementPersistenceAdapter(
         val conditions = queryDslRepository.findConditionsIn(achievementIds)
 
         // 조건들을 achievementId 기준으로 그룹핑하여 Map으로 변환 (처리 효율성 증가)
-        val conditionsMap = conditions.groupBy { it.achievementId }
+        val conditionsMap = conditions.groupBy { it.achievement }
 
         // 업적 엔티티를 도메인 객체로 변환하면서, Map을 사용해 각 업적에 맞는 조건 목록을 주입
         return achievementEntitiesPage.map { entity ->
-            val achievementConditions = conditionsMap[entity.id]?.map { it.toDomain() } ?: emptyList()
+            val achievementConditions = conditionsMap[entity]?.map { it.toDomain() } ?: emptyList()
             entity.toDomain().apply {
                 this.conditions = achievementConditions
             }

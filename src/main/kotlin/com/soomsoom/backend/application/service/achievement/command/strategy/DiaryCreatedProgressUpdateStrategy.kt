@@ -9,8 +9,8 @@ import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.Payload
 import com.soomsoom.backend.common.event.payload.DiaryCreatedPayload
 import com.soomsoom.backend.common.utils.DateHelper
-import com.soomsoom.backend.domain.achievement.model.ConditionType
-import com.soomsoom.backend.domain.achievement.model.UserProgress
+import com.soomsoom.backend.domain.achievement.model.entity.UserProgress
+import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
 import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.diary.model.Emotion
 import org.springframework.stereotype.Component

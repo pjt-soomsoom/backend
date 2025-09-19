@@ -4,8 +4,8 @@ import com.soomsoom.backend.application.port.`in`.achievement.command.CreateAchi
 import com.soomsoom.backend.application.port.`in`.achievement.dto.AchievementDto
 import com.soomsoom.backend.application.port.`in`.achievement.usecase.command.CreateAchievementUseCase
 import com.soomsoom.backend.application.port.out.achievement.AchievementPort
-import com.soomsoom.backend.domain.achievement.model.Achievement
-import com.soomsoom.backend.domain.achievement.model.AchievementCondition
+import com.soomsoom.backend.domain.achievement.model.aggregate.Achievement
+import com.soomsoom.backend.domain.achievement.model.entity.AchievementCondition
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,27 +20,25 @@ class CreateAchievementService(
     override fun create(command: CreateAchievementCommand): AchievementDto {
         val achievement = Achievement.create(
             name = command.name,
-            description = command.description,
             phrase = command.phrase,
             grade = command.grade,
             category = command.category,
-            rewardPoints = command.rewardPoints,
-            rewardItemId = command.rewardItemId
+            unlockedDisplayInfo = command.unlockedDisplayInfo,
+            reward = command.reward
         )
-
-        val savedAchievement = achievementPort.save(achievement)
 
         val conditions = command.conditions.map { conditionCommand ->
             AchievementCondition(
                 id = 0L,
-                achievementId = savedAchievement.id,
                 type = conditionCommand.type,
                 targetValue = conditionCommand.targetValue
             )
         }
+        achievement.conditions = conditions
 
-        val savedConditions = achievementPort.saveConditions(conditions)
+        val savedAchievement = achievementPort.save(achievement)
 
-        return AchievementDto.from(savedAchievement, savedConditions)
+        // 4. DTO로 변환하여 반환
+        return AchievementDto.from(savedAchievement)
     }
 }

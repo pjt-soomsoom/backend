@@ -13,6 +13,9 @@ class AdMobVerificationAdapter : AdMobVerificationPort {
     override fun verify(fullCallbackUrl: String): Boolean {
         return try {
             val verifier = RewardedAdsVerifier.Builder()
+                .fetchVerifyingPublicKeysWith(
+                    RewardedAdsVerifier.KEYS_DOWNLOADER_INSTANCE_PROD
+                )
                 .build()
             verifier.verify(fullCallbackUrl)
             true

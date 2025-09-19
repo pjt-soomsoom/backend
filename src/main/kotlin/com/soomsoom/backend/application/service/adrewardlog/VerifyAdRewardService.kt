@@ -11,6 +11,7 @@ import com.soomsoom.backend.common.utils.DateHelper
 import com.soomsoom.backend.domain.adrewardlog.AdRewardLogErrorCode
 import com.soomsoom.backend.domain.common.vo.Points
 import com.soomsoom.backend.domain.reward.model.RewardSource
+import com.soomsoom.backend.domain.reward.model.RewardType
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -75,7 +76,8 @@ class VerifyAdRewardService(
                 notificationTitle = "보상 획득!",
                 notificationBody = "광고 시청으로 하트를 획득했어요!",
                 notificationImage = null,
-                sendNotification = true
+                sendNotification = true,
+                rewardType = RewardType.POINT
             )
         )
         eventPublisher.publishEvent(event)

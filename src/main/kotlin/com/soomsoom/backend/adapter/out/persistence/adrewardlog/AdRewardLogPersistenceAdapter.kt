@@ -8,8 +8,8 @@ import java.time.LocalDateTime
 
 @Component
 class AdRewardLogPersistenceAdapter(
-    private val adRewardLogJpaRepository: AdRewardLogJpaRepository
-) : AdRewardLogPort{
+    private val adRewardLogJpaRepository: AdRewardLogJpaRepository,
+) : AdRewardLogPort {
     override fun existsByTransactionId(transactionId: String): Boolean = adRewardLogJpaRepository.existsByTransactionId(transactionId)
 
     override fun existsByUserIdAndAdUnitIdAndCreatedAtBetween(userId: Long, adUnitId: String, start: LocalDateTime, end: LocalDateTime): Boolean {

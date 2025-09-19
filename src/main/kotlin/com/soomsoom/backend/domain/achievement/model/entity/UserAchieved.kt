@@ -1,4 +1,4 @@
-package com.soomsoom.backend.domain.achievement.model
+package com.soomsoom.backend.domain.achievement.model.entity
 
 import java.time.LocalDateTime
 

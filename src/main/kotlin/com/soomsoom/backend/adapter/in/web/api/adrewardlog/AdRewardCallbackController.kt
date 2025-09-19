@@ -26,13 +26,25 @@ class AdRewardCallbackController(
     @GetMapping("/ssv")
     @ResponseStatus(HttpStatus.OK)
     fun handleSsvCallback(
-        @Parameter(description = "사용자 ID") @RequestParam("user_id") userId: String,
-        @Parameter(description = "광고 단위 ID") @RequestParam("ad_unit") adUnitId: String,
-        @Parameter(description = "고유 트랜잭션 ID") @RequestParam("transaction_id") transactionId: String,
-        @Parameter(description = "보상 아이템 이름") @RequestParam("reward_item") rewardItem: String,
-        @Parameter(description = "보상량") @RequestParam("reward_amount") rewardAmount: String,
-        @Parameter(description = "타임스탬프") @RequestParam("timestamp") timestamp: String,
-        request: HttpServletRequest
+        @Parameter(description = "사용자 ID")
+        @RequestParam("user_id")
+        userId: String,
+        @Parameter(description = "광고 단위 ID")
+        @RequestParam("ad_unit")
+        adUnitId: String,
+        @Parameter(description = "고유 트랜잭션 ID")
+        @RequestParam("transaction_id")
+        transactionId: String,
+        @Parameter(description = "보상 아이템 이름")
+        @RequestParam("reward_item")
+        rewardItem: String,
+        @Parameter(description = "보상량")
+        @RequestParam("reward_amount")
+        rewardAmount: String,
+        @Parameter(description = "타임스탬프")
+        @RequestParam("timestamp")
+        timestamp: String,
+        request: HttpServletRequest,
     ) {
         val command = VerifyAdRewardCommand(
             userId = userId,

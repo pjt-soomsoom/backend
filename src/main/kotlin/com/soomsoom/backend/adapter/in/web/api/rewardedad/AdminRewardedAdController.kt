@@ -36,7 +36,10 @@ class AdminRewardedAdController(
     @Operation(summary = "보상형 광고 생성", description = "새로운 보상형 광고를 시스템에 등록합니다.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@RequestBody @Valid request: CreateRewardedAdRequest): RewardedAdDto {
+    fun create(
+        @RequestBody @Valid
+        request: CreateRewardedAdRequest,
+    ): RewardedAdDto {
         val command = request.toCommand()
         return createRewardedAdUseCase.command(command)
     }
@@ -45,7 +48,8 @@ class AdminRewardedAdController(
     @PutMapping("/{id}")
     fun update(
         @Parameter(description = "수정할 광고의 ID") @PathVariable id: Long,
-        @RequestBody @Valid request: UpdateRewardedAdRequest
+        @RequestBody @Valid
+        request: UpdateRewardedAdRequest,
     ): RewardedAdDto {
         val command = request.toCommand(id)
         return updateRewardedAdUseCase.command(command)

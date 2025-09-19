@@ -19,7 +19,6 @@ class DeleteAchievementService(
         val achievement = achievementPort.findById(achievementId)
             ?: throw SoomSoomException(AchievementErrorCode.NOT_FOUND)
 
-        achievementPort.deleteConditionsByAchievementId(achievementId)
         achievement.delete()
         achievementPort.save(achievement)
     }

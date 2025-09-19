@@ -47,6 +47,7 @@ class AnnouncementNotificationStrategy(
                     body = if (isEnabled) payload.title else null,
                     badgeCount = userInfo.unreadAnnouncementCount,
                     payload = mapOf(
+                        "notificationType" to NotificationType.NEWS_UPDATE.name,
                         "type" to if (isEnabled) "VISIBLE_ANNOUNCEMENT" else "SILENT_BADGE_UPDATE",
                         "announcementId" to payload.announcementId.toString()
                     )

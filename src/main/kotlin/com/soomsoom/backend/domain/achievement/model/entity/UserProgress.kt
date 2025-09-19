@@ -1,4 +1,6 @@
-package com.soomsoom.backend.domain.achievement.model
+package com.soomsoom.backend.domain.achievement.model.entity
+
+import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
 
 class UserProgress(
     val id: Long?,

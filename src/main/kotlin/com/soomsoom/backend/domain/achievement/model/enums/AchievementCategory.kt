@@ -1,4 +1,4 @@
-package com.soomsoom.backend.domain.achievement.model
+package com.soomsoom.backend.domain.achievement.model.enums
 
 enum class AchievementCategory {
     DIARY, // 마음 일기

@@ -1,18 +1,19 @@
- package com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa
+ 
+package com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa
 
- import com.querydsl.jpa.JPAExpressions
- import com.querydsl.jpa.impl.JPAQueryFactory
- import com.soomsoom.backend.adapter.out.persistence.adrewardlog.repository.jpa.entity.QAdRewardLogJpaEntity.adRewardLogJpaEntity
- import com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa.dto.QRewardedAdWithWatchedStatusProjection
- import com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa.dto.RewardedAdWithWatchedStatusProjection
- import com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa.entity.QRewardedAdJpaEntity.rewardedAdJpaEntity
- import org.springframework.stereotype.Repository
- import java.time.LocalDateTime
+import com.querydsl.jpa.JPAExpressions
+import com.querydsl.jpa.impl.JPAQueryFactory
+import com.soomsoom.backend.adapter.out.persistence.adrewardlog.repository.jpa.entity.QAdRewardLogJpaEntity.adRewardLogJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa.dto.QRewardedAdWithWatchedStatusProjection
+import com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa.dto.RewardedAdWithWatchedStatusProjection
+import com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa.entity.QRewardedAdJpaEntity.rewardedAdJpaEntity
+import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
- @Repository
- class RewardedAdQueryDslRepository(
+@Repository
+class RewardedAdQueryDslRepository(
     private val queryFactory: JPAQueryFactory,
- ) {
+) {
     fun findActiveAdsWithWatchedStatus(userId: Long, start: LocalDateTime, end: LocalDateTime): List<RewardedAdWithWatchedStatusProjection> {
         val watchedAdUnitIdsSubQuery = JPAExpressions
             .select(adRewardLogJpaEntity.adUnitId)
@@ -38,4 +39,4 @@
             .orderBy(rewardedAdJpaEntity.id.asc())
             .fetch()
     }
- }
+}

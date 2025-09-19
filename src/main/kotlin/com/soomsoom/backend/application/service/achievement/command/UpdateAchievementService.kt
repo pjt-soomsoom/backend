@@ -6,7 +6,7 @@ import com.soomsoom.backend.application.port.`in`.achievement.usecase.command.Up
 import com.soomsoom.backend.application.port.out.achievement.AchievementPort
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.achievement.AchievementErrorCode
-import com.soomsoom.backend.domain.achievement.model.AchievementCondition
+import com.soomsoom.backend.domain.achievement.model.entity.AchievementCondition
 import com.soomsoom.backend.domain.common.DeletionStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -27,14 +27,12 @@ class UpdateAchievementService(
 
         achievement.update(
             name = command.name,
-            description = command.description,
             phrase = command.phrase,
             grade = command.grade,
             category = command.category,
-            rewardPoints = command.rewardPoints,
-            rewardItemId = command.rewardItemId
+            unlockedDisplayInfo = command.unlockedDisplayInfo,
+            reward = command.reward
         )
-        val updatedAchievement = achievementPort.save(achievement)
 
         // command.conditions가 null이 아닐 때만 조건 교체 로직 수행
         val finalConditions = command.conditions?.let { newConditionCommands ->
@@ -42,14 +40,14 @@ class UpdateAchievementService(
             val newConditions = newConditionCommands.map {
                 AchievementCondition(
                     id = 0L,
-                    achievementId = updatedAchievement.id,
                     type = it.type,
                     targetValue = it.targetValue
                 )
             }
-            achievementPort.saveConditions(newConditions)
+            newConditions
         } ?: achievementPort.findConditionsByAchievementId(command.id) // null이면 기존 조건들을 다시 조회
-
-        return AchievementDto.from(updatedAchievement, finalConditions)
+        achievement.conditions = finalConditions
+        val updatedAchievement = achievementPort.save(achievement)
+        return AchievementDto.from(updatedAchievement)
     }
 }

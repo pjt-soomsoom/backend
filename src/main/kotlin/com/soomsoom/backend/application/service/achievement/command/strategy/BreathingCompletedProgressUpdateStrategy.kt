@@ -6,8 +6,8 @@ import com.soomsoom.backend.application.port.out.achievement.UserProgressPort
 import com.soomsoom.backend.application.port.out.activityhistory.ActivityHistoryPort
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
 import com.soomsoom.backend.common.utils.DateHelper
-import com.soomsoom.backend.domain.achievement.model.ConditionType
-import com.soomsoom.backend.domain.achievement.model.UserProgress
+import com.soomsoom.backend.domain.achievement.model.entity.UserProgress
+import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional

@@ -1,6 +1,6 @@
 package com.soomsoom.backend.application.port.`in`.achievement.query
 
-import com.soomsoom.backend.domain.achievement.model.AchievementStatusFilter
+import com.soomsoom.backend.domain.achievement.model.enums.AchievementStatusFilter
 import com.soomsoom.backend.domain.common.DeletionStatus
 
 data class FindMyAchievementsCriteria(

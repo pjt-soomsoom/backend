@@ -6,9 +6,12 @@ import com.soomsoom.backend.application.port.`in`.user.command.AddUserPointsComm
 import com.soomsoom.backend.application.port.`in`.user.command.GrantItemToUserCommand
 import com.soomsoom.backend.application.port.`in`.user.usecase.command.AddUserPointsUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.command.GrantItemToUserUseCase
+import com.soomsoom.backend.application.port.out.item.ItemPort
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.payload.RewardCompletedNotificationPayload
+import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.item.ItemErrorCode
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -20,6 +23,7 @@ class GrantRewardService(
     private val addUserPointsUseCase: AddUserPointsUseCase,
     private val grantItemToUserUseCase: GrantItemToUserUseCase,
     private val eventPublisher: ApplicationEventPublisher,
+    private val itemPort: ItemPort,
 ) : GrantRewardUseCase {
 
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -33,6 +37,8 @@ class GrantRewardService(
         }
 
         command.itemId?.let { itemId ->
+            itemPort.findById(itemId)
+                ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
             grantItemToUserUseCase.grantItemToUser(GrantItemToUserCommand(command.userId, itemId))
         }
 
@@ -41,6 +47,7 @@ class GrantRewardService(
                 eventType = EventType.REWARD_COMPLETED,
                 payload = RewardCompletedNotificationPayload(
                     userId = command.userId,
+                    rewardType = command.rewardType,
                     title = command.notificationTitle!!,
                     body = command.notificationBody!!,
                     imageUrl = command.notificationImage

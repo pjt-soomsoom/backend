@@ -3,9 +3,9 @@ package com.soomsoom.backend.application.port.out.achievement
 import com.soomsoom.backend.application.port.`in`.achievement.query.FindAllAchievementsCriteria
 import com.soomsoom.backend.application.port.`in`.achievement.query.FindMyAchievementsCriteria
 import com.soomsoom.backend.application.port.out.achievement.dto.AchievementDetailsDto
-import com.soomsoom.backend.domain.achievement.model.Achievement
-import com.soomsoom.backend.domain.achievement.model.AchievementCondition
-import com.soomsoom.backend.domain.achievement.model.ConditionType
+import com.soomsoom.backend.domain.achievement.model.aggregate.Achievement
+import com.soomsoom.backend.domain.achievement.model.entity.AchievementCondition
+import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
 import com.soomsoom.backend.domain.common.DeletionStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

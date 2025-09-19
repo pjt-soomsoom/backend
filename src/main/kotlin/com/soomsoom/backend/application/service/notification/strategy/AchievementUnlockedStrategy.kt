@@ -1,7 +1,6 @@
 package com.soomsoom.backend.application.service.notification.strategy
 
 import com.soomsoom.backend.application.port.out.notification.NotificationPort
-import com.soomsoom.backend.application.port.out.notification.NotificationTemplatePort
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.payload.AchievementAchievedNotificationPayload
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional
 
 @Component
 class AchievementUnlockedStrategy(
-    private val notificationTemplatePort: NotificationTemplatePort,
     private val notificationPort: NotificationPort,
 ) : NotificationStrategy<AchievementAchievedNotificationPayload> {
 
@@ -32,26 +30,20 @@ class AchievementUnlockedStrategy(
         val payload = event.payload
 
         log.info("업적 달성 처리 시작, achievementName = ${payload.achievementName}")
-        val activeTemplates = notificationTemplatePort.findActiveTemplatesWithActiveVariationsByType(NotificationType.ACHIEVEMENT_UNLOCKED)
-
-        val variation = activeTemplates.firstOrNull()?.variations?.firstOrNull()
-            ?: return
-
-        val title = variation.titleTemplate
-        val body = String.format(variation.bodyTemplate, payload.achievementName)
 
         val message = NotificationMessage(
             targetUserId = payload.userId,
-            title = title,
-            body = body,
+            title = payload.title,
+            body = payload.body,
             badgeCount = 0,
             payload = mapOf(
                 "notificationType" to NotificationType.ACHIEVEMENT_UNLOCKED.name,
-                "achievementId" to payload.achievementId.toString()
+                "achievementId" to payload.achievementId.toString(),
+                "achievementGrade" to payload.achievementGrade.name
             )
         )
 
-        log.info("업적 달성 메시지 송신 요청, title = $title")
+        log.info("업적 달성 메시지 송신 요청, title = $payload.title")
         notificationPort.send(message)
     }
 }
