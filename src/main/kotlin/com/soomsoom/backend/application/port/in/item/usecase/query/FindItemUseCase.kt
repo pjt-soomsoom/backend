@@ -7,5 +7,5 @@ import org.springframework.data.domain.Page
 
 interface FindItemUseCase {
     fun findItems(criteria: FindItemsCriteria): Page<ItemDto>
-    fun findItem(userId: Long, itemId: Long, deletionStatus: DeletionStatus = DeletionStatus.ACTIVE): ItemDto
+    fun findItem(itemId: Long, userId: Long, deletionStatus: DeletionStatus = DeletionStatus.ACTIVE): ItemDto
 }

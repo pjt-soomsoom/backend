@@ -33,7 +33,7 @@ class FindItemService(
     }
 
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
-    override fun findItem(userId: Long, itemId: Long, deletionStatus: DeletionStatus): ItemDto {
+    override fun findItem(itemId: Long, userId: Long, deletionStatus: DeletionStatus): ItemDto {
         val user = userPort.findByIdWithCollections(userId)
             ?: throw SoomSoomException(UserErrorCode.NOT_FOUND)
 
