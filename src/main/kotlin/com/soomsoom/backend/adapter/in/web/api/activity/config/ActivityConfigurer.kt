@@ -11,6 +11,8 @@ class ActivityConfigurer : DomainSecurityConfigurer {
     override fun configure(
         authorize: AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry,
     ) {
+        authorize.requestMatchers("/activities/*/history/**").authenticated()
+
         authorize.requestMatchers(HttpMethod.GET, "/activities/**").permitAll()
         authorize.requestMatchers(HttpMethod.OPTIONS, "/activities/**").permitAll()
         authorize.requestMatchers(HttpMethod.HEAD, "/activities/**").permitAll()
