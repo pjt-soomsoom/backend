@@ -37,6 +37,12 @@ abstract class ActivityJpaEntity(
     var thumbnailFileKey: String?,
     var audioFileKey: String?,
 
+    @Column(name = "mini_thumbnail_image_url")
+    var miniThumbnailImageUrl: String?,
+
+    @Column(name = "mini_thumbnail_file_key")
+    var miniThumbnailFileKey: String?,
+
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)
     var category: ActivityCategory,
@@ -46,6 +52,12 @@ abstract class ActivityJpaEntity(
     @OrderColumn(name = "sequence")
     @Column(name = "description", columnDefinition = "TEXT")
     var descriptions: MutableList<String>,
+
+    @ElementCollection(fetch = LAZY)
+    @CollectionTable(name = "activity_completion_effects", joinColumns = [JoinColumn(name = "activity_id")])
+    @OrderColumn(name = "sequence")
+    @Column(name = "effect_text", columnDefinition = "TEXT")
+    var completionEffectTexts: MutableList<String>,
 ) : BaseTimeEntity() {
     open fun update(activity: Activity) {
         this.title = activity.title
@@ -58,6 +70,9 @@ abstract class ActivityJpaEntity(
         this.thumbnailFileKey = activity.thumbnailFileKey
         this.audioUrl = activity.audioUrl
         this.audioFileKey = activity.audioFileKey
+        this.miniThumbnailImageUrl = activity.miniThumbnailImageUrl
+        this.miniThumbnailFileKey = activity.miniThumbnailFileKey
+        this.completionEffectTexts = activity.completionEffectTexts.toMutableList()
         this.deletedAt = activity.deletedAt
     }
 }

@@ -17,29 +17,62 @@ import com.soomsoom.backend.domain.activity.model.TimelineEvent
 fun ActivityJpaEntity.toDomain(): Activity {
     return when (this) {
         is BreathingActivityJpaEntity -> BreathingActivity(
-            id = this.id, title = this.title, descriptions = this.descriptions,
-            authorId = this.authorId, narratorId = this.narratorId,
+            id = this.id,
+            title = this.title,
+            descriptions = this.descriptions,
+            category = this.category,
+            authorId = this.authorId,
+            narratorId = this.narratorId,
             durationInSeconds = this.durationInSeconds,
-            thumbnailImageUrl = this.thumbnailImageUrl, thumbnailFileKey = this.thumbnailFileKey,
-            audioUrl = this.audioUrl, audioFileKey = this.audioFileKey,
+            thumbnailImageUrl = this.thumbnailImageUrl,
+            thumbnailFileKey = this.thumbnailFileKey,
+            audioUrl = this.audioUrl,
+            audioFileKey = this.audioFileKey,
             timeline = this.timeline.map { it.toDomain() },
-            createdAt = this.createdAt, modifiedAt = this.modifiedAt, deletedAt = this.deletedAt, category = this.category
+            miniThumbnailImageUrl = this.miniThumbnailImageUrl,
+            miniThumbnailFileKey = this.miniThumbnailFileKey,
+            completionEffectTexts = this.completionEffectTexts,
+            createdAt = this.createdAt,
+            modifiedAt = this.modifiedAt,
+            deletedAt = this.deletedAt
         )
         is MeditationActivityJpaEntity -> MeditationActivity(
-            id = this.id, title = this.title, descriptions = this.descriptions,
-            authorId = this.authorId, narratorId = this.narratorId,
+            id = this.id,
+            title = this.title,
+            descriptions = this.descriptions,
+            category = this.category,
+            authorId = this.authorId,
+            narratorId = this.narratorId,
             durationInSeconds = this.durationInSeconds,
-            thumbnailImageUrl = this.thumbnailImageUrl, thumbnailFileKey = this.thumbnailFileKey,
-            audioUrl = this.audioUrl, audioFileKey = this.audioFileKey,
-            createdAt = this.createdAt, modifiedAt = this.modifiedAt, deletedAt = this.deletedAt, category = this.category
+            thumbnailImageUrl = this.thumbnailImageUrl,
+            thumbnailFileKey = this.thumbnailFileKey,
+            audioUrl = this.audioUrl,
+            audioFileKey = this.audioFileKey,
+            miniThumbnailImageUrl = this.miniThumbnailImageUrl,
+            miniThumbnailFileKey = this.miniThumbnailFileKey,
+            completionEffectTexts = this.completionEffectTexts,
+            createdAt = this.createdAt,
+            modifiedAt = this.modifiedAt,
+            deletedAt = this.deletedAt
         )
         is SoundEffectActivityJpaEntity -> SoundEffectActivity(
-            id = this.id, title = this.title, descriptions = this.descriptions,
-            authorId = this.authorId, narratorId = this.narratorId,
+            id = this.id,
+            title = this.title,
+            descriptions = this.descriptions,
+            category = this.category,
+            authorId = this.authorId,
+            narratorId = this.narratorId,
             durationInSeconds = this.durationInSeconds,
-            thumbnailImageUrl = this.thumbnailImageUrl, thumbnailFileKey = this.thumbnailFileKey,
-            audioUrl = this.audioUrl, audioFileKey = this.audioFileKey,
-            createdAt = this.createdAt, modifiedAt = this.modifiedAt, deletedAt = this.deletedAt, category = this.category
+            thumbnailImageUrl = this.thumbnailImageUrl,
+            thumbnailFileKey = this.thumbnailFileKey,
+            audioUrl = this.audioUrl,
+            audioFileKey = this.audioFileKey,
+            miniThumbnailImageUrl = this.miniThumbnailImageUrl,
+            miniThumbnailFileKey = this.miniThumbnailFileKey,
+            completionEffectTexts = this.completionEffectTexts,
+            createdAt = this.createdAt,
+            modifiedAt = this.modifiedAt,
+            deletedAt = this.deletedAt
         )
         else -> throw SoomSoomException(ActivityErrorCode.UNSUPPORTED_ACTIVITY_TYPE)
     }
@@ -59,15 +92,15 @@ fun Activity.toJpaEntity(): ActivityJpaEntity {
             narratorId = this.narratorId,
             durationInSeconds = this.durationInSeconds,
             thumbnailImageUrl = this.thumbnailImageUrl,
+            thumbnailFileKey = this.thumbnailFileKey,
             audioUrl = this.audioUrl,
-            timeline = this.timeline.map { TimelineEventJpaEntity.from(it) }.toMutableList(),
-            category = this.category,
             audioFileKey = this.audioFileKey,
-            thumbnailFileKey = this.thumbnailFileKey
-        ).apply {
-            this.thumbnailFileKey = this@toJpaEntity.thumbnailFileKey
-            this.audioFileKey = this@toJpaEntity.audioFileKey
-        }
+            category = this.category,
+            timeline = this.timeline.map { TimelineEventJpaEntity.from(it) }.toMutableList(),
+            miniThumbnailImageUrl = this.miniThumbnailImageUrl,
+            miniThumbnailFileKey = this.miniThumbnailFileKey,
+            completionEffectTexts = this.completionEffectTexts.toMutableList()
+        )
         is MeditationActivity -> MeditationActivityJpaEntity(
             title = this.title,
             descriptions = this.descriptions.toMutableList(),
@@ -75,29 +108,29 @@ fun Activity.toJpaEntity(): ActivityJpaEntity {
             narratorId = this.narratorId,
             durationInSeconds = this.durationInSeconds,
             thumbnailImageUrl = this.thumbnailImageUrl,
+            thumbnailFileKey = this.thumbnailFileKey,
             audioUrl = this.audioUrl,
-            category = this.category,
             audioFileKey = this.audioFileKey,
-            thumbnailFileKey = this.thumbnailFileKey
-        ).apply {
-            this.thumbnailFileKey = this@toJpaEntity.thumbnailFileKey
-            this.audioFileKey = this@toJpaEntity.audioFileKey
-        }
+            category = this.category,
+            miniThumbnailImageUrl = this.miniThumbnailImageUrl,
+            miniThumbnailFileKey = this.miniThumbnailFileKey,
+            completionEffectTexts = this.completionEffectTexts.toMutableList()
+        )
         is SoundEffectActivity -> SoundEffectActivityJpaEntity(
             title = this.title,
             descriptions = this.descriptions.toMutableList(),
+            category = this.category,
             authorId = this.authorId,
             narratorId = this.narratorId,
             durationInSeconds = this.durationInSeconds,
             thumbnailImageUrl = this.thumbnailImageUrl,
+            thumbnailFileKey = this.thumbnailFileKey,
             audioUrl = this.audioUrl,
-            category = this.category,
             audioFileKey = this.audioFileKey,
-            thumbnailFileKey = this.thumbnailFileKey
-        ).apply {
-            this.thumbnailFileKey = this@toJpaEntity.thumbnailFileKey
-            this.audioFileKey = this@toJpaEntity.audioFileKey
-        }
+            miniThumbnailImageUrl = this.miniThumbnailImageUrl,
+            miniThumbnailFileKey = this.miniThumbnailFileKey,
+            completionEffectTexts = this.completionEffectTexts.toMutableList()
+        )
         else -> throw SoomSoomException(ActivityErrorCode.UNSUPPORTED_ACTIVITY_TYPE)
     }
 }

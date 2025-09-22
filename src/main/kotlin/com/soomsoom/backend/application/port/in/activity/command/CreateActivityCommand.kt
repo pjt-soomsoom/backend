@@ -13,6 +13,8 @@ sealed class CreateActivityCommand {
     abstract val durationInSeconds: Int
     abstract val thumbnailImageMetadata: ValidatedFileMetadata
     abstract val audioMetadata: ValidatedFileMetadata
+    abstract val miniThumbnailImageMetadata: ValidatedFileMetadata?
+    abstract val completionEffectTexts: List<String>
 }
 
 data class CreateBreathingActivityCommand(
@@ -24,6 +26,8 @@ data class CreateBreathingActivityCommand(
     override val durationInSeconds: Int,
     override val thumbnailImageMetadata: ValidatedFileMetadata,
     override val audioMetadata: ValidatedFileMetadata,
+    override val miniThumbnailImageMetadata: ValidatedFileMetadata?,
+    override val completionEffectTexts: List<String>,
     val timeline: List<TimelineEvent>,
 ) : CreateActivityCommand()
 
@@ -36,6 +40,8 @@ data class CreateMeditationActivityCommand(
     override val durationInSeconds: Int,
     override val thumbnailImageMetadata: ValidatedFileMetadata,
     override val audioMetadata: ValidatedFileMetadata,
+    override val miniThumbnailImageMetadata: ValidatedFileMetadata?,
+    override val completionEffectTexts: List<String>,
 ) : CreateActivityCommand()
 
 data class CreateSoundEffectActivityCommand(
@@ -47,4 +53,6 @@ data class CreateSoundEffectActivityCommand(
     override val durationInSeconds: Int,
     override val thumbnailImageMetadata: ValidatedFileMetadata,
     override val audioMetadata: ValidatedFileMetadata,
+    override val miniThumbnailImageMetadata: ValidatedFileMetadata?,
+    override val completionEffectTexts: List<String>,
 ) : CreateActivityCommand()

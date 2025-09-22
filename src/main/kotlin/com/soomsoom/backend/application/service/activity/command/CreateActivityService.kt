@@ -56,7 +56,8 @@ class CreateActivityService(
                 domainId = activityId,
                 files = listOf(
                     GenerateUploadUrlsRequest.FileInfo(FileCategory.THUMBNAIL, command.thumbnailImageMetadata),
-                    GenerateUploadUrlsRequest.FileInfo(FileCategory.AUDIO, command.audioMetadata)
+                    GenerateUploadUrlsRequest.FileInfo(FileCategory.AUDIO, command.audioMetadata),
+                    GenerateUploadUrlsRequest.FileInfo(FileCategory.MINI_THUMBNAIL, command.miniThumbnailImageMetadata)
                 )
             )
         )
@@ -100,19 +101,28 @@ class CreateActivityService(
                 authorId = command.authorId, narratorId = command.narratorId,
                 durationInSeconds = command.durationInSeconds, thumbnailImageUrl = null,
                 thumbnailFileKey = null, audioUrl = null, audioFileKey = null,
-                timeline = command.timeline, category = command.category
+                timeline = command.timeline, category = command.category,
+                miniThumbnailImageUrl = null,
+                miniThumbnailFileKey = null,
+                completionEffectTexts = command.completionEffectTexts
             )
             is CreateMeditationActivityCommand -> MeditationActivity(
                 id = null, title = command.title, descriptions = command.descriptions,
                 authorId = command.authorId, narratorId = command.narratorId,
                 durationInSeconds = command.durationInSeconds, thumbnailImageUrl = null,
-                thumbnailFileKey = null, audioUrl = null, audioFileKey = null, category = command.category
+                thumbnailFileKey = null, audioUrl = null, audioFileKey = null, category = command.category,
+                miniThumbnailImageUrl = null,
+                miniThumbnailFileKey = null,
+                completionEffectTexts = command.completionEffectTexts
             )
             is CreateSoundEffectActivityCommand -> SoundEffectActivity(
                 id = null, title = command.title, descriptions = command.descriptions,
                 authorId = command.authorId, narratorId = command.narratorId,
                 durationInSeconds = command.durationInSeconds, thumbnailImageUrl = null,
-                thumbnailFileKey = null, audioUrl = null, audioFileKey = null, category = command.category
+                thumbnailFileKey = null, audioUrl = null, audioFileKey = null, category = command.category,
+                miniThumbnailImageUrl = null,
+                miniThumbnailFileKey = null,
+                completionEffectTexts = command.completionEffectTexts
             )
         }
     }
@@ -121,6 +131,9 @@ class CreateActivityService(
      * S3에 업로드한 fileKey가 맞는지 확인
      */
     private fun validateFileKeys(command: CompleteActivityUploadCommand) {
+        if (command.miniThumbnailFileKey != null && !fileValidatorPort.validate(command.miniThumbnailFileKey)) {
+            throw SoomSoomException(UploadErrorCode.FILE_KEY_MISMATCH)
+        }
         if (!fileValidatorPort.validate(command.thumbnailFileKey) || !fileValidatorPort.validate(command.audioFileKey)) {
             throw SoomSoomException(UploadErrorCode.FILE_KEY_MISMATCH)
         }
@@ -134,11 +147,16 @@ class CreateActivityService(
     private fun updateActivityWithUploadedFiles(activity: Activity, command: CompleteActivityUploadCommand) {
         val thumbnailUrl = fileUrlResolverPort.resolve(command.thumbnailFileKey)
         val audioUrl = fileUrlResolverPort.resolve(command.audioFileKey)
+        val oldMiniThumbnailKey = command.miniThumbnailFileKey?.let {
+            val miniThumbnailUrl = fileUrlResolverPort.resolve(command.miniThumbnailFileKey)
+            activity.updateMiniThumbnailImage(url = miniThumbnailUrl, fileKey = it)
+        }
 
         val oldThumbnailKey = activity.updateThumbnailImage(url = thumbnailUrl, fileKey = command.thumbnailFileKey)
         val oldAudioKey = activity.updateAudio(url = audioUrl, fileKey = command.audioFileKey)
 
         oldThumbnailKey?.let(fileDeleterPort::delete)
         oldAudioKey?.let(fileDeleterPort::delete)
+        oldMiniThumbnailKey?.let(fileDeleterPort::delete)
     }
 }

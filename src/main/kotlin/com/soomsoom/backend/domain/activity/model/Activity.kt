@@ -16,6 +16,9 @@ abstract class Activity(
     open var durationInSeconds: Int,
     open var audioUrl: String?,
     open var audioFileKey: String?,
+    open var miniThumbnailImageUrl: String?,
+    open var miniThumbnailFileKey: String?,
+    open var completionEffectTexts: List<String>,
     open val createdAt: LocalDateTime? = null,
     open val modifiedAt: LocalDateTime? = null,
     open var deletedAt: LocalDateTime? = null,
@@ -24,6 +27,23 @@ abstract class Activity(
 
     val isDeleted: Boolean
         get() = deletedAt != null
+
+    /**
+     * 완료 효과 텍스트를 수정
+     */
+    fun updateCompletionEffectTexts(texts: List<String>) {
+        this.completionEffectTexts = texts.toList()
+    }
+
+    /**
+     * 미니 썸네일 이미지 정보를 업데이트하고, 이전 파일 키를 반환
+     */
+    fun updateMiniThumbnailImage(url: String, fileKey: String): String? {
+        val oldFileKey = this.miniThumbnailFileKey
+        this.miniThumbnailImageUrl = url
+        this.miniThumbnailFileKey = fileKey
+        return oldFileKey
+    }
 
     /**
      * 썸네일 이미지 정보를 업데이트하고, 이전 파일 키를 반환

@@ -5,6 +5,7 @@ import com.soomsoom.backend.domain.activity.ActivityErrorCode
 import com.soomsoom.backend.domain.activity.model.Activity
 import com.soomsoom.backend.domain.activity.model.BreathingActivity
 import com.soomsoom.backend.domain.activity.model.MeditationActivity
+import com.soomsoom.backend.domain.activity.model.SoundEffectActivity
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 
 data class InstructorActivitySummaryResult(
@@ -20,6 +21,7 @@ data class InstructorActivitySummaryResult(
             val activityType = when (activity) {
                 is BreathingActivity -> ActivityType.BREATHING
                 is MeditationActivity -> ActivityType.MEDITATION
+                is SoundEffectActivity -> ActivityType.SOUND_EFFECT
                 else -> throw SoomSoomException(ActivityErrorCode.UNSUPPORTED_ACTIVITY_TYPE)
             }
 

@@ -4,6 +4,8 @@ import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.Acti
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.ActivityQueryDslRepository
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.ActivityWithFavoriteStatusDto
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.ActivityWithInstructorsDto
+import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.toResult
+import com.soomsoom.backend.application.port.`in`.activity.dto.ActivitySummaryResult
 import com.soomsoom.backend.application.port.`in`.activity.query.SearchActivitiesCriteria
 import com.soomsoom.backend.application.port.`in`.activity.query.SearchInstructorActivitiesCriteria
 import com.soomsoom.backend.application.port.out.activity.ActivityPort
@@ -22,8 +24,8 @@ class ActivityPersistenceAdapter(
     private val activityQueryDslRepository: ActivityQueryDslRepository,
 ) : ActivityPort {
 
-    override fun search(criteria: SearchActivitiesCriteria, pageable: Pageable): Page<ActivityWithInstructorsDto> {
-        return activityQueryDslRepository.search(criteria, pageable)
+    override fun search(criteria: SearchActivitiesCriteria, pageable: Pageable): Page<ActivitySummaryResult> {
+        return activityQueryDslRepository.search(criteria, pageable).map { it.toResult() }
     }
 
     override fun save(activity: Activity): Activity {

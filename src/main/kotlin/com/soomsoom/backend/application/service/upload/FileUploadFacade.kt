@@ -12,16 +12,18 @@ class FileUploadFacade(
     private val fileUploadUrlGeneratorPort: FileUploadUrlGeneratorPort,
 ) {
     fun generateUploadUrls(request: GenerateUploadUrlsRequest): Map<FileCategory, FileUploadUrl> {
-        return request.files.associate { fileInfo ->
-            val uploadUrlInfo = fileUploadUrlGeneratorPort.generate(
-                filename = fileInfo.metadata.filename,
-                domain = request.domain,
-                domainId = request.domainId,
-                category = fileInfo.category,
-                contentType = fileInfo.metadata.contentType
-            )
-            fileInfo.category to uploadUrlInfo
-        }
+        return request.files.filter { it.metadata != null }
+            .associate { fileInfo ->
+                val metadata = fileInfo.metadata!!
+                val uploadUrlInfo = fileUploadUrlGeneratorPort.generate(
+                    filename = metadata.filename,
+                    domain = request.domain,
+                    domainId = request.domainId,
+                    category = fileInfo.category,
+                    contentType = metadata.contentType
+                )
+                fileInfo.category to uploadUrlInfo
+            }
     }
 }
 
@@ -32,6 +34,6 @@ data class GenerateUploadUrlsRequest(
 ) {
     data class FileInfo(
         val category: FileCategory,
-        val metadata: ValidatedFileMetadata,
+        val metadata: ValidatedFileMetadata?,
     )
 }

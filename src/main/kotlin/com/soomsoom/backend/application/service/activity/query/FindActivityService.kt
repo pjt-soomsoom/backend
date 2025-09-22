@@ -2,6 +2,7 @@ package com.soomsoom.backend.application.service.activity.query
 
 import com.soomsoom.backend.adapter.out.persistence.activity.toDomain
 import com.soomsoom.backend.application.port.`in`.activity.dto.ActivityResult
+import com.soomsoom.backend.application.port.`in`.activity.dto.ActivitySummaryResult
 import com.soomsoom.backend.application.port.`in`.activity.query.SearchActivitiesCriteria
 import com.soomsoom.backend.application.port.`in`.activity.usecase.query.FindActivityUseCase
 import com.soomsoom.backend.application.port.`in`.activity.usecase.query.SearchActivitiesUseCase
@@ -40,14 +41,7 @@ class FindActivityService(
      * 다 건 조회
      */
     @PreAuthorize("hasRole('ADMIN') or #criteria.deletionStatus.name == 'ACTIVE' and #criteria.userId == authentication.principal.id")
-    override fun search(criteria: SearchActivitiesCriteria, pageable: Pageable): Page<ActivityResult> {
-        val dtoPage = activityPort.search(criteria, pageable)
-
-        return dtoPage.map { dto ->
-            val activity = dto.activity.toDomain()
-            val author = dto.author.toDomain()
-            val narrator = dto.narrator.toDomain()
-            ActivityResult.from(activity, author, narrator, dto.isFavorited)
-        }
+    override fun search(criteria: SearchActivitiesCriteria, pageable: Pageable): Page<ActivitySummaryResult> {
+        return activityPort.search(criteria, pageable)
     }
 }

@@ -8,4 +8,5 @@ data class UpdateActivityMetadataCommand(
     val title: String,
     val descriptions: List<String>,
     val category: ActivityCategory,
+    val completionEffectTexts: List<String>,
 )

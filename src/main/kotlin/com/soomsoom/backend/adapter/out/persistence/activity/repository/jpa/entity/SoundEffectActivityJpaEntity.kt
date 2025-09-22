@@ -22,6 +22,9 @@ class SoundEffectActivityJpaEntity(
     thumbnailFileKey: String?,
     audioUrl: String?,
     audioFileKey: String?,
+    miniThumbnailImageUrl: String?,
+    miniThumbnailFileKey: String?,
+    completionEffectTexts: MutableList<String>,
 ) : ActivityJpaEntity(
     title = title,
     descriptions = descriptions,
@@ -32,7 +35,10 @@ class SoundEffectActivityJpaEntity(
     thumbnailImageUrl = thumbnailImageUrl,
     audioUrl = audioUrl,
     thumbnailFileKey = thumbnailFileKey,
-    audioFileKey = audioFileKey
+    audioFileKey = audioFileKey,
+    miniThumbnailImageUrl = miniThumbnailImageUrl,
+    miniThumbnailFileKey = miniThumbnailFileKey,
+    completionEffectTexts = completionEffectTexts
 ) {
     override fun update(activity: Activity) {
         super.update(activity)
