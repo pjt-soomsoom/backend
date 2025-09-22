@@ -7,6 +7,7 @@ import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedItemsCrite
 import com.soomsoom.backend.application.port.out.item.ItemPort
 import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.item.model.aggregate.Item
+import com.soomsoom.backend.domain.item.model.enums.AcquisitionType
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
@@ -58,5 +59,9 @@ class ItemPersistenceAdapter(
 
     override fun findByIdForUpdate(itemId: Long): Item? {
         return itemJpaRepository.findByIdForUpdate(itemId)?.toDomain()
+    }
+
+    override fun findAllByAcquisitionType(acquisitionType: AcquisitionType): List<Item> {
+        return itemJpaRepository.findAllByAcquisitionTypeAndDeletedAtIsNull(acquisitionType).map { it.toDomain() }
     }
 }

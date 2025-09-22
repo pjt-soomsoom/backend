@@ -75,9 +75,9 @@ class SocialAuthenticationService(
                 // '익명'이 아니라면(이미 다른 소셜 계정과 연동됨), 연동하지 않고 에러를 발생
                 throw SoomSoomException(UserErrorCode.DEVICE_ALREADY_LINKED)
             }
+        } else {
+            // deviceId로 가입된 계정이 없다면 에러 반환
+            throw SoomSoomException(UserErrorCode.DEVICE_ID_NOT_FOUND)
         }
-
-        // 완전히 새로운 사용자 (신규 소설 가입)
-        return userPort.save(User.createSocial(socialProfile.provider, socialProfile.socialId, deviceId))
     }
 }

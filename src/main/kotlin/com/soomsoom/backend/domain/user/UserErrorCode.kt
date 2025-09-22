@@ -25,6 +25,7 @@ enum class UserErrorCode(
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "auth.refresh-token.expired"),
     ACCESS_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "auth.access-token.expired"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "auth.token.invalid"),
+    DEVICE_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "auth.device-id.not-found"),
     ;
 
     override val status: HttpStatus

@@ -4,23 +4,24 @@ import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.payload.SchedulerTickNotificationPayload
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
-import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Component
 class NotificationScheduler(
     private val eventPublisher: ApplicationEventPublisher,
 ) {
-    private val log = LoggerFactory.getLogger(javaClass)
 
     /**
      * 매 분 0초에 실행됩니다.
      */
     @Scheduled(cron = "0 * * * * *")
     @SchedulerLock(name = "notificationScheduler_everyMinute", lockAtLeastFor = "PT50S", lockAtMostFor = "PT55S")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun runEveryMinuteTasks() {
         val payload = SchedulerTickNotificationPayload(triggeredAt = LocalDateTime.now())
         val event = Event(EventType.SCHEDULER_TICK, payload)

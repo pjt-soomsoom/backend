@@ -13,10 +13,11 @@ class UserPersistenceAdapter(
     private val userQueryDslRepository: UserQueryDslRepository,
 ) : UserPort {
     override fun save(user: User): User {
-        val entity = user.id?.let { userJpaRepository.findById(it).orElse(null) }
-            ?.apply { update(user) }
-            ?: user.toEntity()
-        return userJpaRepository.save(entity).toDomain()
+        return userJpaRepository.save(user.toEntity()).toDomain()
+    }
+
+    override fun grantItemToAllUsers(itemId: Long): Int {
+        return userJpaRepository.grantItemToAllUsers(itemId)
     }
 
     override fun findByDeviceId(deviceId: String): User? {
