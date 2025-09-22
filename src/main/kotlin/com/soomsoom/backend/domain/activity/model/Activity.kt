@@ -32,7 +32,7 @@ abstract class Activity(
      * 완료 효과 텍스트를 수정
      */
     fun updateCompletionEffectTexts(texts: List<String>) {
-        this.completionEffectTexts = texts
+        this.completionEffectTexts = texts.toList()
     }
 
     /**
