@@ -43,6 +43,9 @@ class SocialVerificationAdapter(
         } catch (e: Exception) {
             throw SoomSoomException(UserErrorCode.PROVIDER_TOKEN_INVALID)
         }
+        if (idToken == null) {
+            throw SoomSoomException(UserErrorCode.PROVIDER_TOKEN_INVALID)
+        }
 
         val payload: GoogleIdToken.Payload = idToken.payload
 

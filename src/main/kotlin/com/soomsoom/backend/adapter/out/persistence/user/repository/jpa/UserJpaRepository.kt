@@ -12,13 +12,16 @@ interface UserJpaRepository : JpaRepository<UserJpaEntity, Long> {
     fun findByUsername(username: String): UserJpaEntity?
     fun findBySocialProviderAndSocialId(provider: SocialProvider, socialId: String): UserJpaEntity?
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(
         value = """
         INSERT INTO user_owned_items (user_id, item_id)
         SELECT u.id, :itemId
         FROM users u
-        WHERE u.id NOT IN (SELECT uoi.user_id FROM user_owned_items uoi WHERE uoi.item_id = :itemId)
+        WHERE NOT EXISTS (
+            SELECT 1 FROM user_owned_items uoi
+            WHERE uoi.user_id = u.id AND uoi.item_id = :itemId
+        )
     """,
         nativeQuery = true
     )

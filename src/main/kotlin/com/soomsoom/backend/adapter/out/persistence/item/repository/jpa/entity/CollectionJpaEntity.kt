@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToMany
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 
 @Entity
 @Table(name = "collections")
@@ -43,7 +44,13 @@ class CollectionJpaEntity(
     @JoinTable(
         name = "collection_items",
         joinColumns = [JoinColumn(name = "collection_id")],
-        inverseJoinColumns = [JoinColumn(name = "item_id")]
+        inverseJoinColumns = [JoinColumn(name = "item_id")],
+        uniqueConstraints = [
+            UniqueConstraint(
+                name = "uk_collection_items",
+                columnNames = ["collection_id", "item_Id"]
+            )
+        ]
     )
     val items: MutableSet<ItemJpaEntity> = mutableSetOf(),
 
