@@ -1,10 +1,13 @@
 package com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa
 
 import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
+import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.ActivitySummaryDto
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.ActivityWithFavoriteStatusDto
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.ActivityWithInstructorsDto
+import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.QActivitySummaryDto
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.QActivityWithFavoriteStatusDto
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.dto.QActivityWithInstructorsDto
 import com.soomsoom.backend.adapter.out.persistence.activity.repository.jpa.entity.ActivityJpaEntity
@@ -52,16 +55,37 @@ class ActivityQueryDslRepository(
             .fetchOne()
     }
 
-    fun search(criteria: SearchActivitiesCriteria, pageable: Pageable): Page<ActivityWithInstructorsDto> {
+    fun search(criteria: SearchActivitiesCriteria, pageable: Pageable): Page<ActivitySummaryDto> {
         val author = QInstructorJpaEntity("author")
         val narrator = QInstructorJpaEntity("narrator")
 
         val content = queryFactory
             .select(
-                QActivityWithInstructorsDto(
-                    activityJpaEntity,
-                    author,
-                    narrator,
+                QActivitySummaryDto(
+                    activityJpaEntity.id,
+                    Expressions.cases()
+                        .`when`(activityJpaEntity.instanceOf(BreathingActivityJpaEntity::class.java)).then(
+                            Expressions.constant(ActivityType.BREATHING.name)
+                        )
+                        .`when`(activityJpaEntity.instanceOf(MeditationActivityJpaEntity::class.java)).then(
+                            Expressions.constant(ActivityType.MEDITATION.name)
+                        )
+                        .`when`(activityJpaEntity.instanceOf(SoundEffectActivityJpaEntity::class.java)).then(
+                            Expressions.constant(ActivityType.SOUND_EFFECT.name)
+                        )
+                        .otherwise(Expressions.nullExpression(String::class.java)),
+
+                    activityJpaEntity.title,
+                    activityJpaEntity.category,
+                    author.id,
+                    author.name,
+                    author.profileImageUrl,
+                    narrator.id,
+                    narrator.name,
+                    narrator.profileImageUrl,
+                    activityJpaEntity.durationInSeconds,
+                    activityJpaEntity.thumbnailImageUrl,
+                    activityJpaEntity.miniThumbnailImageUrl,
                     isFavoritedExpression(criteria.userId)
                 )
             )
@@ -82,6 +106,8 @@ class ActivityQueryDslRepository(
             .select(activityJpaEntity.count())
             .from(activityJpaEntity)
             .where(
+                typeEq(criteria.type),
+                categoryEq(criteria.category),
                 deletionStatusEq(criteria.deletionStatus)
             )
 

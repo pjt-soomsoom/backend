@@ -28,6 +28,10 @@ class BreathingActivityJpaEntity(
     audioUrl: String?,
     audioFileKey: String?,
     category: ActivityCategory,
+    miniThumbnailImageUrl: String?,
+    miniThumbnailFileKey: String?,
+    completionEffectTexts: MutableList<String>,
+
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = LAZY)
     @JoinColumn(name = "activity_id")
     @OrderColumn(name = "sequence")
@@ -42,7 +46,10 @@ class BreathingActivityJpaEntity(
     audioUrl = audioUrl,
     thumbnailFileKey = thumbnailFileKey,
     audioFileKey = audioFileKey,
-    category = category
+    category = category,
+    miniThumbnailImageUrl = miniThumbnailImageUrl,
+    miniThumbnailFileKey = miniThumbnailFileKey,
+    completionEffectTexts = completionEffectTexts
 ) {
     override fun update(activity: Activity) {
         super.update(activity)

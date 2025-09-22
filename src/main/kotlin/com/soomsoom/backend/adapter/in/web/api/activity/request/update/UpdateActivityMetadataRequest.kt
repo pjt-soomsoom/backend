@@ -12,8 +12,10 @@ data class UpdateActivityMetadataRequest(
     val title: String?,
     @field:NotEmpty(message = "설명은 비워둘 수 없습니다.")
     val descriptions: List<String>?,
-    @field:NotNull(message = "카테고리는 필수입니다.") // <--- 카테고리 필드 추가
+    @field:NotNull(message = "카테고리는 필수입니다.")
     val category: ActivityCategory?,
+    @field:NotEmpty(message = "완료 효과 문구는 필수입니다.")
+    val completionEffectTexts: List<String>?,
 )
 
 fun UpdateActivityMetadataRequest.toCommand(activityId: Long, principalId: Long): UpdateActivityMetadataCommand {
@@ -22,6 +24,7 @@ fun UpdateActivityMetadataRequest.toCommand(activityId: Long, principalId: Long)
         activityId = activityId,
         title = this.title!!,
         descriptions = this.descriptions!!,
-        category = this.category!!
+        category = this.category!!,
+        completionEffectTexts = this.completionEffectTexts!!
     )
 }

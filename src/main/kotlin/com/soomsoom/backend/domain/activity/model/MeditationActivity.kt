@@ -16,6 +16,10 @@ class MeditationActivity(
     category: ActivityCategory,
     audioUrl: String?,
     audioFileKey: String?,
+    miniThumbnailImageUrl: String?,
+    miniThumbnailFileKey: String?,
+    completionEffectTexts: List<String>,
+
     createdAt: LocalDateTime? = null,
     modifiedAt: LocalDateTime? = null,
     deletedAt: LocalDateTime? = null,
@@ -31,6 +35,9 @@ class MeditationActivity(
     category = category,
     audioUrl = audioUrl,
     audioFileKey = audioFileKey,
+    miniThumbnailImageUrl = miniThumbnailImageUrl,
+    miniThumbnailFileKey = miniThumbnailFileKey,
+    completionEffectTexts = completionEffectTexts,
     createdAt = createdAt,
     modifiedAt = modifiedAt,
     deletedAt = deletedAt

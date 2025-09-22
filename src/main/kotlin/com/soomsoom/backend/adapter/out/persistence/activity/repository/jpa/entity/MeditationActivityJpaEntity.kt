@@ -22,6 +22,9 @@ class MeditationActivityJpaEntity(
     audioUrl: String?,
     audioFileKey: String?,
     category: ActivityCategory,
+    miniThumbnailImageUrl: String?,
+    miniThumbnailFileKey: String?,
+    completionEffectTexts: MutableList<String>,
 ) : ActivityJpaEntity(
     title = title,
     descriptions = descriptions,
@@ -32,7 +35,10 @@ class MeditationActivityJpaEntity(
     audioUrl = audioUrl,
     thumbnailFileKey = thumbnailFileKey,
     audioFileKey = audioFileKey,
-    category = category
+    category = category,
+    miniThumbnailImageUrl = miniThumbnailImageUrl,
+    miniThumbnailFileKey = miniThumbnailFileKey,
+    completionEffectTexts = completionEffectTexts
 ) {
     override fun update(activity: Activity) {
         super.update(activity)

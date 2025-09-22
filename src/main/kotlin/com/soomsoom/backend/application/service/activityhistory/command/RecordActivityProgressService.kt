@@ -12,6 +12,7 @@ import com.soomsoom.backend.domain.activity.ActivityErrorCode
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.activityhistory.model.ActivityProgress
 import com.soomsoom.backend.domain.activityhistory.model.UserActivitySummary
+import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -25,14 +26,23 @@ class RecordActivityProgressService(
     private val activityPort: ActivityPort,
 ) : RecordActivityProgressUseCase {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     /**
      * 사용자의 활동 진행 상황을 기록
      * @param command 사용자 ID, 활동 ID, 마지막 재생 위치, 실제 재생 시간 정보
      */
     @PreAuthorize("hasRole('ADMIN') or #command.userId == authentication.principal.id")
     override fun record(command: RecordActivityProgressCommand) {
+        logger.info("record start")
+        logger.info("lastTime = {}", command.lastPlaybackPosition)
         // 이어듣기를 위한 진행 상황(ActivityProgress)을 저장하거나 갱신
         updateActivityProgress(command)
+
+        if (command.lastPlaybackPosition == 0 && command.actualPlayTimeInSeconds == 0) {
+            logger.info("end")
+            return
+        }
 
         val activity = activityPort.findById(command.activityId)
             ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)

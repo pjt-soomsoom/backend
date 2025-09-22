@@ -5,8 +5,10 @@ import com.soomsoom.backend.adapter.`in`.web.api.activity.request.CompleteActivi
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.CreateActivityRequest
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.SearchActivitiesRequest
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.change.ChangeActivityAudioRequest
+import com.soomsoom.backend.adapter.`in`.web.api.activity.request.change.ChangeActivityMiniThumbnailRequest
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.change.ChangeActivityThumbnailRequest
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.change.CompleteActivityAudioChangeRequest
+import com.soomsoom.backend.adapter.`in`.web.api.activity.request.change.CompleteActivityMiniThumbnailRequest
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.change.CompleteActivityThumbnailChangeRequest
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.change.toCommand
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.toCommand
@@ -15,9 +17,11 @@ import com.soomsoom.backend.adapter.`in`.web.api.activity.request.update.UpdateA
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.update.UpdateActivityTimelineRequest
 import com.soomsoom.backend.adapter.`in`.web.api.activity.request.update.toCommand
 import com.soomsoom.backend.application.port.`in`.activity.dto.ActivityResult
+import com.soomsoom.backend.application.port.`in`.activity.dto.ActivitySummaryResult
 import com.soomsoom.backend.application.port.`in`.activity.dto.ChangeActivityResult
 import com.soomsoom.backend.application.port.`in`.activity.dto.CreateActivityResult
 import com.soomsoom.backend.application.port.`in`.activity.usecase.command.ChangeActivityAudioUseCase
+import com.soomsoom.backend.application.port.`in`.activity.usecase.command.ChangeActivityMiniThumbnailUseCase
 import com.soomsoom.backend.application.port.`in`.activity.usecase.command.ChangeActivityThumbnailUseCase
 import com.soomsoom.backend.application.port.`in`.activity.usecase.command.CreateActivityUseCase
 import com.soomsoom.backend.application.port.`in`.activity.usecase.command.SoftDeleteActivityUseCase
@@ -56,6 +60,7 @@ class ActivityController(
     private val changeActivityAudioUseCase: ChangeActivityAudioUseCase,
     private val softDeleteActivityUseCase: SoftDeleteActivityUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val changeActivityMiniThumbnailUseCase: ChangeActivityMiniThumbnailUseCase,
 ) {
 
     /**
@@ -104,7 +109,7 @@ class ActivityController(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
         @ModelAttribute request: SearchActivitiesRequest,
         pageable: Pageable,
-    ): Page<ActivityResult> {
+    ): Page<ActivitySummaryResult> {
         return searchActivitiesUseCase.search(request.toCriteria(userDetails.id), pageable)
     }
 
@@ -161,6 +166,33 @@ class ActivityController(
         request: CompleteActivityThumbnailChangeRequest,
     ): ActivityResult {
         return changeActivityThumbnailUseCase.completeThumbnailChange(request.toCommand(activityId, userDetails.id))
+    }
+
+    /**
+     * 미니 썸네일 교체 시작 (presigend URL 발급)
+     */
+    @PostMapping("/activities/{activityId}/mini-thumbnail")
+    @ResponseStatus(HttpStatus.OK)
+    fun changeMiniThumbnail(
+        @PathVariable activityId: Long,
+        @Valid @RequestBody
+        request: ChangeActivityMiniThumbnailRequest,
+    ): ChangeActivityResult {
+        return changeActivityMiniThumbnailUseCase.changeMiniThumbnail(request.toCommand(activityId))
+    }
+
+    /**
+     * 썸네일 교체 완료
+     */
+    @PostMapping("/activities/{activityId}/mini-thumbnail/complete-upload")
+    @ResponseStatus(HttpStatus.OK)
+    fun completeMiniThumbnailChange(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+        @PathVariable activityId: Long,
+        @Valid @RequestBody
+        request: CompleteActivityMiniThumbnailRequest,
+    ): ActivityResult {
+        return changeActivityMiniThumbnailUseCase.completeThumbnailChange(request.toCommand(activityId, userDetails.id))
     }
 
     /**

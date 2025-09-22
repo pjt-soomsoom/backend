@@ -4,4 +4,5 @@ class CompleteActivityUploadCommand(
     val activityId: Long,
     val thumbnailFileKey: String,
     val audioFileKey: String,
+    val miniThumbnailFileKey: String?,
 )

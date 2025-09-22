@@ -23,6 +23,7 @@ class UpdateActivityMetadataService(
             ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
 
         activity.updateMetadata(command.title, command.descriptions, command.category)
+        activity.updateCompletionEffectTexts(command.completionEffectTexts)
 
         activityPort.save(activity)
         return activityPort.findByIdWithInstructors(command.activityId, command.userId)

@@ -7,4 +7,5 @@ enum class FileCategory {
     AUDIO,
     ANIMATION,
     IMAGE,
+    MINI_THUMBNAIL,
 }

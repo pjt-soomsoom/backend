@@ -9,6 +9,7 @@ data class CreateActivityResult(
     val activityId: Long,
     val thumbnailUploadInfo: FileUploadInfo,
     val audioUploadInfo: FileUploadInfo,
+    val miniThumbnailUploadInfo: FileUploadInfo?,
 ) {
 
     companion object {
@@ -18,6 +19,12 @@ data class CreateActivityResult(
         fun from(activityId: Long, uploadUrls: Map<FileCategory, FileUploadUrl>): CreateActivityResult {
             val thumbnailInfo = uploadUrls.getOrThrow(FileCategory.THUMBNAIL)
             val audioInfo = uploadUrls.getOrThrow(FileCategory.AUDIO)
+            val miniThumbnailInfo = uploadUrls[FileCategory.MINI_THUMBNAIL]?.let {
+                FileUploadInfo(
+                    preSignedUrl = it.preSignedUrl,
+                    fileKey = it.fileKey
+                )
+            }
 
             return CreateActivityResult(
                 activityId = activityId,
@@ -28,7 +35,8 @@ data class CreateActivityResult(
                 audioUploadInfo = FileUploadInfo(
                     preSignedUrl = audioInfo.preSignedUrl,
                     fileKey = audioInfo.fileKey
-                )
+                ),
+                miniThumbnailUploadInfo = miniThumbnailInfo
             )
         }
     }

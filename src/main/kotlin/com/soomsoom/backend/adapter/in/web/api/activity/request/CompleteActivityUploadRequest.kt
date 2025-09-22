@@ -8,12 +8,14 @@ data class CompleteActivityUploadRequest(
     val thumbnailFileKey: String?,
     @field:NotBlank(message = "오디오 파일 키는 비워둘 수 없습니다.")
     val audioFileKey: String?,
+    val miniThumbnailFileKey: String?,
 )
 
 fun CompleteActivityUploadRequest.toCommand(activityId: Long): CompleteActivityUploadCommand {
     return CompleteActivityUploadCommand(
         activityId = activityId,
         thumbnailFileKey = this.thumbnailFileKey!!,
-        audioFileKey = this.audioFileKey!!
+        audioFileKey = this.audioFileKey!!,
+        miniThumbnailFileKey = this.miniThumbnailFileKey
     )
 }
