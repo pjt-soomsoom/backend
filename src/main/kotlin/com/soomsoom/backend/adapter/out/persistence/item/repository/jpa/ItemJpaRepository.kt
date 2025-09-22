@@ -1,6 +1,7 @@
 package com.soomsoom.backend.adapter.out.persistence.item.repository.jpa
 
 import com.soomsoom.backend.adapter.out.persistence.item.repository.jpa.entity.ItemJpaEntity
+import com.soomsoom.backend.domain.item.model.enums.AcquisitionType
 import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock
@@ -20,4 +21,6 @@ interface ItemJpaRepository : JpaRepository<ItemJpaEntity, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT i FROM ItemJpaEntity i WHERE i.id = :id AND i.deletedAt IS NULL")
     fun findByIdForUpdate(id: Long): ItemJpaEntity?
+
+    fun findAllByAcquisitionTypeAndDeletedAtIsNull(acquisitionType: AcquisitionType): List<ItemJpaEntity>
 }

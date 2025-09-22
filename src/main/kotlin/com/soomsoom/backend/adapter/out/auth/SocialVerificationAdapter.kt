@@ -23,7 +23,6 @@ class SocialVerificationAdapter(
     @Value("\${oauth.apple.client-id}") private val appleClientId: String,
     private val appleKeyProvider: AppleKeyProvider,
 ) : VerifySocialTokenPort {
-
     private val objectMapper = jacksonObjectMapper()
 
     override fun verify(provider: SocialProvider, token: String): SocialProfileInfo {
@@ -38,8 +37,12 @@ class SocialVerificationAdapter(
             .setAudience(Collections.singletonList(googleClientId))
             .build()
 
-        val idToken: GoogleIdToken = verifier.verify(idTokenString)
-            ?: throw throw SoomSoomException(UserErrorCode.PROVIDER_TOKEN_INVALID)
+        val idToken: GoogleIdToken
+        try {
+            idToken = verifier.verify(idTokenString)
+        } catch (e: Exception) {
+            throw SoomSoomException(UserErrorCode.PROVIDER_TOKEN_INVALID)
+        }
 
         val payload: GoogleIdToken.Payload = idToken.payload
 
@@ -78,7 +81,7 @@ class SocialVerificationAdapter(
                 email = claims.get("email", String::class.java)
             )
         } catch (e: Exception) {
-            throw IllegalArgumentException("유효하지 않은 Apple Identity Token입니다.", e)
+            throw SoomSoomException(UserErrorCode.PROVIDER_TOKEN_INVALID)
         }
     }
 }

@@ -61,6 +61,12 @@ class User private constructor(
         _ownedItems.add(itemId)
     }
 
+    fun ownItems(itemIds: List<Long>): List<Long> {
+        val newItems = itemIds.filter { !_ownedItems.contains(it) }
+        _ownedItems.addAll(newItems)
+        return newItems
+    }
+
     fun ownCollection(collectionId: Long) {
         check(!hasCollection(collectionId)) { COLLECTION_ALREADY_OWNED }
         _ownedCollections.add(collectionId)

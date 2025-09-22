@@ -4,6 +4,7 @@ import com.soomsoom.backend.application.port.`in`.item.query.FindItemsCriteria
 import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedItemsCriteria
 import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.item.model.aggregate.Item
+import com.soomsoom.backend.domain.item.model.enums.AcquisitionType
 import org.springframework.data.domain.Page
 
 interface ItemPort {
@@ -16,4 +17,5 @@ interface ItemPort {
     fun findOwnedItems(criteria: FindOwnedItemsCriteria): Page<Item>
     fun findAllByIdsForUpdate(itemIds: List<Long>): List<Item>
     fun findByIdForUpdate(itemId: Long): Item?
+    fun findAllByAcquisitionType(acquisitionType: AcquisitionType): List<Item>
 }

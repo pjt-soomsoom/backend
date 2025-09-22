@@ -3,7 +3,6 @@ package com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.entity
 import com.soomsoom.backend.adapter.out.persistence.common.entity.PointsEmbeddable
 import com.soomsoom.backend.common.entity.BaseTimeEntity
 import com.soomsoom.backend.domain.user.model.aggregate.Role
-import com.soomsoom.backend.domain.user.model.aggregate.User
 import com.soomsoom.backend.domain.user.model.enums.DailyDuration
 import com.soomsoom.backend.domain.user.model.enums.FocusGoal
 import com.soomsoom.backend.domain.user.model.enums.SocialProvider
@@ -78,27 +77,5 @@ class UserJpaEntity(
 ) : BaseTimeEntity() {
     enum class AccountType {
         ANONYMOUS, SOCIAL, ID_PASSWORD
-    }
-
-    fun update(domain: User) {
-        this.role = domain.role
-        this.points = PointsEmbeddable(domain.points.value)
-
-        if (this.equippedItems == null) {
-            this.equippedItems = EquippedItemsEmbeddable(null, null, null, null, null, null)
-        }
-        this.equippedItems.update(domain.equippedItems)
-
-        this.ownedItemIds.clear()
-        this.ownedItemIds.addAll(domain.ownedItems)
-
-        this.ownedCollectionIds.clear()
-        this.ownedCollectionIds.addAll(domain.ownedCollections)
-
-        this.equippedCollectionIds.clear()
-        this.equippedCollectionIds.addAll(domain.equippedCollections)
-
-        this.focusGoal = domain.focusGoal
-        this.dailyDuration = domain.dailyDuration
     }
 }

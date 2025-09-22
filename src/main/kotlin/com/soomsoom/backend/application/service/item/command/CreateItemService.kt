@@ -6,11 +6,13 @@ import com.soomsoom.backend.application.port.`in`.item.dto.CreateItemResult
 import com.soomsoom.backend.application.port.`in`.item.usecase.command.item.CreateItemUseCase
 import com.soomsoom.backend.application.port.`in`.upload.dto.FileUploadInfo
 import com.soomsoom.backend.application.port.out.item.ItemPort
-import com.soomsoom.backend.application.port.out.upload.FileDeleterPort
 import com.soomsoom.backend.application.port.out.upload.FileUrlResolverPort
 import com.soomsoom.backend.application.port.out.upload.FileValidatorPort
 import com.soomsoom.backend.application.service.upload.FileUploadFacade
 import com.soomsoom.backend.application.service.upload.GenerateUploadUrlsRequest
+import com.soomsoom.backend.common.event.Event
+import com.soomsoom.backend.common.event.EventType
+import com.soomsoom.backend.common.event.payload.ItemCreatedPayload
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.common.vo.Points
 import com.soomsoom.backend.domain.item.ItemErrorCode
@@ -19,6 +21,7 @@ import com.soomsoom.backend.domain.item.model.vo.Stock
 import com.soomsoom.backend.domain.upload.UploadErrorCode
 import com.soomsoom.backend.domain.upload.type.FileCategory
 import com.soomsoom.backend.domain.upload.type.FileDomain
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -30,7 +33,7 @@ class CreateItemService(
     private val fileUploadFacade: FileUploadFacade,
     private val fileValidatorPort: FileValidatorPort,
     private val fileUrlResolverPort: FileUrlResolverPort,
-    private val fileDeleterPort: FileDeleterPort,
+    private val eventPublisher: ApplicationEventPublisher,
 ) : CreateItemUseCase {
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -70,6 +73,16 @@ class CreateItemService(
         val lottieUploadInfo = uploadUrls[FileCategory.ANIMATION]?.let {
             FileUploadInfo(preSignedUrl = it.preSignedUrl, fileKey = it.fileKey)
         }
+
+        eventPublisher.publishEvent(
+            Event(
+                eventType = EventType.ITEM_CREATED,
+                payload = ItemCreatedPayload(
+                    itemId = savedItem.id,
+                    acquisitionType = savedItem.acquisitionType
+                )
+            )
+        )
 
         return CreateItemResult(
             itemId = savedItem.id,

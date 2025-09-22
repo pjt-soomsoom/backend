@@ -17,4 +17,6 @@ interface UserPort {
     fun findByIdWithCollections(userId: Long): User?
 
     fun findAllUserIds(pageNumber: Int, pageSize: Int): List<Long>
+
+    fun grantItemToAllUsers(itemId: Long): Int
 }

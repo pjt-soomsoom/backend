@@ -4,7 +4,7 @@ import com.soomsoom.backend.application.port.out.item.CollectionPort
 import com.soomsoom.backend.application.port.out.user.UserOwnedCollectionPort
 import com.soomsoom.backend.application.port.out.user.UserPort
 import com.soomsoom.backend.common.event.Event
-import com.soomsoom.backend.common.event.payload.ItemPurchasedPayload
+import com.soomsoom.backend.common.event.payload.ItemOwnedPayload
 import com.soomsoom.backend.common.event.payload.ItemsEquippedPayload
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.user.UserErrorCode
@@ -23,15 +23,15 @@ class CollectionCompletionEventListener(
 ) {
     @TransactionalEventListener(
         classes = [Event::class],
-        condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).ITEM_PURCHASED",
+        condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).ITEM_OWNED",
         phase = TransactionPhase.BEFORE_COMMIT
     )
-    fun handleItemPurchasedEvent(event: Event<ItemPurchasedPayload>) {
+    fun handleItemPurchasedEvent(event: Event<ItemOwnedPayload>) {
         val payload = event.payload
         val userId = payload.userId
-        val purchasedItemId = payload.itemId
+        val ownedItemId = payload.itemId
 
-        val completedCollectionIds = userOwnedCollectionPort.findCompletedCollectionIds(userId, purchasedItemId)
+        val completedCollectionIds = userOwnedCollectionPort.findCompletedCollectionIds(userId, ownedItemId)
 
         if (completedCollectionIds.isNotEmpty()) {
             val user = userPort.findByIdWithCollections(userId)

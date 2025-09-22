@@ -13,11 +13,17 @@ enum class EventType {
     // diary 작성 완료
     DIARY_CREATED,
 
-    // 아이템 구매(획득)
+    // 아이템 구매
     ITEM_PURCHASED,
+
+    // 아이템 획득
+    ITEM_OWNED,
 
     // 아이템 착용
     ITEMS_EQUIPPED,
+
+    // 아이템 생성
+    ITEM_CREATED,
 
     // 오늘의 첫 접속
     FIRST_CONNECTION_OF_THE_DAY,
