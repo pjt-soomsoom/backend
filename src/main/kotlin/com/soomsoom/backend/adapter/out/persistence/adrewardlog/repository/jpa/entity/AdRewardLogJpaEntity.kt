@@ -9,10 +9,16 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "ad_reward_logs")
+@Table(
+    name = "ad_reward_logs",
+    indexes = [
+        Index(name = "idx_arl_user_ad_created", columnList = "user_id, adUnitId, created_at")
+    ]
+)
 class AdRewardLogJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

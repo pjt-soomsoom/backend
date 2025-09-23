@@ -16,6 +16,6 @@ fun MessageVariation.toDto(): MessageVariationDto {
         templateId = this.notificationTemplate.id,
         titleTemplate = this.titleTemplate,
         bodyTemplate = this.bodyTemplate,
-        isActive = this.isActive
+        isActive = this.active
     )
 }

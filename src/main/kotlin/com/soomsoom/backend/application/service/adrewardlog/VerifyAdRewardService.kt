@@ -13,6 +13,7 @@ import com.soomsoom.backend.domain.common.vo.Points
 import com.soomsoom.backend.domain.reward.model.RewardSource
 import com.soomsoom.backend.domain.reward.model.RewardType
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,10 +26,19 @@ class VerifyAdRewardService(
     private val adRewardLogPort: com.soomsoom.backend.application.port.out.adrewardlog.AdRewardLogPort,
     private val dateHelper: DateHelper,
     private val eventPublisher: ApplicationEventPublisher,
+
+    @Value("\${reward-ad.base-path}")
+    private val basePath: String,
 ) : VerifyAdRewardUseCase {
 
     private val logger = LoggerFactory.getLogger(javaClass)
     override fun command(command: VerifyAdRewardCommand) {
+        val finalAdUnitId = if (command.adUnitId.startsWith(basePath)) {
+            command.adUnitId
+        } else {
+            "$basePath/${command.adUnitId}"
+        }
+
         val isGoogleRequest = adMobVerificationPort.verify(command.fullCallbackUrl)
         if (!isGoogleRequest) {
             logger.warn("Invalid AdMob SSV callback signature received. URL: ${command.fullCallbackUrl}")
@@ -47,7 +57,7 @@ class VerifyAdRewardService(
         val businessDay = dateHelper.getBusinessDay(LocalDateTime.now())
         val hasAlreadyReceivedToday = adRewardLogPort.existsByUserIdAndAdUnitIdAndCreatedAtBetween(
             userId,
-            command.adUnitId,
+            finalAdUnitId,
             businessDay.start,
             businessDay.end
         )
@@ -58,12 +68,12 @@ class VerifyAdRewardService(
         // 보상 '기록'
         val newAdRewardLog = com.soomsoom.backend.domain.adrewardlog.model.AdRewardLog.create(
             userId = userId,
-            adUnitId = command.adUnitId,
+            adUnitId = finalAdUnitId,
             transactionId = command.transactionId,
             amount = Points(rewardAmount)
         )
         adRewardLogPort.save(newAdRewardLog)
-        logger.info("Ad reward log created successfully for userId: $userId, adUnitId: ${command.adUnitId}")
+        logger.info("Ad reward log created successfully for userId: $userId, adUnitId: $finalAdUnitId")
 
         // 보상 지급 요청 이벤트를 발행
         val event = Event(

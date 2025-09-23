@@ -9,10 +9,16 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "activity_completion_log")
+@Table(
+    name = "activity_completion_log",
+    indexes = [
+        Index(name = "idx_acl_user_type_created", columnList = "user_id, activity_type, created_at")
+    ]
+)
 class ActivityCompletionLogJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

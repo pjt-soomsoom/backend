@@ -8,5 +8,6 @@ class RewardCompletedNotificationPayload(
     val rewardType: RewardType,
     val title: String,
     val body: String,
+    val points: Int?,
     val imageUrl: String?,
 ) : NotificationPayload

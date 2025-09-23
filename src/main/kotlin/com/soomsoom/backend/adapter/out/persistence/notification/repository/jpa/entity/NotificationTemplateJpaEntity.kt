@@ -11,11 +11,18 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "notification_templates")
+@Table(
+    name = "notification_templates",
+    indexes = [
+        // 특정 타입의 활성화된 템플릿을 찾는 쿼리 최적화
+        Index(name = "idx_nt_type_active", columnList = "type, active")
+    ]
+)
 class NotificationTemplateJpaEntity(
 
     @Id
@@ -28,10 +35,11 @@ class NotificationTemplateJpaEntity(
 
     var description: String,
 
-    var isActive: Boolean,
+    var active: Boolean,
 
+    @Column(name = "trigger_condition")
     val triggerCondition: Int? = null,
 
-    @OneToMany(mappedBy = "notificationTemplate", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "notificationTemplate", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     val variations: MutableList<MessageVariationJpaEntity> = mutableListOf(),
 ) : BaseTimeEntity()

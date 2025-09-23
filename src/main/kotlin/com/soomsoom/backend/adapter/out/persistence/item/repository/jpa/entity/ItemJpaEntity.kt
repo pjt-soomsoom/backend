@@ -16,10 +16,18 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "items")
+@Table(
+    name = "items",
+    indexes = [
+        Index(name = "idx_items_item_type", columnList = "item_type"),
+        Index(name = "idx_items_acquisition_type", columnList = "acquisition_type"),
+        Index(name = "idx_items_deleted_at", columnList = "deleted_at")
+    ]
+)
 class ItemJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

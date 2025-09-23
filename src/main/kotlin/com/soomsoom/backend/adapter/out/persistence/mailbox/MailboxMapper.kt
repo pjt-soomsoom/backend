@@ -29,7 +29,7 @@ fun UserAnnouncement.toEntity(): UserAnnouncementJpaEntity = UserAnnouncementJpa
     id = this.id,
     userId = this.userId,
     announcementId = this.announcementId,
-    isRead = this.isRead,
+    read = this.read,
     receivedAt = this.receivedAt,
     readAt = this.readAt
 ).also {
@@ -40,7 +40,7 @@ fun UserAnnouncementJpaEntity.toDomain(): UserAnnouncement = UserAnnouncement(
     id = this.id,
     userId = this.userId,
     announcementId = this.announcementId,
-    isRead = this.isRead,
+    read = this.read,
     receivedAt = this.receivedAt,
     readAt = this.readAt,
     createdAt = this.createdAt,

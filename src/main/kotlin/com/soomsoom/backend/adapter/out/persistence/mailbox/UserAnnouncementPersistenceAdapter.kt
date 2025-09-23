@@ -5,6 +5,7 @@ import com.soomsoom.backend.adapter.out.persistence.mailbox.repository.jpa.UserA
 import com.soomsoom.backend.application.port.`in`.mailbox.dto.UserAnnouncementDto
 import com.soomsoom.backend.application.port.out.mailbox.UserAnnouncementPort
 import com.soomsoom.backend.domain.mailbox.model.UserAnnouncement
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -28,10 +29,10 @@ class UserAnnouncementPersistenceAdapter(
     }
 
     override fun countUnreadByUserId(userId: Long): Int {
-        return userAnnouncementJpaRepository.countByUserIdAndIsReadFalseAndDeletedAtIsNull(userId)
+        return userAnnouncementJpaRepository.countByUserIdAndReadFalseAndDeletedAtIsNull(userId)
     }
 
-    override fun findDtosByUserId(userId: Long, pageable: Pageable): List<UserAnnouncementDto> {
+    override fun findDtosByUserId(userId: Long, pageable: Pageable): Page<UserAnnouncementDto> {
         return mailboxQueryDslRepository.findUserAnnouncements(userId, pageable)
             .map { UserAnnouncementDto(it.userAnnouncementId, it.announcementId, it.title, it.receivedAt, it.isRead) }
     }

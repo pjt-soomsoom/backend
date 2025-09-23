@@ -6,10 +6,16 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "screen_time_logs")
+@Table(
+    name = "screen_time_logs",
+    indexes = [
+        Index(name = "idx_screen_time_logs_user_created", columnList = "user_id, created_at")
+    ]
+)
 class ScreenTimeLogJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

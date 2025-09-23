@@ -10,9 +10,15 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 
 @Entity
-@Table(name = "cart_items")
+@Table(
+    name = "cart_items",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_cart_item_cart_item", columnNames = ["cart_id", "item_id"])
+    ]
+)
 class CartItemJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +28,6 @@ class CartItemJpaEntity(
     @JoinColumn(name = "cart_id", nullable = false)
     var cart: CartJpaEntity? = null,
 
-    @Column(nullable = false)
+    @Column(name = "item_id", nullable = false)
     val itemId: Long,
 ) : BaseTimeEntity()

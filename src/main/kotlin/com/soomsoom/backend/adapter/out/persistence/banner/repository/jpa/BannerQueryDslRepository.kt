@@ -18,7 +18,7 @@ class BannerQueryDslRepository(
         return queryFactory.selectFrom(bannerJpaEntity)
             .where(
                 bannerJpaEntity.displayOrder.eq(order),
-                bannerJpaEntity.isActive.isTrue,
+                bannerJpaEntity.active.isTrue,
                 bannerJpaEntity.deletedAt.isNull
             )
             .fetchOne()
@@ -28,7 +28,7 @@ class BannerQueryDslRepository(
         return queryFactory.select(bannerJpaEntity.count())
             .from(bannerJpaEntity)
             .where(
-                bannerJpaEntity.isActive.isTrue,
+                bannerJpaEntity.active.isTrue,
                 bannerJpaEntity.deletedAt.isNull
             )
             .fetchOne() ?: 0L
@@ -39,7 +39,7 @@ class BannerQueryDslRepository(
             .set(bannerJpaEntity.displayOrder, bannerJpaEntity.displayOrder.add(1))
             .where(
                 bannerJpaEntity.displayOrder.goe(order),
-                bannerJpaEntity.isActive.isTrue,
+                bannerJpaEntity.active.isTrue,
                 bannerJpaEntity.deletedAt.isNull
             )
             .execute()
@@ -50,7 +50,7 @@ class BannerQueryDslRepository(
             .set(bannerJpaEntity.displayOrder, bannerJpaEntity.displayOrder.subtract(1))
             .where(
                 bannerJpaEntity.displayOrder.gt(order),
-                bannerJpaEntity.isActive.isTrue,
+                bannerJpaEntity.active.isTrue,
                 bannerJpaEntity.deletedAt.isNull
             )
             .execute()
@@ -59,7 +59,7 @@ class BannerQueryDslRepository(
     fun findActiveBanners(): List<BannerJpaEntity> {
         return queryFactory.selectFrom(bannerJpaEntity)
             .where(
-                bannerJpaEntity.isActive.isTrue,
+                bannerJpaEntity.active.isTrue,
                 bannerJpaEntity.deletedAt.isNull
             )
             .orderBy(bannerJpaEntity.displayOrder.asc())

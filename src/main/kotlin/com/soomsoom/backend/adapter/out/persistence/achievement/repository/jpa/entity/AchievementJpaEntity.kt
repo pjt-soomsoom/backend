@@ -20,11 +20,18 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "achievements")
+@Table(
+    name = "achievements",
+    indexes = [
+        Index(name = "idx_achievements_deleted_at", columnList = "deleted_at"),
+        Index(name = "idx_achievements_category", columnList = "category")
+    ]
+)
 class AchievementJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

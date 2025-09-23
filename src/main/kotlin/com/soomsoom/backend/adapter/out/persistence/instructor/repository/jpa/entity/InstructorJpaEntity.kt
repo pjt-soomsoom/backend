@@ -7,10 +7,16 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "instructors")
+@Table(
+    name = "instructors",
+    indexes = [
+        Index(name = "idx_instructors_deleted_at", columnList = "deleted_at")
+    ]
+)
 class InstructorJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

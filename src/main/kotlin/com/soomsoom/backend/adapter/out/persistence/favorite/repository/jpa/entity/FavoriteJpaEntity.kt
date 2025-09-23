@@ -6,9 +6,15 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 
 @Entity
-@Table(name = "favorites")
+@Table(
+    name = "favorites",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_favorite_user_activity", columnNames = ["user_id", "activity_id"])
+    ]
+)
 class FavoriteJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

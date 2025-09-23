@@ -9,10 +9,16 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "diaries")
+@Table(
+    name = "diaries",
+    indexes = [
+        Index(name = "idx_diaries_user_created", columnList = "user_id, created_at")
+    ]
+)
 class DiaryJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

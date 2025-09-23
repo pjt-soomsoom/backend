@@ -10,13 +10,9 @@ import jakarta.persistence.FetchType.LAZY
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderColumn
-import jakarta.persistence.PrimaryKeyJoinColumn
-import jakarta.persistence.Table
 
 @Entity
-@Table(name = "breathing_activities")
 @DiscriminatorValue("BREATHING")
-@PrimaryKeyJoinColumn(name = "activity_id")
 class BreathingActivityJpaEntity(
     title: String,
     descriptions: MutableList<String>,

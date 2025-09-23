@@ -78,6 +78,8 @@ jobs:
           #  Firebase
             echo "firebase.service-account-key-path=${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_PATH }}" >> ./src/main/resources/application.properties
 
+          # Google Admob Path
+            echo "reward-ad.base-path=${{ secrets.REWARD_AD_BASE_PATH }}" >> ./src/main/resources/application.properties
       - name: Create firebase directory
         run: mkdir -p src/main/resources/firebase
 

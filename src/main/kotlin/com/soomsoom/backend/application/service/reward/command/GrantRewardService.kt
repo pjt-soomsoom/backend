@@ -50,6 +50,7 @@ class GrantRewardService(
                     rewardType = command.rewardType,
                     title = command.notificationTitle!!,
                     body = command.notificationBody!!,
+                    points = command.points,
                     imageUrl = command.notificationImage
                 )
             )

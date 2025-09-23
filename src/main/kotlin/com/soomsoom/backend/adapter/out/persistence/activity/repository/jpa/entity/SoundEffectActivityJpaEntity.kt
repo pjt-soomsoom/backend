@@ -4,13 +4,11 @@ import com.soomsoom.backend.domain.activity.model.Activity
 import com.soomsoom.backend.domain.activity.model.enums.ActivityCategory
 import jakarta.persistence.DiscriminatorValue
 import jakarta.persistence.Entity
-import jakarta.persistence.PrimaryKeyJoinColumn
 import jakarta.persistence.Table
 
 @Entity
 @Table(name = "sound_effect_activities")
 @DiscriminatorValue("SOUND_EFFECT")
-@PrimaryKeyJoinColumn(name = "activity_id")
 class SoundEffectActivityJpaEntity(
     title: String,
     descriptions: MutableList<String>,

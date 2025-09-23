@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
+import org.hibernate.annotations.BatchSize
 
 @Entity
 @Table(name = "carts")
@@ -18,10 +19,11 @@ class CartJpaEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, name = "user_id")
     val userId: Long,
 
-    @OneToMany(mappedBy = "cart", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "cart", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     val items: MutableList<CartItemJpaEntity> = mutableListOf(),
 
 ) : BaseTimeEntity() {

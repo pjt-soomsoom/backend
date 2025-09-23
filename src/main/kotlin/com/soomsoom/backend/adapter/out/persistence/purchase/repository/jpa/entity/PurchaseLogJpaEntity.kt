@@ -12,10 +12,16 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "purchase_logs")
+@Table(
+    name = "purchase_logs",
+    indexes = [
+        Index(name = "idx_purchase_logs_user_created", columnList = "user_id, created_at DESC")
+    ]
+)
 class PurchaseLogJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +39,6 @@ class PurchaseLogJpaEntity(
     val price: PointsEmbeddable,
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, name = "acquisition_type")
     val acquisitionType: AcquisitionType,
 ) : BaseTimeEntity()

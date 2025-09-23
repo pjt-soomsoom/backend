@@ -6,10 +6,16 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType.IDENTITY
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "timeline_events")
+@Table(
+    name = "timeline_events",
+    indexes = [
+        Index(name = "idx_timeline_events_activity_id", columnList = "activity_id")
+    ]
+)
 class TimelineEventJpaEntity(
     @Id
     @GeneratedValue(strategy = IDENTITY)

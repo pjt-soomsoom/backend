@@ -39,6 +39,10 @@ class RewardCompletedStrategy(
                     payload.imageUrl?.let { imageUrl ->
                         put("imageUrl", imageUrl)
                     }
+                } else {
+                    payload.points?.let { points ->
+                        put("points", points.toString())
+                    }
                 }
             }
         )
