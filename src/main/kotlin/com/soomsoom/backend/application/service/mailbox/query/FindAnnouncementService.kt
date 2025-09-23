@@ -8,6 +8,7 @@ import com.soomsoom.backend.application.port.`in`.mailbox.usecase.query.FindAnno
 import com.soomsoom.backend.application.port.out.mailbox.AnnouncementPort
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.mailbox.MailboxErrorCode
+import org.springframework.data.domain.Page
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,7 +20,7 @@ class FindAnnouncementService(
 ) : FindAnnouncementsUseCase, FindAnnouncementDetailsUseCase {
 
     @PreAuthorize("hasRole('ADMIN')")
-    override fun find(criteria: FindAnnouncementsCriteria): List<AnnouncementDto> {
+    override fun find(criteria: FindAnnouncementsCriteria): Page<AnnouncementDto> {
         return announcementPort.findAll(criteria.pageable, criteria.deletionStatus)
             .map { it.toDto(includeContent = false) }
     }

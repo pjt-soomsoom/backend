@@ -12,7 +12,7 @@ fun Banner.toEntity(): BannerJpaEntity {
         imageFileKey = this.imageFileKey,
         linkedActivityId = this.linkedActivityId,
         displayOrder = this.displayOrder,
-        isActive = this.isActive
+        active = this.isActive
     )
     entity.deletedAt = this.deletedAt
     return entity
@@ -27,7 +27,7 @@ fun BannerJpaEntity.toDomain(): Banner {
         imageFileKey = this.imageFileKey,
         linkedActivityId = this.linkedActivityId,
         displayOrder = this.displayOrder,
-        isActive = this.isActive,
+        isActive = this.active,
         deletedAt = this.deletedAt,
         createdAt = this.createdAt,
         modifiedAt = this.modifiedAt

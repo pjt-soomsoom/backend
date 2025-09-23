@@ -1,14 +1,16 @@
 package com.soomsoom.backend.adapter.out.persistence.item.repository.jpa
 
-import com.querydsl.core.types.Order
 import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.CaseBuilder
+import com.querydsl.core.types.dsl.NumberExpression
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.soomsoom.backend.adapter.out.persistence.item.repository.jpa.entity.ItemJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.item.repository.jpa.entity.QItemJpaEntity.itemJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.purchase.repository.jpa.entity.QPurchaseLogJpaEntity.purchaseLogJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.entity.QUserJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.entity.QUserJpaEntity.userJpaEntity
 import com.soomsoom.backend.application.port.`in`.item.query.FindItemsCriteria
 import com.soomsoom.backend.application.port.`in`.item.query.ItemSortCriteria
 import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedItemsCriteria
@@ -34,73 +36,98 @@ class ItemQueryDslRepository(
             .and(excludeOwned(criteria.userId, criteria.excludeOwned))
             .and(itemJpaEntity.acquisitionType.eq(AcquisitionType.PURCHASE))
 
-        val results = queryFactory.select(itemJpaEntity)
-            .from(itemJpaEntity)
-            .where(whereClause)
-            .orderBy(getSortOrder(criteria.sortCriteria))
-            .offset(pageable.offset)
-            .limit(pageable.pageSize.toLong())
+        val ids = fetchPaginatedItemIds(whereClause, criteria.sortCriteria, pageable)
+
+        if (ids.isEmpty()) {
+            return Page.empty(pageable)
+        }
+
+        // 2. ID 목록을 사용하여 content 조회
+        val content = queryFactory
+            .selectFrom(itemJpaEntity)
+            .where(itemJpaEntity.id.`in`(ids))
+            .orderBy(getSortOrder(ids)) // ID 순서대로 정렬 보장
             .fetch()
 
-        val total = queryFactory.select(itemJpaEntity.id.count())
+        // 3. 전체 개수 조회
+        val total = queryFactory
+            .select(itemJpaEntity.id.count())
             .from(itemJpaEntity)
             .where(whereClause)
             .fetchOne() ?: 0L
 
-        return PageImpl(results, pageable, total)
+        return PageImpl(content, pageable, total)
     }
 
     /**
      * 특정 사용자가 소유한 아이템 목록을 조회 (findOwnedItems).
      */
     fun findOwnedItems(criteria: FindOwnedItemsCriteria, pageable: Pageable): Page<ItemJpaEntity> {
-        val subUser = QUserJpaEntity("subUser")
-        val whereClause = handleDeletionStatus(criteria.deletionStatus)
-            .and(itemTypeEq(criteria.itemType)) // itemType 필터링
-            .and(
-                JPAExpressions
-                    .selectOne()
-                    .from(subUser)
-                    .where(
-                        subUser.id.eq(criteria.userId)
-                            .and(subUser.ownedItemIds.contains(itemJpaEntity.id))
-                    ).exists()
+        val baseQuery = queryFactory
+            .from(userJpaEntity)
+            .join(itemJpaEntity).on(userJpaEntity.ownedItemIds.contains(itemJpaEntity.id))
+            .where(
+                userJpaEntity.id.eq(criteria.userId),
+                handleDeletionStatus(criteria.deletionStatus),
+                itemTypeEq(criteria.itemType)
             )
 
-        val results = queryFactory.selectFrom(itemJpaEntity)
-            .where(whereClause)
+        val content = baseQuery.clone().select(itemJpaEntity) // baseQuery 복제 후 select 추가
             .orderBy(itemJpaEntity.createdAt.desc())
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .fetch()
 
-        val total = queryFactory.select(itemJpaEntity.id.count())
-            .from(itemJpaEntity)
-            .where(whereClause)
+        val total = baseQuery.clone().select(itemJpaEntity.id.count()) // baseQuery 복제 후 count
             .fetchOne() ?: 0L
 
-        return PageImpl(results, pageable, total)
+        return PageImpl(content, pageable, total)
     }
 
     private fun itemTypeEq(itemType: ItemType?): BooleanExpression? {
         return if (itemType != null) itemJpaEntity.itemType.eq(itemType) else null
     }
 
-    private fun getSortOrder(sortCriteria: ItemSortCriteria): OrderSpecifier<*> {
-        return when (sortCriteria) {
-            // [수정] ORDER BY 절에 서브쿼리를 사용하여 인기순을 계산합니다.
-            ItemSortCriteria.POPULARITY -> {
-                val subQuery = JPAExpressions
-                    .select(purchaseLogJpaEntity.id.count())
-                    .from(purchaseLogJpaEntity)
-                    .where(purchaseLogJpaEntity.itemId.eq(itemJpaEntity.id))
+    private fun fetchPaginatedItemIds(whereClause: BooleanExpression?, sortCriteria: ItemSortCriteria, pageable: Pageable): List<Long> {
+        val query = queryFactory
+            .select(itemJpaEntity.id)
+            .from(itemJpaEntity)
+            .where(whereClause)
 
-                OrderSpecifier(Order.DESC, subQuery)
+        // 정렬 기준에 따라 JOIN 추가 및 정렬 적용
+        when (sortCriteria) {
+            ItemSortCriteria.POPULARITY -> {
+                query.leftJoin(purchaseLogJpaEntity).on(purchaseLogJpaEntity.itemId.eq(itemJpaEntity.id))
+                    .groupBy(itemJpaEntity.id)
+                    .orderBy(purchaseLogJpaEntity.id.count().desc())
             }
-            ItemSortCriteria.PRICE_ASC -> itemJpaEntity.price.value.asc()
-            ItemSortCriteria.PRICE_DESC -> itemJpaEntity.price.value.desc()
-            ItemSortCriteria.CREATED -> itemJpaEntity.createdAt.desc()
+            ItemSortCriteria.PRICE_ASC -> query.orderBy(itemJpaEntity.price.value.asc())
+            ItemSortCriteria.PRICE_DESC -> query.orderBy(itemJpaEntity.price.value.desc())
+            ItemSortCriteria.CREATED -> query.orderBy(itemJpaEntity.createdAt.desc())
         }
+
+        return query.offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+            .fetch()
+    }
+
+    private fun getSortOrder(ids: List<Long>): OrderSpecifier<*> {
+        if (ids.isEmpty()) {
+            return itemJpaEntity.createdAt.desc()
+        }
+
+        val caseBuilder = CaseBuilder()
+        var orderExpression: CaseBuilder.Cases<Int, NumberExpression<Int>>? = null
+
+        ids.forEachIndexed { index, id ->
+            orderExpression = if (orderExpression == null) {
+                caseBuilder.`when`(itemJpaEntity.id.eq(id)).then(index)
+            } else {
+                orderExpression!!.`when`(itemJpaEntity.id.eq(id)).then(index)
+            }
+        }
+
+        return orderExpression!!.otherwise(Integer.MAX_VALUE).asc()
     }
 
     /**

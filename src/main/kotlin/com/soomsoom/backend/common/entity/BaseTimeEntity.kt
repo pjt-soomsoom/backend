@@ -12,16 +12,16 @@ import java.time.LocalDateTime
 @EntityListeners(AuditingEntityListener::class)
 abstract class BaseTimeEntity {
     @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, name = "created_at")
     var createdAt: LocalDateTime? = null
         protected set
 
     @LastModifiedDate
-    @Column
+    @Column(name = "modified_at")
     var modifiedAt: LocalDateTime? = null
         protected set
 
-    @Column
+    @Column(name = "deleted_at")
     var deletedAt: LocalDateTime? = null
 
     fun delete() {

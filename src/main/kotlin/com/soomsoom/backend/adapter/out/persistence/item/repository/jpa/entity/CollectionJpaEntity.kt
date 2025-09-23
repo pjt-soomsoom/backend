@@ -48,7 +48,7 @@ class CollectionJpaEntity(
         uniqueConstraints = [
             UniqueConstraint(
                 name = "uk_collection_items",
-                columnNames = ["collection_id", "item_Id"]
+                columnNames = ["collection_id", "item_id"]
             )
         ]
     )

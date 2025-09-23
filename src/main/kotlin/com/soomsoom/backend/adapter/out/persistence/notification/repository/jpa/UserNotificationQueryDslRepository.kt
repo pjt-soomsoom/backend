@@ -4,10 +4,9 @@ import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.CaseBuilder
 import com.querydsl.core.types.dsl.DateTimeExpression
 import com.querydsl.core.types.dsl.NumberExpression
-import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
-import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.entity.QActivityCompletionLogJpaEntity.activityCompletionLogJpaEntity
-import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.entity.QDiaryJpaEntity.diaryJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.entity.QActivityCompletionLogJpaEntity
+import com.soomsoom.backend.adapter.out.persistence.diary.repository.jpa.entity.QDiaryJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.mailbox.repository.jpa.entity.QUserAnnouncementJpaEntity.userAnnouncementJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.dto.QUserNotificationPushQueryResult
 import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.dto.UserNotificationPushQueryResult
@@ -17,6 +16,7 @@ import com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.
 import com.soomsoom.backend.adapter.out.persistence.user.repository.jpa.entity.QUserJpaEntity.userJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.InactiveUserAdapterDto
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.dto.QInactiveUserAdapterDto
+import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.entity.QConnectionLogJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.useractivity.repository.jpa.entity.QConnectionLogJpaEntity.connectionLogJpaEntity
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.data.domain.Pageable
@@ -48,45 +48,34 @@ class UserNotificationQueryDslRepository(
         pageNumber: Int,
         pageSize: Int,
     ): List<Long> {
+        val qDiary = QDiaryJpaEntity("qDiary")
+        val qActivityLog = QActivityCompletionLogJpaEntity("qActivityLog")
+        val qConnectionLog = QConnectionLogJpaEntity("qConnectionLog")
+
         // 오늘 일기를 작성했는지 확인하는 서브쿼리 (Boolean)
-        val hasDiaryToday = JPAExpressions.selectOne()
-            .from(diaryJpaEntity)
-            .where(
-                diaryJpaEntity.userId.eq(userNotificationSettingJpaEntity.userId),
-                diaryJpaEntity.createdAt.between(todayStart, todayEnd)
-            ).exists()
-
-        // 오늘 호흡 또는 명상을 했는지 확인하는 서브쿼리 (Boolean)
-        val hasActivityToday = JPAExpressions.selectOne()
-            .from(activityCompletionLogJpaEntity)
-            .where(
-                activityCompletionLogJpaEntity.userId.eq(userNotificationSettingJpaEntity.userId),
-                activityCompletionLogJpaEntity.createdAt.between(todayStart, todayEnd),
-                // ✨ 호흡 또는 명상 타입만 필터링
-                activityCompletionLogJpaEntity.activityType.`in`(ActivityType.BREATHING, ActivityType.MEDITATION)
-            ).exists()
-
         return queryFactory
             .select(userNotificationSettingJpaEntity.userId)
             .from(userNotificationSettingJpaEntity)
+            .leftJoin(qConnectionLog).on(
+                qConnectionLog.userId.eq(userNotificationSettingJpaEntity.userId),
+                qConnectionLog.createdAt.between(yesterdayStart, yesterdayEnd)
+            )
+            .leftJoin(qDiary).on(
+                qDiary.userId.eq(userNotificationSettingJpaEntity.userId),
+                qDiary.createdAt.between(todayStart, todayEnd)
+            )
+            .leftJoin(qActivityLog).on(
+                qActivityLog.userId.eq(userNotificationSettingJpaEntity.userId),
+                qActivityLog.createdAt.between(todayStart, todayEnd),
+                qActivityLog.activityType.`in`(ActivityType.BREATHING, ActivityType.MEDITATION)
+            )
             .where(
-                // 1. [기본 조건] 알림 설정 ON, 시간 일치
                 userNotificationSettingJpaEntity.diaryNotificationEnabled.isTrue,
                 userNotificationSettingJpaEntity.diaryNotificationTime.eq(targetTime),
-
-                // 2. [접속 조건] 어제 접속 기록이 있는 사용자
-                // (이 조건이 여전히 필요한지 확인이 필요합니다. 일단 유지했습니다.)
-                JPAExpressions.selectOne()
-                    .from(connectionLogJpaEntity)
-                    .where(
-                        connectionLogJpaEntity.userId.eq(userNotificationSettingJpaEntity.userId),
-                        connectionLogJpaEntity.createdAt.between(yesterdayStart, yesterdayEnd)
-                    ).exists(),
-
-                // 3. ✨ [새로운 핵심 조건] '일기를 썼다' 와 '호흡/명상을 했다' 가 동시에 참인 경우가 아닌 사용자
-                //    즉, 둘 다 한 사용자는 제외하고, 하나만 했거나 아무것도 안 한 사용자는 포함합니다.
-                hasDiaryToday.and(hasActivityToday).isFalse
+                qConnectionLog.id.isNotNull, // 어제 접속 기록이 있는 사용자 (INNER JOIN 효과)
+                qDiary.id.isNull.or(qActivityLog.id.isNull) // NOT (A AND B) 와 동일
             )
+            .groupBy(userNotificationSettingJpaEntity.userId) // JOIN으로 인한 중복 제거
             .orderBy(userNotificationSettingJpaEntity.userId.asc())
             .offset((pageNumber * pageSize).toLong())
             .limit(pageSize.toLong())
@@ -157,12 +146,21 @@ class UserNotificationQueryDslRepository(
      */
 
     fun findUserNotificationPushQueryResults(pageable: Pageable): List<UserNotificationPushQueryResult> {
+        // 1단계: 페이징 조건에 맞는 대상 userId 목록만 먼저 조회하는 서브쿼리
+        val userIdsSubquery = queryFactory
+            .select(userJpaEntity.id)
+            .from(userJpaEntity)
+            .where(userJpaEntity.deletedAt.isNull)
+            .orderBy(userJpaEntity.id.asc())
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+
+        // 2단계: 위에서 찾은 userId 목록에 대해서만 JOIN과 집계를 수행하는 메인 쿼리
         return queryFactory
             .select(
                 QUserNotificationPushQueryResult(
                     userJpaEntity.id,
-
-                    // 1. CASE 문으로 BIT 타입을 안전하게 1 또는 0으로 변환하고,
+                    // CASE 문은 기존 로직 유지
                     CaseBuilder()
                         .`when`(userNotificationSettingJpaEntity.soomsoomNewsNotificationEnabled.isNotNull)
                         .then(
@@ -171,31 +169,26 @@ class UserNotificationQueryDslRepository(
                                 .then(1)
                                 .otherwise(0)
                         )
-                        .otherwise(1)
+                        .otherwise(1) // 설정이 없는 경우 기본값 true(1)
                         .eq(1),
-
                     userAnnouncementJpaEntity.count().intValue()
                 )
             )
             .from(userJpaEntity)
-            // UserNotificationSetting 정보가 없는 사용자도 포함시키기 위해 LEFT JOIN
             .leftJoin(userNotificationSettingJpaEntity)
             .on(userJpaEntity.id.eq(userNotificationSettingJpaEntity.userId))
-            // 안 읽은 공지사항을 처음부터 LEFT JOIN으로 가져옵니다.
             .leftJoin(userAnnouncementJpaEntity).on(
                 userAnnouncementJpaEntity.userId.eq(userJpaEntity.id),
-                userAnnouncementJpaEntity.isRead.isFalse,
+                userAnnouncementJpaEntity.read.isFalse, // isRead -> read
                 userAnnouncementJpaEntity.deletedAt.isNull
             )
-            .where(userJpaEntity.deletedAt.isNull)
-            // select 절에 있는 집계 함수(count) 외의 모든 컬럼을 기준으로 그룹화합니다.
+            // [핵심 개선] 조회 대상을 페이징된 userId로 한정
+            .where(userJpaEntity.id.`in`(userIdsSubquery))
             .groupBy(
                 userJpaEntity.id,
                 userNotificationSettingJpaEntity.soomsoomNewsNotificationEnabled
             )
             .orderBy(userJpaEntity.id.asc())
-            .offset(pageable.offset)
-            .limit(pageable.pageSize.toLong())
             .fetch()
     }
 

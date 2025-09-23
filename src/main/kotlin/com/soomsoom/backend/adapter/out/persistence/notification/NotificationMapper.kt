@@ -18,7 +18,7 @@ fun NotificationTemplateJpaEntity.toDomain(): NotificationTemplate {
         id = this.id,
         type = this.type,
         description = this.description,
-        isActive = this.isActive,
+        active = this.active,
         triggerCondition = this.triggerCondition,
         variations = domainVariations // 참조 전달
     )
@@ -36,7 +36,7 @@ fun MessageVariationJpaEntity.toDomain(template: NotificationTemplate): MessageV
         notificationTemplate = template, // 부모 참조 설정
         titleTemplate = this.titleTemplate,
         bodyTemplate = this.bodyTemplate,
-        isActive = this.isActive
+        active = this.active
     )
 }
 
@@ -45,7 +45,7 @@ fun NotificationTemplate.toEntity(): NotificationTemplateJpaEntity {
         id = this.id,
         type = this.type,
         description = this.description,
-        isActive = this.isActive,
+        active = this.active,
         triggerCondition = this.triggerCondition
     )
 
@@ -63,7 +63,7 @@ fun MessageVariation.toEntity(templateEntity: NotificationTemplateJpaEntity): Me
         notificationTemplate = templateEntity, // 부모 참조 설정
         titleTemplate = this.titleTemplate,
         bodyTemplate = this.bodyTemplate,
-        isActive = this.isActive
+        active = this.active
     )
 }
 

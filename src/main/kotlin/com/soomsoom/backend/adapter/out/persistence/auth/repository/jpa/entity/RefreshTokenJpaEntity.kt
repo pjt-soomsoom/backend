@@ -3,11 +3,17 @@ package com.soomsoom.backend.adapter.out.persistence.auth.repository.jpa.entity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 import java.time.Instant
 
 @Entity
-@Table(name = "refresh_tokens")
+@Table(
+    name = "refresh_tokens",
+    indexes = [
+        Index(name = "idx_refresh_tokens_user_id", columnList = "user_id")
+    ]
+)
 class RefreshTokenJpaEntity(
     @Id
     val token: String,

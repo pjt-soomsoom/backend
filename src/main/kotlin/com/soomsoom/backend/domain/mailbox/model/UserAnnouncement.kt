@@ -6,7 +6,7 @@ class UserAnnouncement(
     val id: Long = 0L,
     val userId: Long,
     val announcementId: Long,
-    var isRead: Boolean = false,
+    var read: Boolean = false,
     val receivedAt: LocalDateTime,
     var readAt: LocalDateTime? = null,
 
@@ -19,8 +19,8 @@ class UserAnnouncement(
      * 공지를 '읽음' 상태로 변경
      */
     fun markAsRead() {
-        if (!isRead) {
-            this.isRead = true
+        if (!read) {
+            this.read = true
             this.readAt = LocalDateTime.now()
         }
     }

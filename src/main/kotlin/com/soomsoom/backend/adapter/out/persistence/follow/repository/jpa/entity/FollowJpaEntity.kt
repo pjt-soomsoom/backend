@@ -6,9 +6,15 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 
 @Entity
-@Table(name = "follows")
+@Table(
+    name = "follows",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_follow_follower_followee", columnNames = ["follower_id", "followee_id"])
+    ]
+)
 class FollowJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

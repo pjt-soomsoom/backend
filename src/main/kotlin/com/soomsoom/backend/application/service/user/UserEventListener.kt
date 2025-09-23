@@ -24,8 +24,9 @@ class UserEventListener(
     @TransactionalEventListener(
         classes = [Event::class],
         condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).ITEM_PURCHASED",
-        phase = TransactionPhase.BEFORE_COMMIT
+        phase = TransactionPhase.AFTER_COMMIT
     )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleItemPurchasedEvent(event: Event<ItemPurchasedPayload>) {
         val payload = event.payload
         grantItemToUserUseCase.grantItemToUser(GrantItemToUserCommand(payload.userId, payload.itemId))

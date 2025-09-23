@@ -8,6 +8,7 @@ import com.soomsoom.backend.common.event.payload.ItemOwnedPayload
 import com.soomsoom.backend.common.event.payload.ItemsEquippedPayload
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.user.UserErrorCode
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
@@ -21,17 +22,23 @@ class CollectionCompletionEventListener(
     private val userOwnedCollectionPort: UserOwnedCollectionPort,
     private val collectionPort: CollectionPort,
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     @TransactionalEventListener(
         classes = [Event::class],
         condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).ITEM_OWNED",
-        phase = TransactionPhase.BEFORE_COMMIT
+        phase = TransactionPhase.AFTER_COMMIT
     )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleItemPurchasedEvent(event: Event<ItemOwnedPayload>) {
+        logger.info("Item Owned Event Start")
         val payload = event.payload
         val userId = payload.userId
         val ownedItemId = payload.itemId
 
         val completedCollectionIds = userOwnedCollectionPort.findCompletedCollectionIds(userId, ownedItemId)
+
+        logger.info("completedCollectionIds = {}", completedCollectionIds)
 
         if (completedCollectionIds.isNotEmpty()) {
             val user = userPort.findByIdWithCollections(userId)

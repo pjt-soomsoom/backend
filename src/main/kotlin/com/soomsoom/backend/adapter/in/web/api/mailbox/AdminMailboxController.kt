@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -75,7 +76,7 @@ class AdminMailboxController(
         @Parameter(description = "삭제 상태 필터 (ACTIVE, DELETED, ALL)")
         @RequestParam(defaultValue = "ACTIVE")
         deletionStatus: DeletionStatus,
-    ): List<AnnouncementDto> {
+    ): Page<AnnouncementDto> {
         val criteria = FindAnnouncementsCriteria(pageable, deletionStatus)
         return findAnnouncementsUseCase.find(criteria)
     }

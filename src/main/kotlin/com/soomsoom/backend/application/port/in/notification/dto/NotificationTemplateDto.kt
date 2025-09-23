@@ -17,7 +17,7 @@ fun NotificationTemplate.toDto(): NotificationTemplateDto {
         id = this.id,
         type = this.type,
         description = this.description,
-        isActive = this.isActive,
+        isActive = this.active,
         triggerCondition = this.triggerCondition,
         variations = this.variations.map { it.toDto() }
     )

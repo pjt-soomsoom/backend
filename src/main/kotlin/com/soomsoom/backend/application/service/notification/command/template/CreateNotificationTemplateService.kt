@@ -19,7 +19,7 @@ class CreateNotificationTemplateService(
         val newTemplate = NotificationTemplate(
             type = command.type,
             description = command.description,
-            isActive = true,
+            active = true,
             triggerCondition = command.triggerCondition
         )
         return port.saveTemplate(newTemplate).id

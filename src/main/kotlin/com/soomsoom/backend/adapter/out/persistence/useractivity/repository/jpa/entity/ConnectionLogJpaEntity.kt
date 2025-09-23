@@ -6,13 +6,15 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
-import jakarta.persistence.UniqueConstraint
 
 @Entity
 @Table(
     name = "connection_logs",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "created_at"])]
+    indexes = [
+        Index(name = "idx_connection_logs_user_created", columnList = "user_id, created_at")
+    ]
 )
 class ConnectionLogJpaEntity(
     @Id

@@ -9,10 +9,17 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "user_devices")
+@Table(
+    name = "user_devices",
+    indexes = [
+        // 특정 유저의 모든 디바이스를 빠르게 찾기 위한 인덱스
+        Index(name = "idx_user_devices_user_id", columnList = "user_id")
+    ]
+)
 class UserDeviceJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,10 +28,10 @@ class UserDeviceJpaEntity(
     @Column(nullable = false)
     val userId: Long,
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, name = "fcm_token")
     val fcmToken: String,
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "os_type")
     val osType: OSType,
 ) : BaseTimeEntity()

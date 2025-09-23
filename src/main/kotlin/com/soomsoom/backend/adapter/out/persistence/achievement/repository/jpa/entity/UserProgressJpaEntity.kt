@@ -14,15 +14,19 @@ import jakarta.persistence.UniqueConstraint
 @Entity
 @Table(
     name = "user_progress",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["userId", "type"])]
+    uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "type"])]
 )
 class UserProgressJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
+
+    @Column(nullable = false, name = "user_id")
     val userId: Long,
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     val type: ConditionType,
+
+    @Column(name = "current_value")
     var currentValue: Int,
 )

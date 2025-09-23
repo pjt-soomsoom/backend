@@ -17,8 +17,8 @@ class NotificationTemplateQueryDslRepository(
             .leftJoin(notificationTemplateJpaEntity.variations, messageVariationJpaEntity).fetchJoin()
             .where(
                 notificationTemplateJpaEntity.type.eq(type),
-                notificationTemplateJpaEntity.isActive.isTrue,
-                messageVariationJpaEntity.isActive.isTrue
+                notificationTemplateJpaEntity.active.isTrue,
+                messageVariationJpaEntity.active.isTrue
             )
             .fetch()
     }

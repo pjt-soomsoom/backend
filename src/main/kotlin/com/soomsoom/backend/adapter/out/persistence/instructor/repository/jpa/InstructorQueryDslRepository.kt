@@ -3,6 +3,7 @@ package com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
+import com.soomsoom.backend.adapter.out.persistence.follow.repository.jpa.entity.QFollowJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.follow.repository.jpa.entity.QFollowJpaEntity.followJpaEntity
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.dto.InstructorWithFollowStatusDto
 import com.soomsoom.backend.adapter.out.persistence.instructor.repository.jpa.dto.QInstructorWithFollowStatusDto
@@ -58,14 +59,19 @@ class InstructorQueryDslRepository(
     }
 
     fun searchWithFollowStatus(criteria: SearchInstructorsCriteria, pageable: Pageable): Page<InstructorWithFollowStatusDto> {
+        val qFollow = QFollowJpaEntity("qFollow")
         val content = queryFactory
             .select(
                 QInstructorWithFollowStatusDto(
                     instructorJpaEntity,
-                    isFollowingExpression(criteria.userId)
+                    qFollow.id.isNotNull()
                 )
             )
             .from(instructorJpaEntity)
+            .leftJoin(qFollow).on(
+                qFollow.followeeId.eq(instructorJpaEntity.id)
+                    .and(qFollow.followerId.eq(criteria.userId))
+            )
             .where(
                 deletionStatusEq(criteria.deletionStatus)
             )

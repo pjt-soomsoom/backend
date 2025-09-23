@@ -7,11 +7,8 @@ CREATE TABLE shedlock (
 ) engine=InnoDB;
 
 
-
-
-
 create table achievement_conditions (
-                                        target_value integer not null,
+                                        target_value integer,
                                         achievement_id bigint not null,
                                         id bigint not null auto_increment,
                                         type enum ('BREATHING_COUNT','BREATHING_MONTHLY_COUNT','BREATHING_MULTI_TYPE_COUNT','BREATHING_STREAK','BREATHING_TOTAL_MINUTES','DIARY_COUNT','DIARY_MONTHLY_COUNT','DIARY_STREAK','HIDDEN_CUSTOMIZE_CHARACTER','HIDDEN_EMOTION_OVERCOME','HIDDEN_STAY_HOME_SCREEN','MEDITATION_COUNT','MEDITATION_LATE_NIGHT_STREAK','MEDITATION_MONTHLY_COUNT','MEDITATION_STREAK','MEDITATION_TOTAL_MINUTES','SOUND_EFFECT_TOTAL_MINUTES'),
@@ -37,21 +34,30 @@ create table achievements (
 ) engine=InnoDB;
 
 create table activities (
-                            duration_in_seconds integer not null,
-                            author_id bigint not null,
+                            duration_in_seconds integer,
+                            author_id bigint,
                             created_at datetime(6) not null,
                             deleted_at datetime(6),
                             id bigint not null auto_increment,
                             modified_at datetime(6),
-                            narrator_id bigint not null,
+                            narrator_id bigint,
                             activity_type varchar(31) not null,
                             audio_file_key varchar(255),
                             audio_url varchar(255),
+                            mini_thumbnail_file_key varchar(255),
+                            mini_thumbnail_image_url varchar(255),
                             thumbnail_file_key varchar(255),
                             thumbnail_image_url varchar(255),
                             title varchar(255),
                             category enum ('BREATHING','MEDITATION','REST','SLEEP') not null,
                             primary key (id)
+) engine=InnoDB;
+
+create table activity_completion_effects (
+                                             sequence integer not null,
+                                             activity_id bigint not null,
+                                             effect_text TEXT,
+                                             primary key (sequence, activity_id)
 ) engine=InnoDB;
 
 create table activity_completion_log (
@@ -107,8 +113,8 @@ create table announcements (
 ) engine=InnoDB;
 
 create table banners (
+                         active bit not null,
                          display_order integer not null,
-                         is_active bit not null,
                          created_at datetime(6) not null,
                          deleted_at datetime(6),
                          id bigint not null auto_increment,
@@ -121,9 +127,9 @@ create table banners (
                          primary key (id)
 ) engine=InnoDB;
 
-create table breathing_activities (
-                                      activity_id bigint not null,
-                                      primary key (activity_id)
+create table breathing_activity_jpa_entity (
+                                               id bigint not null,
+                                               primary key (id)
 ) engine=InnoDB;
 
 create table cart_items (
@@ -148,7 +154,7 @@ create table carts (
 create table collection_items (
                                   collection_id bigint not null,
                                   item_id bigint not null,
-                                  primary key (collection_id, item_id)
+                                  constraint uk_collection_items primary key (collection_id, item_id)
 ) engine=InnoDB;
 
 create table collections (
@@ -240,12 +246,12 @@ create table items (
 ) engine=InnoDB;
 
 create table meditation_activities (
-                                       activity_id bigint not null,
-                                       primary key (activity_id)
+                                       id bigint not null,
+                                       primary key (id)
 ) engine=InnoDB;
 
 create table message_variations (
-                                    is_active bit not null,
+                                    active bit not null,
                                     created_at datetime(6) not null,
                                     deleted_at datetime(6),
                                     id bigint not null auto_increment,
@@ -261,7 +267,7 @@ create table notification_histories (
                                         created_at datetime(6) not null,
                                         deleted_at datetime(6),
                                         id bigint not null auto_increment,
-                                        message_variation_id bigint not null,
+                                        message_variations_id bigint not null,
                                         modified_at datetime(6),
                                         sent_at datetime(6) not null,
                                         user_id bigint not null,
@@ -269,7 +275,7 @@ create table notification_histories (
 ) engine=InnoDB;
 
 create table notification_templates (
-                                        is_active bit not null,
+                                        active bit not null,
                                         trigger_condition integer,
                                         created_at datetime(6) not null,
                                         deleted_at datetime(6),
@@ -322,8 +328,8 @@ create table screen_time_logs (
 ) engine=InnoDB;
 
 create table sound_effect_activities (
-                                         activity_id bigint not null,
-                                         primary key (activity_id)
+                                         id bigint not null,
+                                         primary key (id)
 ) engine=InnoDB;
 
 create table timeline_events (
@@ -339,7 +345,7 @@ create table timeline_events (
 
 create table user_achieved (
                                achieved_at datetime(6),
-                               achievement_id bigint not null,
+                               achievement_id bigint,
                                id bigint not null auto_increment,
                                user_id bigint not null,
                                primary key (id)
@@ -356,15 +362,15 @@ create table user_activity_summary (
 ) engine=InnoDB;
 
 create table user_announcements (
-                                    is_read bit not null,
-                                    announcement_id bigint not null,
+                                    `read` bit not null,
+                                    announcement_id bigint,
                                     created_at datetime(6) not null,
                                     deleted_at datetime(6),
                                     id bigint not null auto_increment,
                                     modified_at datetime(6),
                                     read_at datetime(6),
                                     received_at datetime(6),
-                                    user_id bigint not null,
+                                    user_id bigint,
                                     primary key (id)
 ) engine=InnoDB;
 
@@ -385,10 +391,10 @@ create table user_equipped_collections (
 ) engine=InnoDB;
 
 create table user_notification_settings (
-                                            diary_notification_enabled bit not null,
+                                            diary_notification_enabled bit,
                                             diary_notification_time time(6),
-                                            re_engagement_notification_enabled bit not null,
-                                            soomsoom_news_notification_enabled bit not null,
+                                            re_engagement_notification_enabled bit,
+                                            soomsoom_news_notification_enabled bit,
                                             created_at datetime(6) not null,
                                             deleted_at datetime(6),
                                             id bigint not null auto_increment,
@@ -408,7 +414,7 @@ create table user_owned_items (
 ) engine=InnoDB;
 
 create table user_progress (
-                               current_value integer not null,
+                               current_value integer,
                                id bigint not null auto_increment,
                                user_id bigint not null,
                                type enum ('BREATHING_COUNT','BREATHING_MONTHLY_COUNT','BREATHING_MULTI_TYPE_COUNT','BREATHING_STREAK','BREATHING_TOTAL_MINUTES','DIARY_COUNT','DIARY_MONTHLY_COUNT','DIARY_STREAK','HIDDEN_CUSTOMIZE_CHARACTER','HIDDEN_EMOTION_OVERCOME','HIDDEN_STAY_HOME_SCREEN','MEDITATION_COUNT','MEDITATION_LATE_NIGHT_STREAK','MEDITATION_MONTHLY_COUNT','MEDITATION_STREAK','MEDITATION_TOTAL_MINUTES','SOUND_EFFECT_TOTAL_MINUTES'),
@@ -439,41 +445,149 @@ create table users (
                        primary key (id)
 ) engine=InnoDB;
 
+create index idx_ac_achievement_id
+    on achievement_conditions (achievement_id);
+
+create index idx_ac_type
+    on achievement_conditions (type);
+
+create index idx_achievements_deleted_at
+    on achievements (deleted_at);
+
+create index idx_achievements_category
+    on achievements (category);
+
 alter table achievements
     add constraint UKktpif54u9a3ssn6rpxxqx6jvp unique (name);
+
+create index idx_activities_type_category
+    on activities (activity_type, category);
+
+create index idx_activities_author_id
+    on activities (author_id);
+
+create index idx_activities_narrator_id
+    on activities (narrator_id);
+
+create index idx_activities_deleted_at
+    on activities (deleted_at);
+
+create index idx_acl_user_type_created
+    on activity_completion_log (user_id, activity_type, created_at);
+
+alter table activity_progress
+    add constraint uk_ap_user_activity unique (user_id, activity_id);
+
+create index idx_arl_user_ad_created
+    on ad_reward_logs (user_id, ad_unit_id, created_at);
 
 alter table ad_reward_logs
     add constraint UK8tepffuut86g94davf44suyeq unique (transaction_id);
 
+create index idx_announcements_deleted_at
+    on announcements (deleted_at);
+
+create index idx_banners_active_deleted_order
+    on banners (active, deleted_at, display_order);
+
+alter table cart_items
+    add constraint uk_cart_item_cart_item unique (cart_id, item_id);
+
 alter table carts
     add constraint UK64t7ox312pqal3p7fg9o503c2 unique (user_id);
 
-alter table connection_logs
-    add constraint UKmy6ahkfsjoe0iu3bj1aehpot0 unique (user_id, created_at);
+alter table collections
+    add constraint UKddet6fvs2nj65hg90ew34sgjy unique (name);
+
+create index idx_connection_logs_user_created
+    on connection_logs (user_id, created_at);
+
+create index idx_diaries_user_created
+    on diaries (user_id, created_at);
+
+alter table favorites
+    add constraint uk_favorite_user_activity unique (user_id, activity_id);
+
+alter table follows
+    add constraint uk_follow_follower_followee unique (follower_id, followee_id);
+
+create index idx_instructors_deleted_at
+    on instructors (deleted_at);
+
+create index idx_items_item_type
+    on items (item_type);
+
+create index idx_items_acquisition_type
+    on items (acquisition_type);
+
+create index idx_items_deleted_at
+    on items (deleted_at);
+
+alter table items
+    add constraint UKmnhl79u3u6jdvutuoeq54stne unique (name);
+
+create index idx_mv_notification_templates_id
+    on message_variations (notification_templates_id);
+
+create index idx_nh_user_sent_at
+    on notification_histories (user_id, sent_at desc);
+
+create index idx_nt_type_active
+    on notification_templates (type, active);
+
+create index idx_purchase_logs_user_created
+    on purchase_logs (user_id, created_at desc);
+
+create index idx_refresh_tokens_user_id
+    on refresh_tokens (user_id);
+
+create index idx_rewarded_ads_active
+    on rewarded_ads (active);
 
 alter table rewarded_ads
     add constraint UK8jsaf6tall9vhyqyw1b5whu1q unique (ad_unit_id);
 
+create index idx_screen_time_logs_user_created
+    on screen_time_logs (user_id, created_at);
+
+create index idx_timeline_events_activity_id
+    on timeline_events (activity_id);
+
+alter table user_achieved
+    add constraint uk_user_achieved_user_achievement unique (user_id, achievement_id);
+
 alter table user_activity_summary
     add constraint UK2hy0knhpjdqu9dro0jyf8higj unique (user_id);
 
-create index idx_user_announcements_user_id
-    on user_announcements (user_id);
+create index idx_ua_user_received
+    on user_announcements (user_id, received_at desc);
 
 create index idx_user_announcements_unread
-    on user_announcements (user_id, is_read, deleted_at);
+    on user_announcements (user_id, `read`, deleted_at);
 
 create index idx_user_announcements_announcement_id
     on user_announcements (announcement_id);
 
+create index idx_user_devices_user_id
+    on user_devices (user_id);
+
 alter table user_devices
     add constraint UKo6vhn2gmiutbtiqk0ljgt5us0 unique (fcm_token);
+
+create index idx_uns_diary_reminder
+    on user_notification_settings (diary_notification_enabled, diary_notification_time);
 
 alter table user_notification_settings
     add constraint UKiopsy42i35vabad4lpu2xcfbq unique (user_id);
 
 alter table user_progress
-    add constraint UKkwnipgc8pxp8bca3jmp5b41cp unique (user_id, type);
+    add constraint UK6lyhl5a7d1o2tn65pji43rm1j unique (user_id, type);
+
+create index idx_users_social
+    on users (social_provider, social_id);
+
+create index idx_users_deleted_at
+    on users (deleted_at);
 
 alter table users
     add constraint UK6jl2ojdbeq8i75ouaqq7ks31 unique (device_id);
@@ -481,14 +595,24 @@ alter table users
 alter table users
     add constraint UKr43af9ap4edm43mmtq01oddj6 unique (username);
 
+alter table achievement_conditions
+    add constraint FKdmql3v0s4stdvirkrl0at4tat
+        foreign key (achievement_id)
+            references achievements (id);
+
+alter table activity_completion_effects
+    add constraint FKjeyexcyjeanfdsnjmcgufg298
+        foreign key (activity_id)
+            references activities (id);
+
 alter table activity_descriptions
     add constraint FKniqcakrxygumslmtvyqonixss
         foreign key (activity_id)
             references activities (id);
 
-alter table breathing_activities
-    add constraint FK2tuodar6suymu5ax9s9x689xw
-        foreign key (activity_id)
+alter table breathing_activity_jpa_entity
+    add constraint FK2pmevk79r5xpm4ifcoxetfm1b
+        foreign key (id)
             references activities (id);
 
 alter table cart_items
@@ -507,8 +631,8 @@ alter table collection_items
             references collections (id);
 
 alter table meditation_activities
-    add constraint FKglmn3dwlgsldrcv8g7q4xdfl7
-        foreign key (activity_id)
+    add constraint FKdmu28i5shi5dwv950v03s7jmq
+        foreign key (id)
             references activities (id);
 
 alter table message_variations
@@ -517,14 +641,14 @@ alter table message_variations
             references notification_templates (id);
 
 alter table sound_effect_activities
-    add constraint FKbp3irtquxcg3s1oqje6l58t33
-        foreign key (activity_id)
+    add constraint FKstjl8bi2odt1a6gy092muuq1x
+        foreign key (id)
             references activities (id);
 
 alter table timeline_events
-    add constraint FKixcwtgioskeskbrhhb4guejmo
+    add constraint FK2eeryyu8do8m7euwxo2p7lu18
         foreign key (activity_id)
-            references breathing_activities (activity_id);
+            references breathing_activity_jpa_entity (id);
 
 alter table user_equipped_collections
     add constraint FKo2uk7dnmh8i2r84eu997mt7jf
