@@ -1,7 +1,7 @@
 package com.soomsoom.backend.adapter.`in`.web.api.notification.request
 
 import com.soomsoom.backend.application.port.`in`.notification.command.RegisterUserDeviceCommand
-import com.soomsoom.backend.domain.notification.model.enums.OSType
+import com.soomsoom.backend.common.entity.enums.OSType
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull

@@ -1,4 +1,4 @@
-package com.soomsoom.backend.adapter.out.persistence.notification.repository.jpa.entity
+package com.soomsoom.backend.adapter.out.persistence.appversion.repository.jpa.entity
 
 import com.soomsoom.backend.common.entity.BaseTimeEntity
 import com.soomsoom.backend.common.entity.enums.OSType
@@ -14,24 +14,23 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(
-    name = "user_devices",
+    name = "app_versions",
     indexes = [
-        // 특정 유저의 모든 디바이스를 빠르게 찾기 위한 인덱스
-        Index(name = "idx_user_devices_user_id", columnList = "user_id")
+        Index(name = "idx_app_versions_os_created_at", columnList = "os, created_at")
     ]
 )
-class UserDeviceJpaEntity(
+class AppVersionJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
-
-    @Column(nullable = false)
-    val userId: Long,
-
-    @Column(unique = true, nullable = false, name = "fcm_token")
-    val fcmToken: String,
+    val id: Long = 0L,
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "os_type")
-    val osType: OSType,
+    @Column(nullable = false)
+    val os: OSType,
+
+    @Column(nullable = false)
+    var versionName: String,
+
+    @Column(nullable = false)
+    var forceUpdate: Boolean,
 ) : BaseTimeEntity()

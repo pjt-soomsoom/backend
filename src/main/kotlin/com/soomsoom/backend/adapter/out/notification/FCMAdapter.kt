@@ -11,8 +11,8 @@ import com.google.firebase.messaging.MulticastMessage
 import com.google.firebase.messaging.Notification
 import com.soomsoom.backend.application.port.out.notification.NotificationPort
 import com.soomsoom.backend.application.port.out.notification.UserNotificationPort
+import com.soomsoom.backend.common.entity.enums.OSType
 import com.soomsoom.backend.domain.notification.model.entity.UserDevice
-import com.soomsoom.backend.domain.notification.model.enums.OSType
 import com.soomsoom.backend.domain.notification.model.vo.NotificationMessage
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component

@@ -22,6 +22,10 @@ repositories {
 }
 
 dependencies {
+
+    // 버전 관리를 위한 의존성 추가
+    implementation("com.github.zafarkhaja:java-semver:0.9.0")
+
     // AdMob SSV 검증을 위한 라이브러리
     implementation("com.google.crypto.tink:apps-rewardedads:1.10.0")
 

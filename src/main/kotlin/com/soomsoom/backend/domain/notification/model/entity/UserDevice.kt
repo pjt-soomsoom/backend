@@ -1,6 +1,6 @@
 package com.soomsoom.backend.domain.notification.model.entity
 
-import com.soomsoom.backend.domain.notification.model.enums.OSType
+import com.soomsoom.backend.common.entity.enums.OSType
 
 /**
  * 사용자의 푸시 알림 수신 디바이스 정보를 관리하는 Entity

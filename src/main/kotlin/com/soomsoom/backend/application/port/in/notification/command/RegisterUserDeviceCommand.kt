@@ -1,6 +1,6 @@
 package com.soomsoom.backend.application.port.`in`.notification.command
 
-import com.soomsoom.backend.domain.notification.model.enums.OSType
+import com.soomsoom.backend.common.entity.enums.OSType
 
 data class RegisterUserDeviceCommand(
     val userId: Long,
