@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -62,7 +63,7 @@ class DeviceAuthenticationService(
         eventPublisher.publishEvent(
             Event(
                 eventType = EventType.USER_AUTHENTICATED,
-                payload = UserAuthenticatedPayload(userId = user.id!!)
+                payload = UserAuthenticatedPayload(userId = user.id!!, authenticatedAt = LocalDateTime.now())
             )
         )
 
