@@ -34,7 +34,7 @@ class UpdateInstructorService(
             }
             ?: throw SoomSoomException(InstructorErrorCode.NOT_FOUND)
         val savedInstructor = instructorPort.save(instructor)
-        return FindInstructorResult.from(savedInstructor, null)
+        return FindInstructorResult.from(savedInstructor, null, null)
     }
 
     override fun updateProfileImageUrl(

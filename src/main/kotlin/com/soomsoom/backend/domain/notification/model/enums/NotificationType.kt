@@ -21,4 +21,9 @@ enum class NotificationType {
      * (e.g., 7일 연속 출석 보상)
      */
     REWARD_ACQUIRED,
+
+    /**
+     * 미션(이벤트) 달성
+     */
+    MISSION_COMPLETED,
 }

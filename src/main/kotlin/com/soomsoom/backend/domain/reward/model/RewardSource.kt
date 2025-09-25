@@ -5,4 +5,5 @@ enum class RewardSource(
 ) {
     AD_WATCH("광고 시청"),
     ACHIEVEMENT("업적 달성"),
+    MISSION("이벤트 달성"),
 }

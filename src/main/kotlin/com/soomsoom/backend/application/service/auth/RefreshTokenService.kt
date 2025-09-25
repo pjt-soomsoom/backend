@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -59,7 +60,7 @@ class RefreshTokenService(
         eventPublisher.publishEvent(
             Event(
                 eventType = EventType.USER_AUTHENTICATED,
-                payload = UserAuthenticatedPayload(userId = user.id!!)
+                payload = UserAuthenticatedPayload(userId = user.id!!, authenticatedAt = LocalDateTime.now())
             )
         )
 
