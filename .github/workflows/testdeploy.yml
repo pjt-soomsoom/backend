@@ -80,6 +80,9 @@ jobs:
 
           # Google Admob Path
             echo "reward-ad.base-path=${{ secrets.REWARD_AD_BASE_PATH }}" >> ./src/main/resources/application.properties
+
+          # First Visit Page
+            echo "mission.page-visit.identifier.yawoongi=${{ secrets.MISSION_PAGE_VISIT_IDENTIFIER_YAWOONGI }}" >>./src/main/resources/application.properties
       - name: Create firebase directory
         run: mkdir -p src/main/resources/firebase
 
