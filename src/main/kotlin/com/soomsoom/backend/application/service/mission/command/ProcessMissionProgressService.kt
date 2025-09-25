@@ -6,6 +6,8 @@ import com.soomsoom.backend.application.port.out.mission.MissionPort
 import com.soomsoom.backend.application.service.mission.strategy.MissionProcessingStrategyLocator
 import com.soomsoom.backend.common.event.Payload
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
+import com.soomsoom.backend.common.event.payload.DiaryCreatedPayload
+import com.soomsoom.backend.common.event.payload.FirstConnectionPayload
 import com.soomsoom.backend.common.event.payload.PageVisitedPayload
 import com.soomsoom.backend.common.event.payload.UserAuthenticatedPayload
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
@@ -40,7 +42,7 @@ class ProcessMissionProgressService(
 
     private fun mapPayloadToMissionTypes(payload: Payload): List<MissionType> {
         return when (payload) {
-            is UserAuthenticatedPayload -> listOf(MissionType.CONSECUTIVE_ATTENDANCE)
+            is FirstConnectionPayload -> listOf(MissionType.CONSECUTIVE_ATTENDANCE, MissionType.ATTENDANCE_COUNT)
             is ActivityCompletedPayload -> when (payload.activityType) {
                 ActivityType.BREATHING -> listOf(
                     MissionType.DAILY_BREATHING_COUNT,
@@ -48,6 +50,7 @@ class ProcessMissionProgressService(
                 )
                 else -> emptyList()
             }
+            is DiaryCreatedPayload -> listOf(MissionType.DIARY_COUNT)
             is PageVisitedPayload -> listOf(MissionType.FIRST_PAGE_VISIT)
             else -> emptyList()
         }

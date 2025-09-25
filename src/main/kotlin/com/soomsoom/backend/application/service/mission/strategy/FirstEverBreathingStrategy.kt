@@ -1,14 +1,16 @@
 package com.soomsoom.backend.application.service.mission.strategy
 
-import com.soomsoom.backend.application.port.`in`.mission.command.ClaimMissionRewardCommand
-import com.soomsoom.backend.application.port.`in`.mission.usecase.command.ClaimMissionRewardUseCase
 import com.soomsoom.backend.application.port.out.mission.MissionCompletionLogPort
+import com.soomsoom.backend.common.event.Event
+import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.Payload
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
+import com.soomsoom.backend.common.event.payload.MissionCompletedNotificationPayload
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.mission.model.aggregate.Mission
 import com.soomsoom.backend.domain.mission.model.entity.MissionCompletionLog
 import com.soomsoom.backend.domain.mission.model.enums.MissionType
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -19,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class FirstEverBreathingStrategy(
     private val missionCompletionLogPort: MissionCompletionLogPort,
-    private val claimMissionRewardUseCase: ClaimMissionRewardUseCase,
+    private val eventPublisher: ApplicationEventPublisher,
 ) : MissionProcessingStrategy {
 
     override fun getMissionType(): MissionType = MissionType.FIRST_EVER_BREATHING
@@ -45,7 +47,19 @@ class FirstEverBreathingStrategy(
             // 완료 로그를 기록
             val log = MissionCompletionLog(userId = userId, missionId = mission.id, completedAt = now)
             missionCompletionLogPort.save(log)
-            claimMissionRewardUseCase.claimReward(ClaimMissionRewardCommand(userId, mission.id))
+            eventPublisher.publishEvent(
+                Event(
+                    eventType = EventType.MISSION_COMPLETED,
+                    payload = MissionCompletedNotificationPayload(
+                        userId = userId,
+                        missionId = mission.id,
+                        missionName = mission.title,
+                        title = mission.completionNotification.title,
+                        body = mission.completionNotification.body,
+                        reward = mission.reward
+                    )
+                )
+            )
         }
     }
 }

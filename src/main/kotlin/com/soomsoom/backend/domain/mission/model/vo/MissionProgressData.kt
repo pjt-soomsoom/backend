@@ -16,9 +16,9 @@ import java.time.LocalDateTime
 )
 @JsonSubTypes(
     JsonSubTypes.Type(value = AttendanceStreakProgress::class, name = "AttendanceStreakProgress"),
-    JsonSubTypes.Type(value = SimpleCountProgress::class, name = "SimpleCountProgress")
+    JsonSubTypes.Type(value = SimpleCountProgress::class, name = "SimpleCountProgress"),
+    JsonSubTypes.Type(value = DailyCountProgress::class, name = "DailyCountProgress")
 )
-@JsonTypeName("AttendanceStreakProgress")
 sealed interface MissionProgressData
 
 /**
@@ -36,6 +36,16 @@ data class AttendanceStreakProgress(
  * '횟수 카운트'가 필요한 미션의 진행 상태를 나타냅니다. (예: 호흡 5회 완료)
  * @property count 현재까지 달성한 횟수
  */
+@JsonTypeName("AttendanceStreakProgress")
 data class SimpleCountProgress(
     val count: Int,
+) : MissionProgressData
+
+/**
+ * 하루에 한 번만 카운트하는 '누적 횟수' 미션의 진행 상태 (예: 누적 출석)
+ */
+@JsonTypeName("DailyCountProgress")
+data class DailyCountProgress(
+    val count: Int,
+    val lastTimestamp: LocalDateTime?,
 ) : MissionProgressData

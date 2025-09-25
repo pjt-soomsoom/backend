@@ -6,6 +6,8 @@ package com.soomsoom.backend.domain.mission.model.enums
  */
 enum class MissionType {
     CONSECUTIVE_ATTENDANCE, // 연속 출석
+    ATTENDANCE_COUNT, // 출석 횟수
+    DIARY_COUNT, // 마음 일기 작성 횟수
     DAILY_BREATHING_COUNT, // 일일 호흡 횟수
     FIRST_EVER_BREATHING, // 생애 첫 호흡
     FIRST_PAGE_VISIT, // 페이지 첫 방문

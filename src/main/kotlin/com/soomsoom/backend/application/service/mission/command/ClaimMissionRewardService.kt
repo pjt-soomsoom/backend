@@ -17,6 +17,7 @@ import com.soomsoom.backend.domain.mission.MissionErrorCode
 import com.soomsoom.backend.domain.mission.model.enums.ClaimType
 import com.soomsoom.backend.domain.reward.model.RewardSource
 import com.soomsoom.backend.domain.reward.model.RewardType
+import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -35,18 +36,22 @@ class ClaimMissionRewardService(
     private val itemPort: ItemPort,
 ) : ClaimMissionRewardUseCase {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
     override fun claimReward(command: ClaimMissionRewardCommand): ClaimMissionRewardResult {
         val mission = missionPort.findById(command.missionId)
             ?: throw SoomSoomException(MissionErrorCode.NOT_FOUND)
 
         val businessDay = dateHelper.getBusinessDay(LocalDateTime.now())
 
+        logger.info("userId = {}, missionId = {}", command.userId, command.missionId)
         val log = missionCompletionLogPort.findCompletedButUnrewardedLog(
             userId = command.userId,
             missionId = command.missionId,
             from = businessDay.start,
             to = businessDay.end
         ) ?: throw SoomSoomException(MissionErrorCode.NOT_COMPLETED)
+
+        logger.info("log = {}", log)
 
         // MissionReward VO로부터 RewardType을 결정
         val rewardType = when {

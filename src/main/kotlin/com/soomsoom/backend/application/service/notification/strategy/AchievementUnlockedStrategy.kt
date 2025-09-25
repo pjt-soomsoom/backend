@@ -1,9 +1,12 @@
 package com.soomsoom.backend.application.service.notification.strategy
 
+import com.soomsoom.backend.application.port.out.achievement.AchievementPort
 import com.soomsoom.backend.application.port.out.notification.NotificationPort
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.payload.AchievementAchievedNotificationPayload
+import com.soomsoom.backend.common.exception.SoomSoomException
+import com.soomsoom.backend.domain.achievement.AchievementErrorCode
 import com.soomsoom.backend.domain.notification.model.enums.NotificationType
 import com.soomsoom.backend.domain.notification.model.vo.NotificationMessage
 import org.slf4j.LoggerFactory
@@ -13,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class AchievementUnlockedStrategy(
     private val notificationPort: NotificationPort,
+    private val achievementPort: AchievementPort,
 ) : NotificationStrategy<AchievementAchievedNotificationPayload> {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -28,6 +32,8 @@ class AchievementUnlockedStrategy(
     @Transactional
     override fun execute(event: Event<AchievementAchievedNotificationPayload>) {
         val payload = event.payload
+        val achievement = achievementPort.findById(payload.achievementId)
+            ?: throw SoomSoomException(AchievementErrorCode.NOT_FOUND)
 
         log.info("업적 달성 처리 시작, achievementName = ${payload.achievementName}")
 
@@ -36,11 +42,14 @@ class AchievementUnlockedStrategy(
             title = payload.title,
             body = payload.body,
             badgeCount = 0,
-            payload = mapOf(
-                "notificationType" to NotificationType.ACHIEVEMENT_UNLOCKED.name,
-                "achievementId" to payload.achievementId.toString(),
-                "achievementGrade" to payload.achievementGrade.name
-            )
+            payload = buildMap {
+                put("notificationType", NotificationType.ACHIEVEMENT_UNLOCKED.name)
+                put("achievementId", payload.achievementId.toString())
+                put("achievementGrade", payload.achievementGrade.name)
+                if (achievement.hasReward) {
+                    put("points", achievement.reward!!.points.toString())
+                }
+            }
         )
 
         log.info("업적 달성 메시지 송신 요청, title = $payload.title")

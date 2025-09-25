@@ -52,4 +52,7 @@ enum class EventType {
 
     // 페이지 방문 이벤트
     PAGE_VISITED,
+
+    // 미션(이벤트) 완료
+    MISSION_COMPLETED,
 }
