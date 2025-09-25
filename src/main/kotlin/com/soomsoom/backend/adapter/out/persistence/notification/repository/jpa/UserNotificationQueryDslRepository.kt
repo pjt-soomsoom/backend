@@ -147,15 +147,6 @@ class UserNotificationQueryDslRepository(
 
     fun findUserNotificationPushQueryResults(pageable: Pageable): List<UserNotificationPushQueryResult> {
         // 1단계: 페이징 조건에 맞는 대상 userId 목록만 먼저 조회하는 서브쿼리
-        val userIdsSubquery = queryFactory
-            .select(userJpaEntity.id)
-            .from(userJpaEntity)
-            .where(userJpaEntity.deletedAt.isNull)
-            .orderBy(userJpaEntity.id.asc())
-            .offset(pageable.offset)
-            .limit(pageable.pageSize.toLong())
-
-        // 2단계: 위에서 찾은 userId 목록에 대해서만 JOIN과 집계를 수행하는 메인 쿼리
         return queryFactory
             .select(
                 QUserNotificationPushQueryResult(
@@ -171,7 +162,7 @@ class UserNotificationQueryDslRepository(
                         )
                         .otherwise(1) // 설정이 없는 경우 기본값 true(1)
                         .eq(1),
-                    userAnnouncementJpaEntity.count().intValue()
+                    userAnnouncementJpaEntity.countDistinct().intValue() // count() -> countDistinct()
                 )
             )
             .from(userJpaEntity)
@@ -179,16 +170,14 @@ class UserNotificationQueryDslRepository(
             .on(userJpaEntity.id.eq(userNotificationSettingJpaEntity.userId))
             .leftJoin(userAnnouncementJpaEntity).on(
                 userAnnouncementJpaEntity.userId.eq(userJpaEntity.id),
-                userAnnouncementJpaEntity.read.isFalse, // isRead -> read
+                userAnnouncementJpaEntity.read.isFalse,
                 userAnnouncementJpaEntity.deletedAt.isNull
             )
-            // [핵심 개선] 조회 대상을 페이징된 userId로 한정
-            .where(userJpaEntity.id.`in`(userIdsSubquery))
-            .groupBy(
-                userJpaEntity.id,
-                userNotificationSettingJpaEntity.soomsoomNewsNotificationEnabled
-            )
+            .where(userJpaEntity.deletedAt.isNull) // 쿼리 조건은 여기에
+            .groupBy(userJpaEntity.id) // GROUP BY는 userId로만
             .orderBy(userJpaEntity.id.asc())
+            .offset(pageable.offset) // ✅ 메인 쿼리에 offset 적용
+            .limit(pageable.pageSize.toLong()) // ✅ 메인 쿼리에 limit 적용
             .fetch()
     }
 

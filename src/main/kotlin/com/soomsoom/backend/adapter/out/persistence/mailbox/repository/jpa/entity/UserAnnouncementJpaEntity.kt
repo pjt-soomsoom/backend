@@ -15,10 +15,10 @@ import java.time.LocalDateTime
     name = "user_announcements",
     indexes = [
         // userId로 조회 후 receivedAt으로 정렬하는 페이징 쿼리 최적화
-        Index(name = "idx_ua_user_received", columnList = "user_id, received_at DESC"),
+        Index(name = "idx_ua_user_received", columnList = "user_id, received_at"),
 
         // 안 읽은 개수 카운트 쿼리에 완벽하게 최적화된 인덱스
-        Index(name = "idx_user_announcements_unread", columnList = "user_id, read, deleted_at"),
+        Index(name = "idx_user_announcements_unread", columnList = "user_id, `read`, deleted_at"),
 
         // announcementId로 일괄 삭제하는 쿼리 최적화
         Index(name = "idx_user_announcements_announcement_id", columnList = "announcement_id")
@@ -34,6 +34,8 @@ class UserAnnouncementJpaEntity(
 
     @Column(name = "announcement_id")
     val announcementId: Long,
+
+    @Column(name = "`read`")
     var read: Boolean,
 
     @Column(name = "received_at")

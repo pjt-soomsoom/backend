@@ -112,6 +112,17 @@ create table announcements (
                                primary key (id)
 ) engine=InnoDB;
 
+create table app_versions (
+                              force_update bit not null,
+                              created_at datetime(6) not null,
+                              deleted_at datetime(6),
+                              id bigint not null auto_increment,
+                              modified_at datetime(6),
+                              version_name varchar(255) not null,
+                              os enum ('ANDROID','IOS') not null,
+                              primary key (id)
+) engine=InnoDB;
+
 create table banners (
                          active bit not null,
                          display_order integer not null,
@@ -262,6 +273,38 @@ create table message_variations (
                                     primary key (id)
 ) engine=InnoDB;
 
+create table mission_completion_logs (
+                                         completed_at datetime(6) not null,
+                                         created_at datetime(6) not null,
+                                         deleted_at datetime(6),
+                                         id bigint not null auto_increment,
+                                         mission_id bigint not null,
+                                         modified_at datetime(6),
+                                         rewarded_at datetime(6),
+                                         user_id bigint not null,
+                                         primary key (id)
+) engine=InnoDB;
+
+create table missions (
+                          points integer,
+                          target_value integer not null,
+                          created_at datetime(6) not null,
+                          deleted_at datetime(6),
+                          id bigint not null auto_increment,
+                          item_id bigint,
+                          modified_at datetime(6),
+                          completion_notification_body varchar(255) not null,
+                          completion_notification_title varchar(255) not null,
+                          description varchar(255) not null,
+                          reward_notification_body varchar(255),
+                          reward_notification_title varchar(255),
+                          title varchar(255) not null,
+                          claim_type enum ('AUTOMATIC','MANUAL') not null,
+                          repeatable_type enum ('DAILY','NONE','WEEKLY') not null,
+                          type enum ('ATTENDANCE_COUNT','CONSECUTIVE_ATTENDANCE','DAILY_BREATHING_COUNT','DIARY_COUNT','FIRST_EVER_BREATHING','FIRST_PAGE_VISIT') not null,
+                          primary key (id)
+) engine=InnoDB;
+
 create table notification_histories (
                                         clicked_at datetime(6),
                                         created_at datetime(6) not null,
@@ -282,7 +325,7 @@ create table notification_templates (
                                         id bigint not null auto_increment,
                                         modified_at datetime(6),
                                         description varchar(255),
-                                        type enum ('ACHIEVEMENT_UNLOCKED','DIARY_REMINDER','NEWS_UPDATE','REWARD_ACQUIRED','RE_ENGAGEMENT') not null,
+                                        type enum ('ACHIEVEMENT_UNLOCKED','DIARY_REMINDER','MISSION_COMPLETED','NEWS_UPDATE','REWARD_ACQUIRED','RE_ENGAGEMENT') not null,
                                         primary key (id)
 ) engine=InnoDB;
 
@@ -362,7 +405,7 @@ create table user_activity_summary (
 ) engine=InnoDB;
 
 create table user_announcements (
-                                    `read` bit not null,
+                                    `read` bit,
                                     announcement_id bigint,
                                     created_at datetime(6) not null,
                                     deleted_at datetime(6),
@@ -388,6 +431,17 @@ create table user_devices (
 create table user_equipped_collections (
                                            collection_id bigint,
                                            user_id bigint not null
+) engine=InnoDB;
+
+create table user_mission_progress (
+                                       created_at datetime(6) not null,
+                                       deleted_at datetime(6),
+                                       id bigint not null auto_increment,
+                                       mission_id bigint not null,
+                                       modified_at datetime(6),
+                                       user_id bigint not null,
+                                       progress_data json not null,
+                                       primary key (id)
 ) engine=InnoDB;
 
 create table user_notification_settings (
@@ -487,6 +541,9 @@ alter table ad_reward_logs
 create index idx_announcements_deleted_at
     on announcements (deleted_at);
 
+create index idx_app_versions_os_created_at
+    on app_versions (os, created_at);
+
 create index idx_banners_active_deleted_order
     on banners (active, deleted_at, display_order);
 
@@ -529,6 +586,12 @@ alter table items
 create index idx_mv_notification_templates_id
     on message_variations (notification_templates_id);
 
+create index idx_mission_log_user_mission_completed
+    on mission_completion_logs (user_id, mission_id, completed_at);
+
+create index idx_mission_type_deleted_at
+    on missions (type, deleted_at);
+
 create index idx_nh_user_sent_at
     on notification_histories (user_id, sent_at desc);
 
@@ -560,7 +623,7 @@ alter table user_activity_summary
     add constraint UK2hy0knhpjdqu9dro0jyf8higj unique (user_id);
 
 create index idx_ua_user_received
-    on user_announcements (user_id, received_at desc);
+    on user_announcements (user_id, received_at);
 
 create index idx_user_announcements_unread
     on user_announcements (user_id, `read`, deleted_at);
@@ -573,6 +636,9 @@ create index idx_user_devices_user_id
 
 alter table user_devices
     add constraint UKo6vhn2gmiutbtiqk0ljgt5us0 unique (fcm_token);
+
+alter table user_mission_progress
+    add constraint uk_user_mission_progress_user_mission unique (user_id, mission_id);
 
 create index idx_uns_diary_reminder
     on user_notification_settings (diary_notification_enabled, diary_notification_time);
