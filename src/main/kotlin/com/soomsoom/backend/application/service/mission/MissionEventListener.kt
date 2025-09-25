@@ -38,7 +38,6 @@ class MissionEventListener(
         processMissionProgressUseCase.process(ProcessMissionProgressCommand(event.payload))
     }
 
-
     /**
      * 사용자가 인증(로그인/앱 접속)할 때 발생하는 이벤트를 처리합니다.
      * '연속 출석' 미션의 트리거가 됩니다.

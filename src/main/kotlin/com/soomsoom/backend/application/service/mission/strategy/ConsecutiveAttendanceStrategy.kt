@@ -7,7 +7,6 @@ import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.Payload
 import com.soomsoom.backend.common.event.payload.FirstConnectionPayload
 import com.soomsoom.backend.common.event.payload.MissionCompletedNotificationPayload
-import com.soomsoom.backend.common.event.payload.UserAuthenticatedPayload
 import com.soomsoom.backend.common.utils.DateHelper
 import com.soomsoom.backend.domain.mission.model.aggregate.Mission
 import com.soomsoom.backend.domain.mission.model.entity.MissionCompletionLog

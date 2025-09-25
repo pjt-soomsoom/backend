@@ -7,7 +7,6 @@ import com.soomsoom.backend.common.event.EventType
 import com.soomsoom.backend.common.event.Payload
 import com.soomsoom.backend.common.event.payload.FirstConnectionPayload
 import com.soomsoom.backend.common.event.payload.MissionCompletedNotificationPayload
-import com.soomsoom.backend.common.event.payload.UserAuthenticatedPayload
 import com.soomsoom.backend.common.utils.DateHelper
 import com.soomsoom.backend.domain.mission.model.aggregate.Mission
 import com.soomsoom.backend.domain.mission.model.entity.MissionCompletionLog
@@ -15,7 +14,6 @@ import com.soomsoom.backend.domain.mission.model.entity.UserMissionProgress
 import com.soomsoom.backend.domain.mission.model.enums.ClaimType
 import com.soomsoom.backend.domain.mission.model.enums.MissionType
 import com.soomsoom.backend.domain.mission.model.enums.RepeatableType
-import com.soomsoom.backend.domain.mission.model.vo.DailyCountProgress
 import com.soomsoom.backend.domain.mission.model.vo.SimpleCountProgress
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
@@ -33,7 +31,6 @@ class AttendanceCountStrategy(
     override fun getMissionType() = MissionType.ATTENDANCE_COUNT
 
     override fun process(mission: Mission, payload: Payload) {
-
         if (payload !is FirstConnectionPayload) return
 
         handleProgress(mission, payload) { progress ->

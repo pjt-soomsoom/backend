@@ -9,7 +9,6 @@ import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
 import com.soomsoom.backend.common.event.payload.DiaryCreatedPayload
 import com.soomsoom.backend.common.event.payload.FirstConnectionPayload
 import com.soomsoom.backend.common.event.payload.PageVisitedPayload
-import com.soomsoom.backend.common.event.payload.UserAuthenticatedPayload
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.mission.model.enums.MissionType
 import org.springframework.stereotype.Service
