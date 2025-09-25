@@ -1,6 +1,5 @@
 package com.soomsoom.backend.application.service.mission.strategy
 
-import com.soomsoom.backend.application.port.`in`.mission.command.ClaimMissionRewardCommand
 import com.soomsoom.backend.application.port.`in`.mission.usecase.command.ClaimMissionRewardUseCase
 import com.soomsoom.backend.application.port.out.mission.MissionCompletionLogPort
 import com.soomsoom.backend.common.event.Payload
@@ -49,8 +48,6 @@ class DailyBreathingCountStrategy(
             // 완료 로그를 기록
             val log = MissionCompletionLog(userId = userId, missionId = mission.id, completedAt = now)
             missionCompletionLogPort.save(log)
-
-            claimMissionRewardUseCase.claimReward(ClaimMissionRewardCommand(userId, mission.id))
         }
     }
 }

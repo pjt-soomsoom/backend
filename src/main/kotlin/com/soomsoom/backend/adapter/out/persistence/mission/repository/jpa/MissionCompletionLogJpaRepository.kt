@@ -5,7 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDateTime
 
 interface MissionCompletionLogJpaRepository : JpaRepository<MissionCompletionLogJpaEntity, Long> {
-    fun existsByUserIdAndMissionIdAndCompletedAtBetween(userId: Long, missionId: Long, from: LocalDateTime, to: LocalDateTime): Boolean
+    fun existsByUserIdAndMissionIdAndCompletedAtBetween(
+        userId: Long,
+        missionId: Long,
+        from: LocalDateTime,
+        to: LocalDateTime,
+    ): Boolean
     fun findByUserIdAndMissionIdAndCompletedAtBetweenAndRewardedAtIsNull(
         userId: Long,
         missionId: Long,
@@ -13,4 +18,5 @@ interface MissionCompletionLogJpaRepository : JpaRepository<MissionCompletionLog
         to: LocalDateTime,
     ): MissionCompletionLogJpaEntity?
     fun existsByUserIdAndMissionId(userId: Long, missionId: Long): Boolean
+    fun existsByUserIdAndMissionIdAndRewardedAtIsNull(userId: Long, missionId: Long): Boolean
 }

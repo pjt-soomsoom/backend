@@ -1,5 +1,6 @@
 package com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa
 import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.CaseBuilder
 import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
@@ -32,6 +33,10 @@ class AchievementQueryDslRepository(
         criteria: FindMyAchievementsCriteria,
         pageable: Pageable,
     ): Page<AchievementWithProgressDto> {
+        val gradeOrderExpression = CaseBuilder()
+            .`when`(achievementJpaEntity.grade.eq(AchievementGrade.SPECIAL)).then(0)
+            .otherwise(1)
+
         val content = queryFactory
             .select(
                 QAchievementWithProgressDto(
@@ -54,7 +59,10 @@ class AchievementQueryDslRepository(
                 deletionStatusEq(criteria.deletionStatus),
                 hiddenFilter()
             )
-            .orderBy(*QueryDslSortUtil.toOrderSpecifiers(pageable.sort, AchievementJpaEntity::class.java).toTypedArray())
+            .orderBy(
+                gradeOrderExpression.asc(),
+                *QueryDslSortUtil.toOrderSpecifiers(pageable.sort, AchievementJpaEntity::class.java).toTypedArray()
+            )
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .fetch()

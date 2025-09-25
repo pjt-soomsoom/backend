@@ -15,7 +15,6 @@ import com.soomsoom.backend.common.utils.DateHelper
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.activityhistory.model.ActivityCompletionLog
-import com.soomsoom.backend.domain.mission.model.entity.MissionCompletionLog
 import com.soomsoom.backend.domain.mission.model.enums.MissionType
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.access.prepost.PreAuthorize
@@ -61,16 +60,18 @@ class CompleteActivityService(
                     businessDay.end
                 )
 
+                val findCompletedButUnrewardedLog = missionCompletionLogPort.findCompletedButUnrewardedLog(
+                    command.userId,
+                    mission.id,
+                    businessDay.start,
+                    businessDay.end
+                )
                 // 오늘 아직 완료하지 않았다면, 보상 가능 상태로 설정하고 '완료' 로그를 동기적으로 기록
-                if (!isCompletedToday) {
+                if (!isCompletedToday || findCompletedButUnrewardedLog != null) {
                     rewardableMissionInfo = ActivityCompleteResult.RewardableMissionInfo(
                         missionId = mission.id,
                         title = mission.title
                     )
-
-                    // Mission 완료 로그를 즉시 저장하여 중복 보상을 방지
-                    val missionLog = MissionCompletionLog(userId = command.userId, missionId = mission.id, completedAt = now)
-                    missionCompletionLogPort.save(missionLog)
                 }
             }
         }

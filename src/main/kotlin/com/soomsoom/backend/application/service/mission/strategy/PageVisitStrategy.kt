@@ -37,7 +37,7 @@ class PageVisitStrategy(
         val now = LocalDateTime.now()
 
         // 일회성 미션이므로, 전체 기간에 대해 이미 완료했는지 확인합니다.
-        val alreadyCompleted = missionCompletionLogPort.existsBy(userId, mission.id)
+        val alreadyCompleted = missionCompletionLogPort.exists(userId, mission.id)
         if (alreadyCompleted) return
 
         if (mission.targetValue == 1) {

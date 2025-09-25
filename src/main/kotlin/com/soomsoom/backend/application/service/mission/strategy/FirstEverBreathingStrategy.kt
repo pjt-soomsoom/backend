@@ -1,5 +1,7 @@
 package com.soomsoom.backend.application.service.mission.strategy
 
+import com.soomsoom.backend.application.port.`in`.mission.command.ClaimMissionRewardCommand
+import com.soomsoom.backend.application.port.`in`.mission.usecase.command.ClaimMissionRewardUseCase
 import com.soomsoom.backend.application.port.out.mission.MissionCompletionLogPort
 import com.soomsoom.backend.common.event.Payload
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class FirstEverBreathingStrategy(
     private val missionCompletionLogPort: MissionCompletionLogPort,
+    private val claimMissionRewardUseCase: ClaimMissionRewardUseCase,
 ) : MissionProcessingStrategy {
 
     override fun getMissionType(): MissionType = MissionType.FIRST_EVER_BREATHING
@@ -32,7 +35,7 @@ class FirstEverBreathingStrategy(
         val now = payload.completedAt
 
         // 전체 기간에 대해 이미 완료했는지 확인
-        val alreadyCompleted = missionCompletionLogPort.existsBy(userId, mission.id)
+        val alreadyCompleted = missionCompletionLogPort.exists(userId, mission.id)
         if (alreadyCompleted) return
 
         updateLogic()
@@ -42,7 +45,7 @@ class FirstEverBreathingStrategy(
             // 완료 로그를 기록
             val log = MissionCompletionLog(userId = userId, missionId = mission.id, completedAt = now)
             missionCompletionLogPort.save(log)
-            // TODO: 달성 알림 이벤트 발행
+            claimMissionRewardUseCase.claimReward(ClaimMissionRewardCommand(userId, mission.id))
         }
     }
 }

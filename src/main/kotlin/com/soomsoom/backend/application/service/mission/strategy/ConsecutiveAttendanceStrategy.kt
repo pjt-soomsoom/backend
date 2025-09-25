@@ -72,13 +72,13 @@ class ConsecutiveAttendanceStrategy(
         val userId = payload.userId
         val now = payload.authenticatedAt
 
-        // 1. [최적화] 이미 완료된 미션인지 먼저 확인합니다.
+        // 이미 완료된 미션인지 먼저 확인합니다.
         val alreadyCompleted = when (mission.repeatableType) {
             RepeatableType.DAILY -> {
                 val businessDay = dateHelper.getBusinessDay(now)
                 missionCompletionLogPort.existsByCompletedAtBetween(userId, mission.id, businessDay.start, businessDay.end)
             }
-            RepeatableType.NONE -> missionCompletionLogPort.existsBy(userId, mission.id)
+            RepeatableType.NONE -> missionCompletionLogPort.exists(userId, mission.id)
             RepeatableType.WEEKLY -> return
         }
         if (alreadyCompleted) return

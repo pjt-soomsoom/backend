@@ -18,7 +18,6 @@ import com.soomsoom.backend.domain.mission.model.enums.ClaimType
 import com.soomsoom.backend.domain.reward.model.RewardSource
 import com.soomsoom.backend.domain.reward.model.RewardType
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -36,7 +35,6 @@ class ClaimMissionRewardService(
     private val itemPort: ItemPort,
 ) : ClaimMissionRewardUseCase {
 
-    @PreAuthorize("hasRole('ADMIN') or #command.userId == authentication.principal.id")
     override fun claimReward(command: ClaimMissionRewardCommand): ClaimMissionRewardResult {
         val mission = missionPort.findById(command.missionId)
             ?: throw SoomSoomException(MissionErrorCode.NOT_FOUND)

@@ -26,5 +26,7 @@ interface MissionCompletionLogPort {
      * @param to 종료 시간 (LocalDateTime)
      */
     fun findCompletedButUnrewardedLog(userId: Long, missionId: Long, from: LocalDateTime, to: LocalDateTime): MissionCompletionLog?
-    fun existsBy(userId: Long, missionId: Long): Boolean
+    fun exists(userId: Long, missionId: Long): Boolean
+
+    fun existsWithUnrewarded(userId: Long, missionId: Long): Boolean
 }

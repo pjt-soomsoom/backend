@@ -29,9 +29,13 @@ class FindInstructorService(
     private val missionPort: MissionPort,
     private val missionCompletionLogPort: MissionCompletionLogPort,
     private val eventPublisher: ApplicationEventPublisher,
-    @Value("\${app.character.yawoongi.name}") private val yawoongiName: String,
     @Value("\${mission.page-visit.identifier.yawoongi}") private val yawoongiPageIdentifier: String,
 ) : FindInstructorByIdUseCase, SearchInstructorUseCase {
+
+    companion object {
+        private const val CHARACTER_NAME: String = "야웅이"
+    }
+    private val logger = org.slf4j.LoggerFactory.getLogger(javaClass)
 
     /**
      * ID로 강사 한 명을 조회
@@ -47,16 +51,17 @@ class FindInstructorService(
         var rewardableMissionInfo: FindInstructorResult.RewardableMissionInfo? = null
 
         // 조회한 강사가 '야웅이'인지 확인
-        if (instructor.name == yawoongiName) {
+        if (instructor.name == CHARACTER_NAME) {
             // '페이지 첫 방문' 타입의 미션 찾기
             val mission = missionPort.findByType(MissionType.FIRST_PAGE_VISIT)
             if (mission != null) {
                 // 이 사용자가 해당 미션을 아직 완료하지 않았는지 확인
-                val isCompleted = missionCompletionLogPort.existsBy(userId, mission.id)
-                if (!isCompleted) {
+                val isCompleted = missionCompletionLogPort.exists(userId, mission.id)
+                val isUnRewarded = missionCompletionLogPort.existsWithUnrewarded(userId, mission.id)
+
+                if (!isCompleted || isUnRewarded) {
                     // 완료하지 않았다면, 응답에 보상 가능 정보를 담음
                     rewardableMissionInfo = FindInstructorResult.RewardableMissionInfo(missionId = mission.id, title = mission.title)
-
                     // 비동기로 미션 완료 처리를 요청합니다.
                     val visitEvent = Event(
                         eventType = EventType.PAGE_VISITED, // 새로운 EventType 추가 필요

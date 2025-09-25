@@ -6,6 +6,7 @@ import com.soomsoom.backend.application.port.out.mission.MissionPort
 import com.soomsoom.backend.application.service.mission.strategy.MissionProcessingStrategyLocator
 import com.soomsoom.backend.common.event.Payload
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
+import com.soomsoom.backend.common.event.payload.PageVisitedPayload
 import com.soomsoom.backend.common.event.payload.UserAuthenticatedPayload
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.mission.model.enums.MissionType
