@@ -16,6 +16,7 @@ import com.soomsoom.backend.application.port.`in`.item.query.ItemSortCriteria
 import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedItemsCriteria
 import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.item.model.enums.AcquisitionType
+import com.soomsoom.backend.domain.item.model.enums.EquipSlot
 import com.soomsoom.backend.domain.item.model.enums.ItemType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -34,7 +35,8 @@ class ItemQueryDslRepository(
         val whereClause = handleDeletionStatus(criteria.deletionStatus)
             .and(itemTypeEq(criteria.itemType))
             .and(excludeOwned(criteria.userId, criteria.excludeOwned))
-            .and(itemJpaEntity.acquisitionType.eq(AcquisitionType.PURCHASE))
+            .and(acquisitionTypeEq(criteria.acquisitionType))
+            .and(equipSlotEq(criteria.equipSlot))
 
         val ids = fetchPaginatedItemIds(whereClause, criteria.sortCriteria, pageable)
 
@@ -82,6 +84,14 @@ class ItemQueryDslRepository(
             .fetchOne() ?: 0L
 
         return PageImpl(content, pageable, total)
+    }
+
+    private fun equipSlotEq(equipSlot: EquipSlot?): BooleanExpression? {
+        return if (equipSlot != null) itemJpaEntity.equipSlot.eq(equipSlot) else null
+    }
+
+    private fun acquisitionTypeEq(acquisitionType: AcquisitionType?): BooleanExpression? {
+        return if (acquisitionType != null) itemJpaEntity.acquisitionType.eq(acquisitionType) else null
     }
 
     private fun itemTypeEq(itemType: ItemType?): BooleanExpression? {

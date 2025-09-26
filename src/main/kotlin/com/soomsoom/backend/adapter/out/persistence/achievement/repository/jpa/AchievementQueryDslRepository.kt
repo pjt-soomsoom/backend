@@ -15,6 +15,7 @@ import com.soomsoom.backend.adapter.out.persistence.achievement.repository.jpa.e
 import com.soomsoom.backend.application.port.`in`.achievement.query.FindAllAchievementsCriteria
 import com.soomsoom.backend.application.port.`in`.achievement.query.FindMyAchievementsCriteria
 import com.soomsoom.backend.common.utils.QueryDslSortUtil
+import com.soomsoom.backend.domain.achievement.model.enums.AchievementCategory
 import com.soomsoom.backend.domain.achievement.model.enums.AchievementGrade
 import com.soomsoom.backend.domain.achievement.model.enums.AchievementStatusFilter
 import com.soomsoom.backend.domain.achievement.model.enums.ConditionType
@@ -126,7 +127,9 @@ class AchievementQueryDslRepository(
         val content = queryFactory
             .selectFrom(achievementJpaEntity)
             .where(
-                deletionStatusEq(criteria.deletionStatus)
+                deletionStatusEq(criteria.deletionStatus),
+                categoryEq(criteria.category),
+                achievementGradeEq(criteria.grade),
             )
             .orderBy(*QueryDslSortUtil.toOrderSpecifiers(pageable.sort, AchievementJpaEntity::class.java).toTypedArray())
             .offset(pageable.offset)
@@ -178,6 +181,13 @@ class AchievementQueryDslRepository(
             .fetch()
     }
 
+    private fun achievementGradeEq(grade: AchievementGrade?): BooleanExpression? {
+        return if (grade != null) achievementJpaEntity.grade.eq(grade) else null
+    }
+
+    private fun categoryEq(category: AchievementCategory?): BooleanExpression? {
+        return if (category != null) achievementJpaEntity.category.eq(category) else null
+    }
     private fun statusFilter(statusFilter: AchievementStatusFilter): BooleanExpression? {
         return when (statusFilter) {
             AchievementStatusFilter.ACHIEVED -> userAchievedJpaEntity.id.isNotNull

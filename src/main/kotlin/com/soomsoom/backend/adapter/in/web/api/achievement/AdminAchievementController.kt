@@ -10,6 +10,7 @@ import com.soomsoom.backend.application.port.`in`.achievement.usecase.command.Up
 import com.soomsoom.backend.application.port.`in`.achievement.usecase.query.FindAchievementByIdUseCase
 import com.soomsoom.backend.application.port.`in`.achievement.usecase.query.FindAllAchievementsUseCase
 import com.soomsoom.backend.domain.achievement.model.enums.AchievementCategory
+import com.soomsoom.backend.domain.achievement.model.enums.AchievementGrade
 import com.soomsoom.backend.domain.common.DeletionStatus
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -82,14 +83,16 @@ class AdminAchievementController(
     @Operation(summary = "전체 업적 목록 조회", description = "모든 업적 목록을 카테고리, 삭제 상태별로 필터링하여 조회합니다.")
     fun getAllAchievements(
         @Parameter(description = "업적 카테고리 필터")
-        @RequestParam(required = false)
-        category: AchievementCategory?,
+        @RequestParam(required = false) category: AchievementCategory?,
+        @RequestParam(required = false) achievementGrade: AchievementGrade?,
         @Parameter(description = "삭제 상태 필터 (ALL, ACTIVE, DELETED)")
         @RequestParam(required = false, defaultValue = "ALL")
         deletionStatus: DeletionStatus,
         pageable: Pageable,
     ): Page<AchievementDto> {
         val criteria = FindAllAchievementsCriteria(
+            category = category,
+            grade = achievementGrade,
             deletionStatus = deletionStatus
         )
         return findAllAchievementsUseCase.findAll(criteria, pageable)

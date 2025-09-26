@@ -25,6 +25,8 @@ import com.soomsoom.backend.application.port.`in`.item.usecase.command.item.Upda
 import com.soomsoom.backend.application.port.`in`.item.usecase.query.FindItemUseCase
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
 import com.soomsoom.backend.domain.common.DeletionStatus
+import com.soomsoom.backend.domain.item.model.enums.AcquisitionType
+import com.soomsoom.backend.domain.item.model.enums.EquipSlot
 import com.soomsoom.backend.domain.item.model.enums.ItemType
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -60,8 +62,10 @@ class ItemController(
     fun findItems(
         @RequestParam(required = false) itemType: ItemType?,
         @RequestParam(required = true) sort: ItemSortCriteria,
+        @RequestParam(required = false) equipSlot: EquipSlot?,
         @RequestParam(defaultValue = "false") excludeOwned: Boolean,
         @RequestParam(required = false) deletionStatus: DeletionStatus?,
+        @RequestParam(required = false) acquisitionType: AcquisitionType?,
         pageable: Pageable,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
     ): Page<ItemDto> {
@@ -71,6 +75,8 @@ class ItemController(
             sortCriteria = sort,
             excludeOwned = excludeOwned,
             pageable = pageable,
+            acquisitionType = acquisitionType,
+            equipSlot = equipSlot,
             deletionStatus = deletionStatus ?: DeletionStatus.ACTIVE
         )
 
