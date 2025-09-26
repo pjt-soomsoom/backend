@@ -129,7 +129,7 @@ class AchievementQueryDslRepository(
             .where(
                 deletionStatusEq(criteria.deletionStatus),
                 categoryEq(criteria.category),
-                achievementGradeEq(criteria.grade),
+                achievementGradeEq(criteria.grade)
             )
             .orderBy(*QueryDslSortUtil.toOrderSpecifiers(pageable.sort, AchievementJpaEntity::class.java).toTypedArray())
             .offset(pageable.offset)
