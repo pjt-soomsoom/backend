@@ -78,9 +78,9 @@ resource "aws_iam_policy" "github_actions" {
     policy = jsonencode({
         Version = "2012-10-17",
         Statement = [
+            # --- Terraform Backend 및 CI/CD 기본 권한 ---
             { Effect = "Allow", Action = ["ecr:GetAuthorizationToken", "ecr:BatchCheckLayerAvailability", "ecr:CompleteLayerUpload", "ecr:InitiateLayerUpload", "ecr:PutImage", "ecr:UploadLayerPart"], Resource = "*" },
             { Effect = "Allow", Action = ["s3:PutObject"], Resource = ["arn:aws:s3:::${var.project_name}-test-bucket/*", "arn:aws:s3:::${var.project_name}-prod-bucket/*"] },
-            { Effect = "Allow", Action = ["codedeploy:CreateDeployment"], Resource = "*" },
             {
                 Effect = "Allow",
                 Action = [
@@ -104,34 +104,19 @@ resource "aws_iam_policy" "github_actions" {
                 ],
                 Resource = "arn:aws:dynamodb:*:*:table/soomsoom-terraform-state-lock"
             },
+
+            # --- Terraform Apply를 위한 전체 인프라 관리 권한 ---
             {
                 Effect = "Allow",
                 Action = [
-                    # Terraform Plan을 위한 읽기 권한
-                    "iam:GetOpenIDConnectProvider",
-                    "iam:GetPolicy",
-                    "iam:GetPolicyVersion",
-                    "iam:GetRole",
-                    "iam:ListAttachedRolePolicies",
-                    "iam:ListRolePolicies",
-                    "iam:GetInstanceProfile",
-
-                    # Terraform Apply를 위한 IAM 리소스 관리 권한
-                    "iam:CreateRole",
-                    "iam:DeleteRole",
-                    "iam:AttachRolePolicy",
-                    "iam:DetachRolePolicy",
-                    "iam:CreateInstanceProfile",
-                    "iam:DeleteInstanceProfile",
-                    "iam:AddRoleToInstanceProfile",
-                    "iam:RemoveRoleFromInstanceProfile",
-                    "iam:TagRole",
-                    "iam:PassRole",
-
-                    # EC2, SSM, RDS 리소스 관리를 위한 전체 권한
+                    "iam:*",
                     "ec2:*",
                     "ssm:*",
-                    "rds:*"
+                    "rds:*",
+                    "codedeploy:*",
+                    "logs:*",
+                    "elasticloadbalancing:*",
+                    "autoscaling:*"
                 ],
                 Resource = "*"
             }
