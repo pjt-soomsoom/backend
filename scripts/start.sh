@@ -22,6 +22,12 @@ if [ "$EXISTING_CONTAINER_ID" ]; then
     docker stop $EXISTING_CONTAINER_ID
     docker rm $EXISTING_CONTAINER_ID
 fi
+echo "--- Docker Image Variables ---"
+echo "AWS Account ID: ${AWS_ACCOUNT_ID}"
+echo "AWS Region: ${AWS_REGION}"
+echo "Image Repo Name: ${IMAGE_REPO_NAME}"
+echo "Image Tag: ${IMAGE_TAG}"
+echo "------------------------------"
 
 # CI/CD 파이프라인에서 빌드하고 푸시한 새로운 버전의 Docker 이미지를 pull 합니다.
 docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
