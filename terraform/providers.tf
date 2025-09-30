@@ -23,4 +23,3 @@ provider "aws" {
   # profile = "soomsoom"
   region = "ap-northeast-2"
 }
-
