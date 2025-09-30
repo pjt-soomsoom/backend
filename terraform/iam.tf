@@ -107,13 +107,29 @@ resource "aws_iam_policy" "github_actions" {
             {
                 Effect = "Allow",
                 Action = [
+                    # Terraform Plan을 위한 읽기 권한
                     "iam:GetOpenIDConnectProvider",
                     "iam:GetPolicy",
-                    "iam:GetRole",
-                    "iam:ListRolePolicies",
                     "iam:GetPolicyVersion",
+                    "iam:GetRole",
                     "iam:ListAttachedRolePolicies",
-                    "ec2:DescribeAvailabilityZones"
+                    "iam:ListRolePolicies",
+
+                    # Terraform Apply를 위한 IAM 리소스 관리 권한
+                    "iam:CreateRole",
+                    "iam:DeleteRole",
+                    "iam:AttachRolePolicy",
+                    "iam:DetachRolePolicy",
+                    "iam:CreateInstanceProfile",
+                    "iam:DeleteInstanceProfile",
+                    "iam:AddRoleToInstanceProfile",
+                    "iam:RemoveRoleFromInstanceProfile",
+                    "iam:TagRole",
+                    "iam:PassRole",
+
+                    # EC2 및 SSM 리소스 관리를 위한 전체 권한
+                    "ec2:*",
+                    "ssm:*"
                 ],
                 Resource = "*"
             }
