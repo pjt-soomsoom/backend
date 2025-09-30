@@ -81,6 +81,15 @@ resource "aws_iam_policy" "github_actions" {
             { Effect = "Allow", Action = ["ecr:GetAuthorizationToken", "ecr:BatchCheckLayerAvailability", "ecr:CompleteLayerUpload", "ecr:InitiateLayerUpload", "ecr:PutImage", "ecr:UploadLayerPart"], Resource = "*" },
             { Effect = "Allow", Action = ["s3:PutObject"], Resource = ["arn:aws:s3:::${var.project_name}-test-bucket/*", "arn:aws:s3:::${var.project_name}-prod-bucket/*"] },
             { Effect = "Allow", Action = ["codedeploy:CreateDeployment"], Resource = "*" }
+            {
+                Effect = "Allow",
+                Action = [
+                    "s3:GetObject",
+                    "s3:PutObject",
+                    "s3:DeleteObject"
+                ],
+                Resource = "arn:aws:s3:::soomsoom-terraform-state-bucket/*"
+            }
         ]
     })
 }
