@@ -41,7 +41,6 @@ resource "aws_subnet" "private" {
 }
 
 # 라우팅 테이블
-
 resource "aws_route_table" "public" {
     vpc_id = aws_vpc.main.id
 
