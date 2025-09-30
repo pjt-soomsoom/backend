@@ -44,7 +44,7 @@ jobs:
               uses: aws-actions/configure-aws-credentials@v4
               with:
                   role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role
-                  aws-region: ${{ env.AWS_REGION }}
+                  aws-region: ap-northeast-2
 
             - name: Login to Amazon ECR
               id: login-ecr
