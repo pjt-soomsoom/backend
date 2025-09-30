@@ -23,7 +23,6 @@ repositories {
 
 dependencies {
 
-
     // actuator 추가
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
