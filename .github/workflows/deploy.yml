@@ -6,8 +6,9 @@ on:
     paths-ignore:
       - 'terraform/**'
       - 'README.md'
+  workflow_dispatch:
+
 env:
-  # 환경에 따라 다른 버킷 이름을 사용하도록 변수 추가
   PROD_S3_BUCKET_NAME: soomsoom-prod-bucket
   TEST_S3_BUCKET_NAME: soomsoom-test-bucket
   ECR_REPOSITORY: soomsoom-backend
@@ -18,13 +19,11 @@ permissions:
   contents: read
 
 jobs:
-  # 1. Build Job: 어떤 환경이든 동일한 Docker 이미지를 딱 한 번만 빌드합니다.
   build:
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.build-image.outputs.image_tag }}
 
-    # [수정] build 작업에도 environment를 명시하여 Secret 컨텍스트를 일치시킵니다.
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
 
@@ -32,7 +31,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # [수정] build 작업 시작 시 명시적으로 AWS 인증을 수행합니다.
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -51,7 +49,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -x test
 
-      # 이제 이 단계는 위에서 설정된 인증 정보를 자동으로 사용합니다.
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
@@ -66,9 +63,8 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-  # 2. Deploy Job: 빌드된 이미지를 특정 환경에 배포합니다.
   deploy:
-    needs: build # build job이 성공해야 실행됩니다.
+    needs: build
     runs-on: ubuntu-latest
 
     environment:
@@ -78,13 +74,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Configure AWS credentials using OIDC
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Set deployment variables based on branch
+      - name: Set deployment variables
         id: set-vars
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
@@ -97,15 +93,54 @@ jobs:
             echo "bucket_name=${{ env.TEST_S3_BUCKET_NAME }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Zip and upload to S3 for CodeDeploy
+      # [수정된 부분] IMAGE_REPO_NAME과 IMAGE_TAG를 모두 env.vars 파일에 저장합니다.
+      - name: Create env.vars file
         run: |
-          echo "IMAGE_TAG=${{ needs.build.outputs.image_tag }}" > env.vars
+          echo "IMAGE_REPO_NAME=${{ env.ECR_REPOSITORY }}" > env.vars
+          echo "IMAGE_TAG=${{ needs.build.outputs.image_tag }}" >> env.vars
+          echo "Environment variables file content:"
+          cat env.vars
+
+      - name: Prepare deployment package
+        run: |
+          chmod +x scripts/*.sh
           zip -r deploy.zip appspec.yml scripts/ env.vars
-          aws s3 cp deploy.zip s3://${{ steps.set-vars.outputs.bucket_name }}/soomsoom-backend/${{ needs.build.outputs.image_tag }}.zip
+          echo "Deployment package contents:"
+          unzip -l deploy.zip
+
+      - name: Upload to S3
+        run: |
+          S3_KEY="soomsoom-backend/${{ needs.build.outputs.image_tag }}.zip"
+          echo "Uploading to s3://${{ steps.set-vars.outputs.bucket_name }}/${S3_KEY}"
+          aws s3 cp deploy.zip s3://${{ steps.set-vars.outputs.bucket_name }}/${S3_KEY}
+          aws s3 ls s3://${{ steps.set-vars.outputs.bucket_name }}/soomsoom-backend/
 
       - name: Create CodeDeploy Deployment
+        id: create-deployment
         run: |
-          aws deploy create-deployment \
+          DEPLOYMENT_ID=$(aws deploy create-deployment \
             --application-name ${{ steps.set-vars.outputs.app_name }} \
             --deployment-group-name ${{ steps.set-vars.outputs.group_name }} \
-            --s3-location bucket=${{ steps.set-vars.outputs.bucket_name }},key=soomsoom-backend/${{ needs.build.outputs.image_tag }}.zip,bundleType=zip
+            --s3-location bucket=${{ steps.set-vars.outputs.bucket_name }},key=soomsoom-backend/${{ needs.build.outputs.image_tag }}.zip,bundleType=zip \
+            --query 'deploymentId' \
+            --output text)
+
+          echo "Deployment ID: ${DEPLOYMENT_ID}"
+          echo "deployment_id=${DEPLOYMENT_ID}" >> $GITHUB_OUTPUT
+
+      - name: Wait for deployment
+        run: |
+          echo "Waiting for deployment ${{ steps.create-deployment.outputs.deployment_id }} to complete..."
+
+          aws deploy wait deployment-successful \
+            --deployment-id ${{ steps.create-deployment.outputs.deployment_id }}
+
+          echo "✓ Deployment completed successfully!"
+
+      - name: Get deployment status
+        if: always()
+        run: |
+          aws deploy get-deployment \
+            --deployment-id ${{ steps.create-deployment.outputs.deployment_id }} \
+            --query 'deploymentInfo.status' \
+            --output text
