@@ -114,6 +114,7 @@ resource "aws_iam_policy" "github_actions" {
                     "iam:GetRole",
                     "iam:ListAttachedRolePolicies",
                     "iam:ListRolePolicies",
+                    "iam:GetInstanceProfile",
 
                     # Terraform Apply를 위한 IAM 리소스 관리 권한
                     "iam:CreateRole",
