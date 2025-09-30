@@ -30,6 +30,8 @@ jobs:
             # 2. Terraform CLI 설치
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v2
+              with:
+                  terraform_version: 1.8.5
 
             # 3. GitHub OIDC를 사용하여 AWS에 로그인
             - name: Configure AWS credentials
@@ -58,8 +60,8 @@ jobs:
                   TF_VAR_jpa_show_sql: ${{ secrets.JPA_SHOW_SQL }}
                   TF_VAR_jpa_format_sql: ${{ secrets.JPA_FORMAT_SQL }}
                   TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
-                  TF_VAR_jwt_access_expiration: ${{ secret.JWT_ACCESS_EXPIRATION }}
-                  TF_VAR_jwt_refresh_expiration: ${{ secret.JWT_REFRESH_EXPIRATION }}
+                  TF_VAR_jwt_access_expiration: ${{ secrets.JWT_ACCESS_EXPIRATION }}
+                  TF_VAR_jwt_refresh_expiration: ${{ secrets.JWT_REFRESH_EXPIRATION }}
                   TF_VAR_aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET }}
                   TF_VAR_aws_s3_base_url: ${{ secrets.AWS_S3_BASE_URL }}
                   TF_VAR_oauth_google_client_id: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
@@ -86,8 +88,8 @@ jobs:
                   TF_VAR_jpa_show_sql: ${{ secrets.JPA_SHOW_SQL }}
                   TF_VAR_jpa_format_sql: ${{ secrets.JPA_FORMAT_SQL }}
                   TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
-                  TF_VAR_jwt_access_expiration: ${{ secret.JWT_ACCESS_EXPIRATION }}
-                  TF_VAR_jwt_refresh_expiration: ${{ secret.JWT_REFRESH_EXPIRATION }}
+                  TF_VAR_jwt_access_expiration: ${{ secrets.JWT_ACCESS_EXPIRATION }}
+                  TF_VAR_jwt_refresh_expiration: ${{ secrets.JWT_REFRESH_EXPIRATION }}
                   TF_VAR_aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET }}
                   TF_VAR_aws_s3_base_url: ${{ secrets.AWS_S3_BASE_URL }}
                   TF_VAR_oauth_google_client_id: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
