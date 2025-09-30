@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
         condition {
             test     = "StringLike"
             variable = "token.actions.githubusercontent.com:sub"
-            values   = ["repo:${var.github_repo}:ref:refs/heads/main", "repo:${var.github_repo}:ref:refs/heads/release"]
+            values   = ["repo:${var.github_repo}:environment:prod", "repo:${var.github_repo}:environment:test"]
         }
     }
 }
@@ -70,6 +70,7 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
 resource "aws_iam_role" "github_actions" {
     name               = "${var.project_name}-github-actions-role"
     assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role.json
+    max_session_duration = 10800
 }
 
 resource "aws_iam_policy" "github_actions" {

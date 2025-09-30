@@ -14,13 +14,13 @@ terraform {
       region         = "ap-northeast-2"
       dynamodb_table = "soomsoom-terraform-state-lock"   # 1단계에서 만든 DynamoDB 테이블 이름
       encrypt        = true
-      profile        = "soomsoom"
+      # profile        = "soomsoom"
   }
 }
 
 # 사용할 AWS 리전을 설정합니다.
 provider "aws" {
-  profile = "soomsoom"
+  # profile = "soomsoom"
   region = "ap-northeast-2"
 }
 
