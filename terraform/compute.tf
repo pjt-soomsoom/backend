@@ -26,6 +26,7 @@ resource "aws_launch_template" "main" {
               EOF
     )
 
+
     tags = {
         Name = "${var.project_name}-lt-${var.environment}"
     }

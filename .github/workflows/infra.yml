@@ -32,12 +32,35 @@ jobs:
               uses: hashicorp/setup-terraform@v2
               with:
                   terraform_version: 1.8.5
-
             - name: Print GitHub Context
               run: |
                echo "Repository Name seen by this workflow:"
                echo "${{ github.repository }}"
                echo "-------------------------------------------"
+
+            - name: Get GitHub OIDC Token
+              id: get_token
+              uses: actions/github-script@v6
+              with:
+                script: |
+                  const token = await core.getIDToken('sts.amazonaws.com');
+                  core.setOutput('token', token);
+
+            - name: Debug AWS OIDC
+              run: |
+                echo "Step 1: Decoding OIDC Token to check its contents"
+                TOKEN_PAYLOAD=$(echo "${{ steps.get_token.outputs.token }}" | cut -d. -f2 | base64 --decode)
+                echo "Token Issuer (iss): $(echo $TOKEN_PAYLOAD | jq -r .iss)"
+                echo "Token Subject (sub): $(echo $TOKEN_PAYLOAD | jq -r .sub)"
+                echo "Token Audience (aud): $(echo $TOKEN_PAYLOAD | jq -r .aud)"
+
+                echo "-------------------------------------------"
+                echo "Step 2: Manually trying to assume role using the token"
+                aws sts assume-role-with-web-identity \
+                  --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role \
+                  --role-session-name GHA-Debug-Session \
+                  --web-identity-token "${{ steps.get_token.outputs.token }}" \
+                  --duration-seconds 10800
             # 3. GitHub OIDC를 사용하여 AWS에 로그인
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v4
