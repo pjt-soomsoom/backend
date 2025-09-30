@@ -80,7 +80,7 @@ resource "aws_iam_policy" "github_actions" {
         Statement = [
             { Effect = "Allow", Action = ["ecr:GetAuthorizationToken", "ecr:BatchCheckLayerAvailability", "ecr:CompleteLayerUpload", "ecr:InitiateLayerUpload", "ecr:PutImage", "ecr:UploadLayerPart"], Resource = "*" },
             { Effect = "Allow", Action = ["s3:PutObject"], Resource = ["arn:aws:s3:::${var.project_name}-test-bucket/*", "arn:aws:s3:::${var.project_name}-prod-bucket/*"] },
-            { Effect = "Allow", Action = ["codedeploy:CreateDeployment"], Resource = "*" }
+            { Effect = "Allow", Action = ["codedeploy:CreateDeployment"], Resource = "*" },
             {
                 Effect = "Allow",
                 Action = [
