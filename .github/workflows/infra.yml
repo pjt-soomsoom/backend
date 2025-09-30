@@ -46,7 +46,6 @@ jobs:
                   role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role
                   aws-region: ap-northeast-2
 
-
             # 4. Terraform 작업 디렉토리로 이동하여 초기화
             - name: Terraform Init
               run: terraform init
