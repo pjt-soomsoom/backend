@@ -41,6 +41,22 @@ jobs:
                   role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role
                   aws-region: ap-northeast-2
 
+            - name: Debug AWS OIDC
+              run: |
+                  echo "Step 1: Decoding OIDC Token to check its contents"
+                  TOKEN=$(echo $ACTIONS_ID_TOKEN_REQUEST_TOKEN | cut -d. -f2 | base64 --decode)
+                  echo "Token Issuer (iss): $(echo $TOKEN | jq -r .iss)"
+                  echo "Token Subject (sub): $(echo $TOKEN | jq -r .sub)"
+                  echo "Token Audience (aud): $(echo $TOKEN | jq -r .aud)"
+
+                  echo "Step 2: Manually trying to assume role using the token"
+                  aws sts assume-role-with-web-identity \
+                    --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role \
+                    --role-session-name GHA-Debug-Session \
+                    --web-identity-token $ACTIONS_ID_TOKEN_REQUEST_TOKEN \
+                    --duration-seconds 10800
+                  env:
+                      ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ steps.configure_aws_credentials.outputs.actions-id-token-request-token }}
             # 4. Terraform 작업 디렉토리로 이동하여 초기화
             - name: Terraform Init
               run: terraform init
