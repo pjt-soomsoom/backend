@@ -115,6 +115,7 @@ resource "aws_autoscaling_group" "prod" {
     }
 }
 
+
 resource "aws_instance" "test" {
     count = var.environment == "test" ? 1 : 0
 
