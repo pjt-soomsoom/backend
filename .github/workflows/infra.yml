@@ -1,142 +1,135 @@
 name: Manage Infrastructure with Terraform
 
 on:
-  push:
-    branches: [ "main", "release/**" ]
-    paths:
-      - 'terraform/**'
-  workflow_dispatch:
+    push:
+        branches: [ "main", "release/**" ]
+        # terraform 디렉토리 하위의 파일이 변경되었을 때만 이 워크플로우를 트리거
+        paths:
+            - 'terraform/**'
+    # 필요할 때 수동으로 직접 실행할 수도 있음
+    workflow_dispatch:
 
+# OIDC를 통해 AWS 임시 자격 증명을 요청하기 위한 권한 설정
 permissions:
-  id-token: write
-  contents: read
+    id-token: write
+    contents: read
 
 jobs:
-  terraform-apply:
-    runs-on: ubuntu-latest
+    terraform-apply:
+        runs-on: ubuntu-latest
 
-    environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
+        # main -> prod, release -> test
+        environment:
+            name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+        steps:
+            # 1. 소스 코드 체크아웃
+            - name: Checkout
+              uses: actions/checkout@v3
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.8.5
+            # 2. Terraform CLI 설치
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v2
+              with:
+                  terraform_version: 1.8.5
+            - name: Print GitHub Context
+              run: |
+               echo "Repository Name seen by this workflow:"
+               echo "${{ github.repository }}"
+               echo "-------------------------------------------"
 
-      - name: Print GitHub Context
-        run: |
-          echo "Repository Name: ${{ github.repository }}"
-          echo "Branch: ${{ github.ref }}"
-          echo "Environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}"
+            - name: Get GitHub OIDC Token
+              id: get_token
+              uses: actions/github-script@v6
+              with:
+                script: |
+                  const token = await core.getIDToken('sts.amazonaws.com');
+                  core.setOutput('token', token);
 
-      - name: Get GitHub OIDC Token
-        id: get_token
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const token = await core.getIDToken('sts.amazonaws.com');
-            core.setOutput('token', token);
+            - name: Debug AWS OIDC
+              run: |
+                echo "Step 1: Decoding OIDC Token to check its contents"
+                TOKEN_PAYLOAD=$(echo "${{ steps.get_token.outputs.token }}" | cut -d. -f2 | base64 --decode)
+                echo "Token Issuer (iss): $(echo $TOKEN_PAYLOAD | jq -r .iss)"
+                echo "Token Subject (sub): $(echo $TOKEN_PAYLOAD | jq -r .sub)"
+                echo "Token Audience (aud): $(echo $TOKEN_PAYLOAD | jq -r .aud)"
 
-      - name: Debug AWS OIDC
-        env:
-          OIDC_TOKEN: ${{ steps.get_token.outputs.token }}
-        run: |
-          echo "Step 1: Decoding OIDC Token to check its contents"
-          # base64 -d 대신 -D 또는 --decode 옵션 사용 (OS에 따라 다름)
-          TOKEN_PAYLOAD=$(echo "$OIDC_TOKEN" | cut -d. -f2 | base64 -d 2>/dev/null || echo "$OIDC_TOKEN" | cut -d. -f2 | base64 --decode 2>/dev/null)
+                echo "-------------------------------------------"
+                echo "Step 2: Manually trying to assume role using the token"
+                aws sts assume-role-with-web-identity \
+                  --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role \
+                  --role-session-name GHA-Debug-Session \
+                  --web-identity-token "${{ steps.get_token.outputs.token }}" \
+                  --duration-seconds 10800
+            # 3. GitHub OIDC를 사용하여 AWS에 로그인
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  # GitHub Secrets에 저장된 AWS 계정 ID와 IAM Role 이름을 사용
+                  role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role
+                  aws-region: ap-northeast-2
 
-          if [ -n "$TOKEN_PAYLOAD" ]; then
-            echo "Token Issuer (iss): $(echo $TOKEN_PAYLOAD | jq -r .iss)"
-            echo "Token Subject (sub): $(echo $TOKEN_PAYLOAD | jq -r .sub)"
-            echo "Token Audience (aud): $(echo $TOKEN_PAYLOAD | jq -r .aud)"
-          else
-            echo "Failed to decode token payload"
-          fi
 
-          echo "-------------------------------------------"
-          echo "Step 2: Manually trying to assume role using the token"
-          aws sts assume-role-with-web-identity \
-            --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role \
-            --role-session-name GHA-Debug-Session \
-            --web-identity-token "$OIDC_TOKEN" \
-            --duration-seconds 10800 || echo "AssumeRole failed - this is expected if role trust policy needs adjustment"
+            # 4. Terraform 작업 디렉토리로 이동하여 초기화
+            - name: Terraform Init
+              run: terraform init
+              working-directory: ./terraform
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role
-          aws-region: ap-northeast-2
-          role-duration-seconds: 10800
+            # 5. Terraform Plan을 실행하여 변경 사항을 미리 확인
+            - name: Terraform Plan
+              id: plan
+              run: terraform plan -no-color
+              working-directory: ./terraform
+              env:
+                  TF_VAR_environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
+                  TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+                  TF_VAR_db_username: ${{ secrets.DB_USERNAME }}
+                  TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+                  TF_VAR_db_driver_class_name: ${{ secrets.DB_DRIVER_CLASS_NAME }}
+                  TF_VAR_jpa_ddl_auto: ${{ secrets.JPA_DDL_AUTO }}
+                  TF_VAR_jpa_show_sql: ${{ secrets.JPA_SHOW_SQL }}
+                  TF_VAR_jpa_format_sql: ${{ secrets.JPA_FORMAT_SQL }}
+                  TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
+                  TF_VAR_jwt_access_expiration: ${{ secrets.JWT_ACCESS_EXPIRATION }}
+                  TF_VAR_jwt_refresh_expiration: ${{ secrets.JWT_REFRESH_EXPIRATION }}
+                  TF_VAR_aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET }}
+                  TF_VAR_aws_s3_base_url: ${{ secrets.AWS_S3_BASE_URL }}
+                  TF_VAR_oauth_google_client_id: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
+                  TF_VAR_oauth_apple_client_id: ${{ secrets.OAUTH_APPLE_CLIENT_ID }}
+                  TF_VAR_firebase_service_account_json: ${{ secrets.FIREBASE_JSON }}
+                  TF_VAR_app_daily_cutoff_hour: ${{ secrets.APP_DAILY_CUTOFF_HOUR }}
+                  TF_VAR_diary_default_time: ${{ secrets.DIARY_DEFAULT_TIME }}
+                  TF_VAR_alarm_inactive_user_default_time: ${{ secrets.ALARM_INACTIVE_USER_DEFAULT_TIME }}
+                  TF_VAR_alarm_batch_size: ${{ secrets.ALARM_BATCH_SIZE }}
+                  TF_VAR_reward_ad_base_path: ${{ secrets.REWARD_AD_BASE_PATH }}
+                  TF_VAR_mission_page_visit_identifier_yawoongi: ${{ secrets.MISSION_PAGE_VISIT_IDENTIFIER_YAWOONGI }}
+                  TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
 
-      - name: Verify AWS credentials
-        run: |
-          echo "Current AWS Identity:"
-          aws sts get-caller-identity
-          echo "-------------------------------------------"
-          echo "Testing S3 access:"
-          aws s3 ls s3://soomsoom-terraform-state-bucket/ || echo "S3 access failed"
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: ./terraform
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color
-        working-directory: ./terraform
-        env:
-          TF_VAR_environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
-          TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
-          TF_VAR_db_username: ${{ secrets.DB_USERNAME }}
-          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
-          TF_VAR_db_driver_class_name: ${{ secrets.DB_DRIVER_CLASS_NAME }}
-          TF_VAR_jpa_ddl_auto: ${{ secrets.JPA_DDL_AUTO }}
-          TF_VAR_jpa_show_sql: ${{ secrets.JPA_SHOW_SQL }}
-          TF_VAR_jpa_format_sql: ${{ secrets.JPA_FORMAT_SQL }}
-          TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
-          TF_VAR_jwt_access_expiration: ${{ secrets.JWT_ACCESS_EXPIRATION }}
-          TF_VAR_jwt_refresh_expiration: ${{ secrets.JWT_REFRESH_EXPIRATION }}
-          TF_VAR_aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET }}
-          TF_VAR_aws_s3_base_url: ${{ secrets.AWS_S3_BASE_URL }}
-          TF_VAR_oauth_google_client_id: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
-          TF_VAR_oauth_apple_client_id: ${{ secrets.OAUTH_APPLE_CLIENT_ID }}
-          TF_VAR_firebase_service_account_json: ${{ secrets.FIREBASE_JSON }}
-          TF_VAR_app_daily_cutoff_hour: ${{ secrets.APP_DAILY_CUTOFF_HOUR }}
-          TF_VAR_diary_default_time: ${{ secrets.DIARY_DEFAULT_TIME }}
-          TF_VAR_alarm_inactive_user_default_time: ${{ secrets.ALARM_INACTIVE_USER_DEFAULT_TIME }}
-          TF_VAR_alarm_batch_size: ${{ secrets.ALARM_BATCH_SIZE }}
-          TF_VAR_reward_ad_base_path: ${{ secrets.REWARD_AD_BASE_PATH }}
-          TF_VAR_mission_page_visit_identifier_yawoongi: ${{ secrets.MISSION_PAGE_VISIT_IDENTIFIER_YAWOONGI }}
-          TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-        working-directory: ./terraform
-        env:
-          TF_VAR_environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
-          TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
-          TF_VAR_db_username: ${{ secrets.DB_USERNAME }}
-          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
-          TF_VAR_db_driver_class_name: ${{ secrets.DB_DRIVER_CLASS_NAME }}
-          TF_VAR_jpa_ddl_auto: ${{ secrets.JPA_DDL_AUTO }}
-          TF_VAR_jpa_show_sql: ${{ secrets.JPA_SHOW_SQL }}
-          TF_VAR_jpa_format_sql: ${{ secrets.JPA_FORMAT_SQL }}
-          TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
-          TF_VAR_jwt_access_expiration: ${{ secrets.JWT_ACCESS_EXPIRATION }}
-          TF_VAR_jwt_refresh_expiration: ${{ secrets.JWT_REFRESH_EXPIRATION }}
-          TF_VAR_aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET }}
-          TF_VAR_aws_s3_base_url: ${{ secrets.AWS_S3_BASE_URL }}
-          TF_VAR_oauth_google_client_id: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
-          TF_VAR_oauth_apple_client_id: ${{ secrets.OAUTH_APPLE_CLIENT_ID }}
-          TF_VAR_firebase_service_account_json: ${{ secrets.FIREBASE_JSON }}
-          TF_VAR_app_daily_cutoff_hour: ${{ secrets.APP_DAILY_CUTOFF_HOUR }}
-          TF_VAR_diary_default_time: ${{ secrets.DIARY_DEFAULT_TIME }}
-          TF_VAR_alarm_inactive_user_default_time: ${{ secrets.ALARM_INACTIVE_USER_DEFAULT_TIME }}
-          TF_VAR_alarm_batch_size: ${{ secrets.ALARM_BATCH_SIZE }}
-          TF_VAR_reward_ad_base_path: ${{ secrets.REWARD_AD_BASE_PATH }}
-          TF_VAR_mission_page_visit_identifier_yawoongi: ${{ secrets.MISSION_PAGE_VISIT_IDENTIFIER_YAWOONGI }}
-          TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+            # 6. Terraform Apply를 실행하여 실제 인프라에 변경 사항을 적용
+            - name: Terraform Apply
+              run: terraform apply -auto-approve
+              working-directory: ./terraform
+              env:
+                  TF_VAR_environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
+                  TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+                  TF_VAR_db_username: ${{ secrets.DB_USERNAME }}
+                  TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+                  TF_VAR_db_driver_class_name: ${{ secrets.DB_DRIVER_CLASS_NAME }}
+                  TF_VAR_jpa_ddl_auto: ${{ secrets.JPA_DDL_AUTO }}
+                  TF_VAR_jpa_show_sql: ${{ secrets.JPA_SHOW_SQL }}
+                  TF_VAR_jpa_format_sql: ${{ secrets.JPA_FORMAT_SQL }}
+                  TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
+                  TF_VAR_jwt_access_expiration: ${{ secrets.JWT_ACCESS_EXPIRATION }}
+                  TF_VAR_jwt_refresh_expiration: ${{ secrets.JWT_REFRESH_EXPIRATION }}
+                  TF_VAR_aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET }}
+                  TF_VAR_aws_s3_base_url: ${{ secrets.AWS_S3_BASE_URL }}
+                  TF_VAR_oauth_google_client_id: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
+                  TF_VAR_oauth_apple_client_id: ${{ secrets.OAUTH_APPLE_CLIENT_ID }}
+                  TF_VAR_firebase_service_account_json: ${{ secrets.FIREBASE_JSON }}
+                  TF_VAR_app_daily_cutoff_hour: ${{ secrets.APP_DAILY_CUTOFF_HOUR }}
+                  TF_VAR_diary_default_time: ${{ secrets.DIARY_DEFAULT_TIME }}
+                  TF_VAR_alarm_inactive_user_default_time: ${{ secrets.ALARM_INACTIVE_USER_DEFAULT_TIME }}
+                  TF_VAR_alarm_batch_size: ${{ secrets.ALARM_BATCH_SIZE }}
+                  TF_VAR_reward_ad_base_path: ${{ secrets.REWARD_AD_BASE_PATH }}
+                  TF_VAR_mission_page_visit_identifier_yawoongi: ${{ secrets.MISSION_PAGE_VISIT_IDENTIFIER_YAWOONGI }}
+                  TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
