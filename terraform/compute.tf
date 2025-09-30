@@ -1,6 +1,6 @@
 resource "aws_launch_template" "main" {
     name_prefix = "${var.project_name}-${var.environment}-"
-    image_id = "ami-0c9c942bd7bf113a2" # Amazon Linux 2023 AMI(서울 리전 기준)
+    image_id = "ami-0a1a0bfc478c711eb" # Amazon Linux 2023 AMI(서울 리전 기준)
     instance_type = var.environment == "prod" ? "t4g.small" : "t2.micro"
 
     vpc_security_group_ids = [aws_security_group.app.id]
