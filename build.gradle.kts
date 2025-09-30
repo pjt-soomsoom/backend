@@ -23,6 +23,12 @@ repositories {
 
 dependencies {
 
+    // actuator 추가
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    // 환경 변수 관리를 위한 의존성 추가
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
+
     // 버전 관리를 위한 의존성 추가
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
 

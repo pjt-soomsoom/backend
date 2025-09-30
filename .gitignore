@@ -302,3 +302,28 @@ id_rsa
 # End of https://www.toptal.com/developers/gitignore/api/ssh
 
 src/main/resources/firebase/serviceAccountKey.json
+
+# 로컬 Terraform 상태 및 구성 파일
+terraform.tfstate
+terraform.tfstate.backup
+
+# Terraform이 자동으로 생성하는 잠금 파일 및 디렉터리
+.terraform.lock.hcl
+.terraform/
+
+# 크래시 로그 파일
+crash.log
+
+# 변수 파일 (민감한 정보 포함 가능성)
+*.tfvars
+*.tfvars.json
+
+# Override 파일
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI 구성 파일
+.terraformrc
+terraform.rc
