@@ -95,7 +95,6 @@ resource "aws_iam_policy" "github_actions" {
                 Action   = "s3:ListBucket",
                 Resource = "arn:aws:s3:::soomsoom-terraform-state-bucket"
             },
-
             {
                 Effect = "Allow",
                 Action = [
