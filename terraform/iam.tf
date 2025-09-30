@@ -129,3 +129,9 @@ resource "aws_iam_role_policy_attachment" "github_actions" {
     policy_arn = aws_iam_policy.github_actions.arn
 }
 
+resource "aws_iam_role_policy_attachment" "app_ecr" {
+    role       = aws_iam_role.app.name
+    policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+
