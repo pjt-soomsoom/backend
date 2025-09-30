@@ -36,55 +36,58 @@ resource "aws_codedeploy_deployment_group" "group" {
     deployment_group_name  = "${var.project_name}-${var.environment}-deploy-group"
     service_role_arn       = aws_iam_role.codedeploy.arn
 
-    # Auto Scaling 그룹을 배포 대상으로 지정 (prod 환경)
+    # 'prod' 환경에서는 Auto Scaling 그룹을 배포 대상으로 지정합니다.
     autoscaling_groups = var.environment == "prod" ? [aws_autoscaling_group.prod[0].name] : []
 
-    # EC2 인스턴스를 태그 기준으로 타겟팅 (test 환경)
-    ec2_tag_filter {
-        key   = "Name"
-        type  = "KEY_AND_VALUE"
-        value = "${var.project_name}-ec2-${var.environment}"
-    }
-
-    # 배포 방식 설정 (블루/그린) - 'prod' 환경에서만 적용
-    blue_green_deployment_config {
-        deployment_ready_option {
-            action_on_timeout = "CONTINUE_DEPLOYMENT"
-        }
-        terminate_blue_instances_on_deployment_success {
-            action                           = "TERMINATE"
-            termination_wait_time_in_minutes = 5 # 새 버전(Green)으로 전환 후 이전 버전(Blue) 인스턴스를 종료하기까지 대기 시간
+    # 'test' 환경에서는 EC2 인스턴스 태그를 배포 대상으로 지정합니다.
+    dynamic "ec2_tag_filter" {
+        for_each = var.environment == "test" ? [1] : []
+        content {
+            key   = "Name"
+            type  = "KEY_AND_VALUE"
+            value = "${var.project_name}-ec2-${var.environment}"
         }
     }
 
-    # 로드 밸런서 설정 (Blue/Green 배포에 필수)
-    # 'prod' 환경에서 생성된 리소스들을 참조합니다.
-    load_balancer_info {
-        target_group_pair_info {
-            prod_traffic_route {
-                # main.tf에 정의된 HTTPS 리스너를 참조
-                listener_arns = [aws_lb_listener.https[0].arn]
+    # 'prod' 환경에만 Blue/Green 배포 방식을 설정합니다.
+    dynamic "blue_green_deployment_config" {
+        for_each = var.environment == "prod" ? [1] : []
+        content {
+            deployment_ready_option {
+                action_on_timeout = "CONTINUE_DEPLOYMENT"
             }
-            target_group {
-                # main.tf에 정의된 기본 대상 그룹을 Blue로 사용
-                name = aws_lb_target_group.main[0].name
-            }
-            target_group {
-                # 이 파일에서 새로 정의한 대상 그룹을 Green으로 사용
-                name = aws_lb_target_group.green[0].name
+            terminate_blue_instances_on_deployment_success {
+                action                           = "TERMINATE"
+                termination_wait_time_in_minutes = 5
             }
         }
     }
 
+    # 'prod' 환경에만 로드 밸런서 설정을 추가합니다.
     dynamic "load_balancer_info" {
-        for_each = var.environment == "test" ? [] : [1]
-        content {}
+        for_each = var.environment == "prod" ? [1] : []
+        content {
+            target_group_pair_info {
+                prod_traffic_route {
+                    listener_arns = [aws_lb_listener.https[0].arn]
+                }
+                target_group {
+                    name = aws_lb_target_group.main[0].name
+                }
+                target_group {
+                    name = aws_lb_target_group.green[0].name
+                }
+            }
+        }
     }
 
-    # 'test' 환경에서는 롤링 업데이트와 같은 기본 배포 전략을 사용합니다.
-    deployment_style {
-        deployment_option = "WITHOUT_TRAFFIC_CONTROL"
-        deployment_type   = "IN_PLACE"
+    # 'test' 환경에만 IN_PLACE 배포 방식을 설정합니다.
+    dynamic "deployment_style" {
+        for_each = var.environment == "test" ? [1] : []
+        content {
+            deployment_option = "WITHOUT_TRAFFIC_CONTROL"
+            deployment_type   = "IN_PLACE"
+        }
     }
 }
 
