@@ -1,7 +1,7 @@
 resource "aws_iam_role" "app" {
     name = "${var.project_name}-ec2-role-${var.environment}"
     assume_role_policy = jsonencode({
-        version = "2012-10-17",
+        Version = "2012-10-17",
         Statement = [{
             Action = "sts:AssumeRole",
             Effect = "Allow",
@@ -127,9 +127,10 @@ resource "aws_iam_policy" "github_actions" {
                     "iam:TagRole",
                     "iam:PassRole",
 
-                    # EC2 및 SSM 리소스 관리를 위한 전체 권한
+                    # EC2, SSM, RDS 리소스 관리를 위한 전체 권한
                     "ec2:*",
-                    "ssm:*"
+                    "ssm:*",
+                    "rds:*"
                 ],
                 Resource = "*"
             }
@@ -141,3 +142,4 @@ resource "aws_iam_role_policy_attachment" "github_actions" {
     role       = aws_iam_role.github_actions.name
     policy_arn = aws_iam_policy.github_actions.arn
 }
+
