@@ -89,6 +89,15 @@ resource "aws_iam_policy" "github_actions" {
                     "s3:DeleteObject"
                 ],
                 Resource = "arn:aws:s3:::soomsoom-terraform-state-bucket/*"
+            },
+            {
+                Effect = "Allow",
+                Action = [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:DeleteItem"
+                ],
+                Resource = "arn:aws:dynamodb:*:*:table/soomsoom-terraform-state-lock"
             }
         ]
     })
