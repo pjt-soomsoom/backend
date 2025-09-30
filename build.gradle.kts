@@ -23,11 +23,9 @@ repositories {
 
 dependencies {
 
+
     // actuator 추가
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-
-    // 환경 변수 관리를 위한 의존성 추가
-    implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.1.1")
 
     // 버전 관리를 위한 의존성 추가
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
@@ -61,7 +59,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
     // aws 의존성 추가
-    implementation(platform("software.amazon.awssdk:bom:2.20.45"))
+    implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.1.0"))
+
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
     implementation("software.amazon.awssdk:s3")
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
