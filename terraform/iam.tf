@@ -110,6 +110,8 @@ resource "aws_iam_policy" "github_actions" {
                     "iam:GetOpenIDConnectProvider",
                     "iam:GetPolicy",
                     "iam:GetRole",
+                    "iam:ListRolePolicies",
+                    "iam:GetPolicyVersion",
                     "ec2:DescribeAvailabilityZones"
                 ],
                 Resource = "*"
