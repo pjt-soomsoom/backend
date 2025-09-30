@@ -47,7 +47,7 @@ class SecurityConfig(
                         "/auth/logout",
                         "/callbacks/admob/ssv",
                         "/app-versions/check",
-                        "/actuator/health",
+                        "/actuator/health"
                     ).permitAll()
 
                 domainSecurityConfigurer.forEach { it.configure(authorize) }
