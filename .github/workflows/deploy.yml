@@ -113,7 +113,6 @@ jobs:
           S3_KEY="soomsoom-backend/${{ needs.build.outputs.image_tag }}.zip"
           echo "Uploading to s3://${{ steps.set-vars.outputs.bucket_name }}/${S3_KEY}"
           aws s3 cp deploy.zip s3://${{ steps.set-vars.outputs.bucket_name }}/${S3_KEY}
-          aws s3 ls s3://${{ steps.set-vars.outputs.bucket_name }}/soomsoom-backend/
 
       - name: Create CodeDeploy Deployment
         id: create-deployment
