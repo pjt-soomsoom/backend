@@ -103,6 +103,16 @@ resource "aws_iam_policy" "github_actions" {
                     "dynamodb:DeleteItem"
                 ],
                 Resource = "arn:aws:dynamodb:*:*:table/soomsoom-terraform-state-lock"
+            },
+            {
+                Effect = "Allow",
+                Action = [
+                    "iam:GetOpenIDConnectProvider",
+                    "iam:GetPolicy",
+                    "iam:GetRole",
+                    "ec2:DescribeAvailabilityZones"
+                ],
+                Resource = "*"
             }
         ]
     })
