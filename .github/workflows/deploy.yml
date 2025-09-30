@@ -6,7 +6,6 @@ on:
     paths-ignore:
       - 'terraform/**'
       - 'README.md'
-
 env:
   # 환경에 따라 다른 버킷 이름을 사용하도록 변수 추가
   PROD_S3_BUCKET_NAME: soomsoom-prod-bucket
