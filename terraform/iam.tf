@@ -112,6 +112,7 @@ resource "aws_iam_policy" "github_actions" {
                     "iam:GetRole",
                     "iam:ListRolePolicies",
                     "iam:GetPolicyVersion",
+                    "iam:ListAttachedRolePolicies",
                     "ec2:DescribeAvailabilityZones"
                 ],
                 Resource = "*"
