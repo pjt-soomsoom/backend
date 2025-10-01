@@ -74,14 +74,18 @@ resource "aws_iam_policy" "github_actions" {
                 Effect = "Allow",
                 Action = [
                     # ECR 로그인 및 이미지 푸시에 필요한 전체 권한
-                    "ecr:GetAuthorizationToken",
-                    "ecr:BatchCheckLayerAvailability",
-                    "ecr:CompleteLayerUpload",
-                    "ecr:InitiateLayerUpload",
-                    "ecr:PutImage",
-                    "ecr:UploadLayerPart",
-                    "ecr:DescribeRepositories", # 저장소 확인을 위해 누락된 권한 추가
-                    "ecr:DescribeImages"      # 이미지 메타데이터 확인을 위해 누락된 권한 추가
+                    "ecr:*"
+                    # "ecr:GetAuthorizationToken",
+                    # "ecr:BatchCheckLayerAvailability",
+                    # "ecr:CompleteLayerUpload",
+                    # "ecr:InitiateLayerUpload",
+                    # "ecr:PutImage",
+                    # "ecr:UploadLayerPart",
+                    # "ecr:BatchGetImage",
+                    # "ecr:PutImageManifest",
+                    # "ecr:BatchDeleteImage",
+                    # "ecr:DescribeRepositories", # 저장소 확인을 위해 누락된 권한 추가
+                    # "ecr:DescribeImages"      # 이미지 메타데이터 확인을 위해 누락된 권한 추가
                 ],
                 Resource = "*"
             },
