@@ -1,0 +1,145 @@
+name: Deploy SoomSoom Backend Application
+
+on:
+  push:
+    branches: [ "main", "release/**" ]
+    paths-ignore:
+      - 'terraform/**'
+      - 'README.md'
+  workflow_dispatch:
+
+env:
+  PROD_S3_BUCKET_NAME: soomsoom-prod-bucket
+  TEST_S3_BUCKET_NAME: soomsoom-test-bucket
+  ECR_REPOSITORY: soomsoom-backend
+  AWS_REGION: ap-northeast-2
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.build-image.outputs.image_tag }}
+
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set deployment variables
+        id: set-vars
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "app_name=soomsoom-backend-prod" >> $GITHUB_OUTPUT
+            echo "group_name=soomsoom-prod-deploy-group" >> $GITHUB_OUTPUT
+            echo "bucket_name=${{ env.PROD_S3_BUCKET_NAME }}" >> $GITHUB_OUTPUT
+          else
+            echo "app_name=soomsoom-backend-test" >> $GITHUB_OUTPUT
+            echo "group_name=soomsoom-test-deploy-group" >> $GITHUB_OUTPUT
+            echo "bucket_name=${{ env.TEST_S3_BUCKET_NAME }}" >> $GITHUB_OUTPUT
+          fi
+
+      # [수정된 부분] IMAGE_REPO_NAME과 IMAGE_TAG를 모두 env.vars 파일에 저장합니다.
+      - name: Create env.vars file
+        run: |
+          echo "IMAGE_REPO_NAME=${{ env.ECR_REPOSITORY }}" > env.vars
+          echo "IMAGE_TAG=${{ needs.build.outputs.image_tag }}" >> env.vars
+          echo "Environment variables file content:"
+          cat env.vars
+
+      - name: Prepare deployment package
+        run: |
+          chmod +x scripts/*.sh
+          zip -r deploy.zip appspec.yml scripts/ env.vars
+          echo "Deployment package contents:"
+          unzip -l deploy.zip
+
+      - name: Upload to S3
+        run: |
+          S3_KEY="soomsoom-backend/${{ needs.build.outputs.image_tag }}.zip"
+          echo "Uploading to s3://${{ steps.set-vars.outputs.bucket_name }}/${S3_KEY}"
+          aws s3 cp deploy.zip s3://${{ steps.set-vars.outputs.bucket_name }}/${S3_KEY}
+
+      - name: Create CodeDeploy Deployment
+        id: create-deployment
+        run: |
+          DEPLOYMENT_ID=$(aws deploy create-deployment \
+            --application-name ${{ steps.set-vars.outputs.app_name }} \
+            --deployment-group-name ${{ steps.set-vars.outputs.group_name }} \
+            --s3-location bucket=${{ steps.set-vars.outputs.bucket_name }},key=soomsoom-backend/${{ needs.build.outputs.image_tag }}.zip,bundleType=zip \
+            --query 'deploymentId' \
+            --output text)
+
+          echo "Deployment ID: ${DEPLOYMENT_ID}"
+          echo "deployment_id=${DEPLOYMENT_ID}" >> $GITHUB_OUTPUT
+
+      - name: Wait for deployment
+        run: |
+          echo "Waiting for deployment ${{ steps.create-deployment.outputs.deployment_id }} to complete..."
+
+          aws deploy wait deployment-successful \
+            --deployment-id ${{ steps.create-deployment.outputs.deployment_id }}
+
+          echo "✓ Deployment completed successfully!"
+
+      - name: Get deployment status
+        if: always()
+        run: |
+          aws deploy get-deployment \
+            --deployment-id ${{ steps.create-deployment.outputs.deployment_id }} \
+            --query 'deploymentInfo.status' \
+            --output text
