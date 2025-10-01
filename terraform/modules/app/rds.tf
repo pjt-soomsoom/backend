@@ -28,4 +28,3 @@ resource "aws_db_instance" "main" {
     skip_final_snapshot = var.environment == "prod" ? false : true
     publicly_accessible = false
 }
-
