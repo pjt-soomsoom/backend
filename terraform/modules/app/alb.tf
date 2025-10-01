@@ -6,6 +6,8 @@ resource "aws_lb" "main" {
     security_groups    = [aws_security_group.alb[0].id]
     subnets            = aws_subnet.public[*].id
     tags               = { Name = "${var.project_name}-alb" }
+
+    depends_on = [aws_internet_gateway.main]
 }
 
 resource "aws_lb_target_group" "main" {
