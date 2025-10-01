@@ -1,7 +1,9 @@
 resource "aws_launch_template" "main" {
     name_prefix   = "${var.project_name}-${var.environment}-"
-    image_id      = "ami-077ad873396d76f6a" # Amazon Linux 2023 AMI(서울 리전 기준)
-    instance_type = var.environment == "prod" ? "t4g.small" : "t2.micro"
+    # arm64 아키텍처용 최신 Amazon Linux 2023 AMI (서울 리전 기준)
+    image_id      = "ami-0d211b58ff9d9bb61"
+    # test와 prod 환경 모두 t4g.small 인스턴스 타입을 사용하도록 통일합니다.
+    instance_type = "t4g.small"
 
     vpc_security_group_ids = [aws_security_group.app.id]
 
@@ -26,6 +28,7 @@ resource "aws_launch_template" "main" {
               EOF
     )
 
+
     tags = {
         Name = "${var.project_name}-lt-${var.environment}"
     }
@@ -45,7 +48,7 @@ resource "aws_autoscaling_group" "prod" {
         version = "$Latest"
     }
 
-    target_group_arns         = [aws_lb_target_group.main[0].arn]
+    target_group_arns = [aws_lb_target_group.main[0].arn]
     health_check_type         = "ELB"
     health_check_grace_period = 300
 
@@ -68,3 +71,4 @@ resource "aws_instance" "test" {
         Name = "${var.project_name}-ec2-test"
     }
 }
+

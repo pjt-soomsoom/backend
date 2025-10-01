@@ -22,7 +22,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.build-image.outputs.image_tag }}
+      image_tag: ${{ steps.set-tag.outputs.image_tag }}
+      # ✅ deploy 잡으로 ECR 레지스트리 주소를 전달하기 위해 output 추가
+      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
 
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
@@ -53,15 +55,25 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image for arm64
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          platforms: linux/arm64
+          provenance: false
+          sbom: false
+
+      - name: Set image_tag output
+        id: set-tag
+        run: echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
 
   deploy:
     needs: build
@@ -93,10 +105,11 @@ jobs:
             echo "bucket_name=${{ env.TEST_S3_BUCKET_NAME }}" >> $GITHUB_OUTPUT
           fi
 
-      # [수정된 부분] IMAGE_REPO_NAME과 IMAGE_TAG를 모두 env.vars 파일에 저장합니다.
+      # ✅ ECR_REGISTRY 변수를 env.vars 파일에 추가
       - name: Create env.vars file
         run: |
-          echo "IMAGE_REPO_NAME=${{ env.ECR_REPOSITORY }}" > env.vars
+          echo "ECR_REGISTRY=${{ needs.build.outputs.ecr_registry }}" > env.vars
+          echo "IMAGE_REPO_NAME=${{ env.ECR_REPOSITORY }}" >> env.vars
           echo "IMAGE_TAG=${{ needs.build.outputs.image_tag }}" >> env.vars
           echo "Environment variables file content:"
           cat env.vars
@@ -143,3 +156,4 @@ jobs:
             --deployment-id ${{ steps.create-deployment.outputs.deployment_id }} \
             --query 'deploymentInfo.status' \
             --output text
+

@@ -69,14 +69,43 @@ resource "aws_iam_policy" "github_actions" {
     policy = jsonencode({
         Version = "2012-10-17",
         Statement = [
-            # Terraform Backend 및 CI/CD 기본 권한
-            { Effect = "Allow", Action = ["ecr:GetAuthorizationToken", "ecr:BatchCheckLayerAvailability", "ecr:CompleteLayerUpload", "ecr:InitiateLayerUpload", "ecr:PutImage", "ecr:UploadLayerPart"], Resource = "*" },
+            # --- Terraform Backend 및 CI/CD 기본 권한 ---
+            {
+                Effect = "Allow",
+                Action = [
+                    # ECR 로그인 및 이미지 푸시에 필요한 전체 권한
+                    "ecr:GetAuthorizationToken",
+                    "ecr:BatchCheckLayerAvailability",
+                    "ecr:CompleteLayerUpload",
+                    "ecr:InitiateLayerUpload",
+                    "ecr:PutImage",
+                    "ecr:UploadLayerPart",
+                    "ecr:DescribeRepositories", # 저장소 확인을 위해 누락된 권한 추가
+                    "ecr:DescribeImages"      # 이미지 메타데이터 확인을 위해 누락된 권한 추가
+                ],
+                Resource = "*"
+            },
             { Effect = "Allow", Action = ["s3:PutObject"], Resource = ["arn:aws:s3:::${var.project_name}-test-bucket/*", "arn:aws:s3:::${var.project_name}-prod-bucket/*"] },
             { Effect = "Allow", Action = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:HeadObject"], Resource = "arn:aws:s3:::soomsoom-terraform-state-bucket/*" },
             { Effect = "Allow", Action = "s3:ListBucket", Resource = "arn:aws:s3:::soomsoom-terraform-state-bucket" },
             { Effect = "Allow", Action = ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:DeleteItem"], Resource = "arn:aws:dynamodb:*:*:table/soomsoom-terraform-state-lock" },
-            # Terraform Apply를 위한 전체 인프라 관리 권한
-            { Effect = "Allow", Action = ["iam:*", "ec2:*", "ssm:*", "rds:*", "codedeploy:*", "logs:*", "elasticloadbalancing:*", "autoscaling:*", "route53:*", "acm:*"], Resource = "*" }
+            # --- Terraform Apply를 위한 전체 인프라 관리 권한 ---
+            {
+                Effect = "Allow",
+                Action = [
+                    "iam:*",
+                    "ec2:*",
+                    "ssm:*",
+                    "rds:*",
+                    "codedeploy:*",
+                    "logs:*",
+                    "elasticloadbalancing:*",
+                    "autoscaling:*",
+                    "route53:*",
+                    "acm:*"
+                ],
+                Resource = "*"
+            }
         ]
     })
 }
