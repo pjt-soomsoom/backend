@@ -47,3 +47,25 @@ resource "aws_iam_role_policy_attachment" "app_ecr" {
     role       = aws_iam_role.app.name
     policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
+
+resource "aws_iam_policy" "s3_write_policy" {
+    name        = "${var.project_name}-s3-write-policy-${var.environment}"
+    description = "Allow PutObject to a specific S3 bucket"
+
+    policy = jsonencode({
+        Version = "2012-10-17",
+        Statement = [
+            {
+                Action   = "s3:PutObject",
+                Effect   = "Allow",
+                Resource = "arn:aws:s3:::soomsoom-${var.environment}-bucket/*" # <-- 여기에 실제 버킷 이름을 입력하세요.
+            }
+        ]
+    })
+}
+
+# 2. 위에서 생성한 S3 쓰기 정책을 EC2 역할(aws_iam_role.app)에 연결합니다.
+resource "aws_iam_role_policy_attachment" "app_s3_write" {
+    role       = aws_iam_role.app.name
+    policy_arn = aws_iam_policy.s3_write_policy.arn
+}
