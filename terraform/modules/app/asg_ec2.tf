@@ -57,6 +57,8 @@ resource "aws_autoscaling_group" "prod" {
         value               = "${var.project_name}-ec2-prod"
         propagate_at_launch = true
     }
+
+    depends_on = [aws_internet_gateway.main]
 }
 
 resource "aws_instance" "test" {
@@ -70,5 +72,7 @@ resource "aws_instance" "test" {
     tags = {
         Name = "${var.project_name}-ec2-test"
     }
+
+    depends_on = [aws_internet_gateway.main]
 }
 
