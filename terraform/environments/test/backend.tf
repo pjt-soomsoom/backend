@@ -14,6 +14,5 @@ terraform {
         region         = "ap-northeast-2"
         dynamodb_table = "soomsoom-terraform-state-lock"
         encrypt        = true
-        profile        = "soomsoom"
     }
 }
