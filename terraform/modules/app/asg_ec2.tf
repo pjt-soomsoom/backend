@@ -1,6 +1,6 @@
 resource "aws_launch_template" "main" {
     name_prefix   = "${var.project_name}-${var.environment}-"
-    image_id      = "ami-024bf8a1313cb6b6"
+    image_id      = "ami-024bf8a1313cb6b6e"
     instance_type = "t4g.small"
 
     vpc_security_group_ids = [aws_security_group.app.id]
