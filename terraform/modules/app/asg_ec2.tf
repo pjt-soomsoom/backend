@@ -1,8 +1,6 @@
 resource "aws_launch_template" "main" {
     name_prefix   = "${var.project_name}-${var.environment}-"
-    # arm64 아키텍처용 최신 Amazon Linux 2023 AMI (서울 리전 기준)
-    image_id      = "ami-02cf627e019f25aeb"
-    # test와 prod 환경 모두 t4g.small 인스턴스 타입을 사용하도록 통일합니다.
+    image_id      = "ami-024bf8a1313cb6b6"
     instance_type = "t4g.small"
 
     vpc_security_group_ids = [aws_security_group.app.id]
