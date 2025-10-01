@@ -1,0 +1,52 @@
+name: 'Manual Terraform Destroy'
+
+on:
+    # GitHub Actions 탭에서 수동으로 이 워크플로우를 실행
+    workflow_dispatch:
+        inputs:
+            # 삭제할 환경을 선택하는 드롭다운 메뉴
+            environment:
+                description: 'Which environment to destroy? (prod/test)'
+                required: true
+                type: choice
+                options:
+                    - test
+                    - prod
+                default: 'test'
+
+permissions:
+    id-token: write
+    contents: read
+
+jobs:
+    terraform-destroy:
+        name: 'Terraform Destroy'
+        runs-on: ubuntu-latest
+
+        steps:
+            # 1. 소스 코드 체크아웃
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            # 2. AWS 자격 증명 설정 (기존 워크플로우와 동일한 역할 사용)
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/soomsoom-github-actions-role
+                  aws-region: ap-northeast-2
+
+            # 3. Terraform CLI 설정
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v2
+
+            # 4. Terraform 초기화
+            # ✅ 기존 apply 워크플로우와 동일하게 환경별 작업 디렉토리 지정
+            - name: Terraform Init
+              run: terraform init
+              working-directory: ./terraform/environments/${{ github.event.inputs.environment }}
+
+            # 5. Terraform 인프라 삭제
+            # ✅ -auto-approve 옵션으로 확인 없이 바로 삭제
+            - name: Terraform Destroy
+              run: terraform destroy -auto-approve
+              working-directory: ./terraform/environments/${{ github.event.inputs.environment }}
