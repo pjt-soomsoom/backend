@@ -68,6 +68,8 @@ jobs:
           push: true
           tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
           platforms: linux/arm64
+          provenance: false
+          sbom: false
 
       - name: Set image_tag output
         id: set-tag
