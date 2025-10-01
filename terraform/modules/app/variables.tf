@@ -2,63 +2,66 @@
 
 variable "project_name" {
     description = "프로젝트 이름. 모든 AWS 자원의 이릅에 접두사로 사용"
-    type = string
-    default = "soomsoom"
+    type        = string
+    default     = "soomsoom"
 }
 
 variable "environment" {
     description = "배포 환경 (test, prod). 자원 이름과 설정을 구분하는 데 사용"
-    type = string
+    type        = string
 }
 
 variable "domain_name" {
     description = "실제로 구매한 도메인 이름. prod 환경의 HTTPS 인증서 발급 및 DNS 설정에 사용"
-    type = string
+    type        = string
 }
 
 # --- Github OIDC 연동을 위한 변수
 
 variable "github_repo" {
     description = "Github 리포지토리 경로"
-    type = string
-    default = "pjt-soomsoom/backend"
+    type        = string
+    default     = "pjt-soomsoom/backend"
 }
 
 # --- Datasource ---
 
 variable "db_username" {
-    type = string
-    sensitive = true
+    description = "RDS 데이터베이스 사용자 이름"
+    type        = string
+    sensitive   = true
 }
 
 variable "db_password" {
-    type = string
-    sensitive = true
+    description = "RDS 데이터베이스 비밀번호"
+    type        = string
+    sensitive   = true
 }
 
 variable "db_driver_class_name" {
-    type = string
+    description = "DB 드라이버 클래스 이름"
+    type        = string
 }
 
 # --- JPA ---
 variable "jpa_ddl_auto" {
-    type = string
+    type    = string
     default = "none"
 }
 
 variable "jpa_show_sql" {
-    type = string
-    default = false
+    type    = string
+    default = "false"
 }
 
 variable "jpa_format_sql" {
-    type = string
-    default = false
+    type    = string
+    default = "false"
 }
 
 # --- JWT ---
 variable "jwt_secret" {
-    type = string
+    type      = string
     sensitive = true
 }
 
@@ -70,7 +73,7 @@ variable "jwt_refresh_expiration" {
     type = string
 }
 
-# --- AWS S# ---
+# --- AWS S3 ---
 variable "aws_s3_bucket" {
     type = string
 }
@@ -81,24 +84,24 @@ variable "aws_s3_base_url" {
 
 variable "aws_region" {
     description = "배포할 AWS 리전"
-    type = string
-    default = "ap-northeast-2"
+    type        = string
+    default     = "ap-northeast-2"
 }
 
 # --- OAuth ---
 variable "oauth_google_client_id" {
-    type = string
+    type      = string
     sensitive = true
 }
 
 variable "oauth_apple_client_id" {
-    type = string
+    type      = string
     sensitive = true
 }
 
 # --- Firebase ---
 variable "firebase_service_account_json" {
-    type = string
+    type      = string
     sensitive = true
 }
 
