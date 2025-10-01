@@ -22,7 +22,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.build-image.outputs.image_tag }}
+      image_tag: ${{ steps.set-tag.outputs.image_tag }}
 
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
@@ -53,15 +53,25 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+      # --- 아키텍처 문제 해결을 위한 수정 ---
+      - name: Set up QEMU for multi-platform builds
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image for arm64
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          platforms: linux/arm64
+
+      # 다음 deploy 잡에서 이미지 태그를 사용할 수 있도록 output을 설정합니다.
+      - name: Set image_tag output
+        id: set-tag
+        run: echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
 
   deploy:
     needs: build
@@ -93,7 +103,6 @@ jobs:
             echo "bucket_name=${{ env.TEST_S3_BUCKET_NAME }}" >> $GITHUB_OUTPUT
           fi
 
-      # [수정된 부분] IMAGE_REPO_NAME과 IMAGE_TAG를 모두 env.vars 파일에 저장합니다.
       - name: Create env.vars file
         run: |
           echo "IMAGE_REPO_NAME=${{ env.ECR_REPOSITORY }}" > env.vars
