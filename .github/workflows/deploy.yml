@@ -23,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.set-tag.outputs.image_tag }}
+      # ✅ deploy 잡으로 ECR 레지스트리 주소를 전달하기 위해 output 추가
+      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
 
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'test' }}
@@ -53,8 +55,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      # --- 아키텍처 문제 해결을 위한 수정 ---
-      - name: Set up QEMU for multi-platform builds
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
@@ -68,7 +69,6 @@ jobs:
           tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
           platforms: linux/arm64
 
-      # 다음 deploy 잡에서 이미지 태그를 사용할 수 있도록 output을 설정합니다.
       - name: Set image_tag output
         id: set-tag
         run: echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
@@ -103,9 +103,11 @@ jobs:
             echo "bucket_name=${{ env.TEST_S3_BUCKET_NAME }}" >> $GITHUB_OUTPUT
           fi
 
+      # ✅ ECR_REGISTRY 변수를 env.vars 파일에 추가
       - name: Create env.vars file
         run: |
-          echo "IMAGE_REPO_NAME=${{ env.ECR_REPOSITORY }}" > env.vars
+          echo "ECR_REGISTRY=${{ needs.build.outputs.ecr_registry }}" > env.vars
+          echo "IMAGE_REPO_NAME=${{ env.ECR_REPOSITORY }}" >> env.vars
           echo "IMAGE_TAG=${{ needs.build.outputs.image_tag }}" >> env.vars
           echo "Environment variables file content:"
           cat env.vars
@@ -152,3 +154,4 @@ jobs:
             --deployment-id ${{ steps.create-deployment.outputs.deployment_id }} \
             --query 'deploymentInfo.status' \
             --output text
+
