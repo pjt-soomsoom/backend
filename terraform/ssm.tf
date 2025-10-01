@@ -20,7 +20,7 @@ locals {
         "alarm.batch-size"                           = { value = var.alarm_batch_size, type = "String" }
         "reward-ad.base-path"                        = { value = var.reward_ad_base_path, type = "String" }
         "mission.page-visit.identifier.yawoongi"     = { value = var.mission_page_visit_identifier_yawoongi, type = "String" }
-        "aws_region"                                 = { value = var.aws_region, type = "String"}
+        "aws.region"                                 = { value = var.aws_region, type = "String"}
     }
 }
 
