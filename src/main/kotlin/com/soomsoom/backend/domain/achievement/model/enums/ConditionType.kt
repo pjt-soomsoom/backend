@@ -11,7 +11,7 @@ enum class ConditionType {
     // 명상 관련
     MEDITATION_COUNT, // 총 명상 완료 횟수
     MEDITATION_STREAK, // 연속 명상 완료일 수
-    MEDITATION_LATE_NIGHT_STREAK, // 심야(20시~02시) 명상 연속 완료일 수
+    MEDITATION_LATE_NIGHT_COUNT, // 심야(20시~02시) 명상 연속 완료일 수
     MEDITATION_MONTHLY_COUNT, // 월간 명상 완료 횟수
     MEDITATION_TOTAL_MINUTES, // 명상 총 시간(분)
 
@@ -91,7 +91,7 @@ enum class ConditionType {
                 descriptionKey = "achievement.condition.MEDITATION_STREAK",
                 progressUnitKey = ACHIEVEMENT_UNIT_DAY
             ),
-            MEDITATION_LATE_NIGHT_STREAK to DisplayProperties(
+            MEDITATION_LATE_NIGHT_COUNT to DisplayProperties(
                 descriptionKey = "achievement.condition.MEDITATION_LATE_NIGHT_STREAK",
                 progressUnitKey = ACHIEVEMENT_UNIT_DAY
             ),

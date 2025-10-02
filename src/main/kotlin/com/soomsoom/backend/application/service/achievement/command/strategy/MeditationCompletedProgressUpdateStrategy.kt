@@ -33,7 +33,7 @@ class MeditationCompletedProgressUpdateStrategy(
         handleStreak(payload, ConditionType.MEDITATION_STREAK)
 
         // 심야 연속
-        handleLateNightStreak(payload)
+        handleLateNightCount(payload)
 
         // 월간 누적
         handleMonthlyCount(payload, ConditionType.MEDITATION_MONTHLY_COUNT)
@@ -65,15 +65,14 @@ class MeditationCompletedProgressUpdateStrategy(
         }
     }
 
-    private fun handleLateNightStreak(payload: ActivityCompletedPayload) {
+    private fun handleLateNightCount(payload: ActivityCompletedPayload) {
         val completedAt = payload.completedAt
-        val type = ConditionType.MEDITATION_LATE_NIGHT_STREAK
+        val type = ConditionType.MEDITATION_LATE_NIGHT_COUNT
 
-        if (completedAt.hour >= 20 || completedAt.hour < 2) { // 20시 ~ 02시 사이
-            handleStreak(payload, type)
-        } else {
-            // 심야 시간이 아니면 연속 기록을 0으로 초기화
-            handleProgress(payload.userId, type) { progress, maxTarget -> progress.updateTo(0, maxTarget) }
+        if (completedAt.hour >= 20 || completedAt.hour < 5) { // 20시 ~ 02시 사이
+            handleProgress(payload.userId, type) { progress, maxTarget ->
+                progress.increase(maxTarget)
+            }
         }
     }
 

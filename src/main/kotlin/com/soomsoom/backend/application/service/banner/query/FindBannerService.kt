@@ -10,6 +10,7 @@ import com.soomsoom.backend.application.port.out.activity.ActivityPort
 import com.soomsoom.backend.application.port.out.banner.BannerPort
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.activity.ActivityErrorCode
+import com.soomsoom.backend.domain.banner.BannerErrorCode
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.access.prepost.PreAuthorize
@@ -50,5 +51,15 @@ class FindBannerService(
                 ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
             banner.toAdminResult(activity)
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    override fun findById(bannerId: Long): BannerAdminResult {
+        val banner = bannerPort.findById(bannerId)
+            ?: throw SoomSoomException(BannerErrorCode.NOT_FOUND)
+        val activity = activityPort.findById(banner.linkedActivityId)
+            ?: throw SoomSoomException(ActivityErrorCode.NOT_FOUND)
+
+        return banner.toAdminResult(activity)
     }
 }
