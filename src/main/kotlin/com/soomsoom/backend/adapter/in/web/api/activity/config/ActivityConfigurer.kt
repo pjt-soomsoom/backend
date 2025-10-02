@@ -16,7 +16,7 @@ class ActivityConfigurer : DomainSecurityConfigurer {
         authorize.requestMatchers(HttpMethod.GET, "/activities/**").permitAll()
         authorize.requestMatchers(HttpMethod.OPTIONS, "/activities/**").permitAll()
         authorize.requestMatchers(HttpMethod.HEAD, "/activities/**").permitAll()
-        authorize.requestMatchers(HttpMethod.POST, "/activities/**").hasRole("ADMIN")
+        authorize.requestMatchers(HttpMethod.POST, "/activities/**").authenticated()
         authorize.requestMatchers(HttpMethod.PUT, "/activities/**").hasRole("ADMIN")
         authorize.requestMatchers(HttpMethod.DELETE, "/activities/**").hasRole("ADMIN")
         authorize.requestMatchers(HttpMethod.PATCH, "/activities/**").hasRole("ADMIN")
