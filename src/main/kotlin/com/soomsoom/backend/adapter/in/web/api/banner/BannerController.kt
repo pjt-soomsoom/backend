@@ -125,4 +125,12 @@ class BannerController(
     ) {
         deleteBannerUseCase.delete(bannerId)
     }
+
+    @GetMapping("/{bannerId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun findById(
+        @PathVariable bannerId: Long,
+    ): BannerAdminResult {
+        return bannerQueryUseCase.findById(bannerId)
+    }
 }

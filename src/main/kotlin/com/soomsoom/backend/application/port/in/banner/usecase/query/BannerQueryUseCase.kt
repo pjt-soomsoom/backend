@@ -9,4 +9,5 @@ import org.springframework.data.domain.Pageable
 interface BannerQueryUseCase {
     fun findActiveBanners(): List<BannerResult>
     fun findAllBanners(criteria: FindBannersCriteria, pageable: Pageable): Page<BannerAdminResult>
+    fun findById(bannerId: Long): BannerAdminResult
 }
