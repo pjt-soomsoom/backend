@@ -56,7 +56,11 @@ resource "aws_iam_policy" "s3_write_policy" {
         Version = "2012-10-17",
         Statement = [
             {
-                Action   = "s3:PutObject",
+                Action   = [
+                    "s3:GetObject",
+                    "s3:PutObject",
+                    "s3:DeleteObject"
+                ]
                 Effect   = "Allow",
                 Resource = "arn:aws:s3:::soomsoom-${var.environment}-bucket/*" # <-- 여기에 실제 버킷 이름을 입력하세요.
             }
