@@ -37,8 +37,8 @@ class DiaryCountStrategy(
             // DailyCountProgress를 사용하여 마지막 작성 시간을 기록
             val progressData = progress.progressData as? DailyCountProgress ?: DailyCountProgress(0, null)
 
-            val currentBusinessDate = dateHelper.getBusinessDate(now)
-            val lastBusinessDate = progressData.lastTimestamp?.let { dateHelper.getBusinessDate(it) }
+            val currentBusinessDate = dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(now))
+            val lastBusinessDate = progressData.lastTimestamp?.let { dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(it)) }
 
             // 마지막 작성일과 오늘 날짜가 다를 경우에만 카운트 증가
             if (currentBusinessDate != lastBusinessDate) {
