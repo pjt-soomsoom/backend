@@ -45,20 +45,22 @@ class GrantRewardService(
             grantItemToUserUseCase.grantItemToUser(GrantItemToUserCommand(command.userId, it.id))
         }
 
-        val payload = RewardCompletedNotificationPayload(
-            userId = command.userId,
-            rewardType = command.rewardType,
-            title = command.notificationTitle!!,
-            body = command.notificationBody!!,
-            points = command.points,
-            imageUrl = item?.imageUrl
-        )
-
-        eventPublisher.publishEvent(
-            Event(
-                eventType = EventType.REWARD_COMPLETED,
-                payload = payload
+        if (command.sendNotification) {
+            val payload = RewardCompletedNotificationPayload(
+                userId = command.userId,
+                rewardType = command.rewardType,
+                title = command.notificationTitle!!,
+                body = command.notificationBody!!,
+                points = command.points,
+                imageUrl = item?.imageUrl
             )
-        )
+
+            eventPublisher.publishEvent(
+                Event(
+                    eventType = EventType.REWARD_COMPLETED,
+                    payload = payload
+                )
+            )
+        }
     }
 }
