@@ -70,7 +70,7 @@ class CheckAndGrantAchievementsService(
                     points = reward.points,
                     itemId = reward.itemId,
                     source = RewardSource.ACHIEVEMENT,
-                    sendNotification = true,
+                    sendNotification = false,
                     notificationTitle = reward.displayInfo.titleTemplate,
                     notificationBody = reward.displayInfo.bodyTemplate,
                     notificationImage = reward.itemId?.let {

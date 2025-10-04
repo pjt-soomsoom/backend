@@ -12,6 +12,7 @@ import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.time.YearMonth
+import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 @Component
@@ -53,8 +54,8 @@ class MeditationCompletedProgressUpdateStrategy(
     private fun handleStreak(payload: ActivityCompletedPayload, type: ConditionType) {
         val lastLog = activityHistoryPort.findLatestCompletionLogBefore(payload.userId, payload.activityType, payload.completedAt.toLocalDate())
         val isStreak = if (lastLog?.createdAt != null) {
-            val lastBusinessDate = dateHelper.getBusinessDate(lastLog.createdAt)
-            val currentBusinessDate = dateHelper.getBusinessDate(payload.completedAt)
+            val lastBusinessDate = dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(lastLog.createdAt))
+            val currentBusinessDate = dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(payload.completedAt))
             ChronoUnit.DAYS.between(lastBusinessDate, currentBusinessDate) == 1L
         } else {
             false
@@ -67,9 +68,10 @@ class MeditationCompletedProgressUpdateStrategy(
 
     private fun handleLateNightCount(payload: ActivityCompletedPayload) {
         val completedAt = payload.completedAt
+        val completedAtInKst = completedAt.atZone(ZoneId.of("UTC"))
         val type = ConditionType.MEDITATION_LATE_NIGHT_COUNT
 
-        if (completedAt.hour >= 20 || completedAt.hour < 5) { // 20시 ~ 02시 사이
+        if (completedAtInKst.hour >= 20 || completedAtInKst.hour < 5) { // 20시 ~ 02시 사이
             handleProgress(payload.userId, type) { progress, maxTarget ->
                 progress.increase(maxTarget)
             }
@@ -77,7 +79,7 @@ class MeditationCompletedProgressUpdateStrategy(
     }
 
     private fun handleMonthlyCount(payload: ActivityCompletedPayload, type: ConditionType) {
-        val currentBusinessDate = dateHelper.getBusinessDate(payload.completedAt)
+        val currentBusinessDate = dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(payload.completedAt))
         val currentYearMonth = YearMonth.from(currentBusinessDate)
         val period = dateHelper.getBusinessPeriod(currentYearMonth)
 

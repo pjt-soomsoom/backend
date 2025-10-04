@@ -30,6 +30,6 @@ class UpdateDiaryService(
             ?: throw SoomSoomException(DiaryErrorCode.NOT_FOUND)
 
         val savedDiary = diaryPort.save(diary)
-        return FindDiaryResult.from(savedDiary, dateHelper.getBusinessDate(savedDiary.createdAt!!))
+        return FindDiaryResult.from(savedDiary, dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(savedDiary.createdAt!!)))
     }
 }

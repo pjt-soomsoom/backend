@@ -23,7 +23,7 @@ class RecordConnectionService(
     override fun recordConnection(command: RecordConnectionCommand) {
         val now = LocalDateTime.now()
         val businessDay = dateHelper.getBusinessDay(now)
-        val businessDate = dateHelper.getBusinessDate(now)
+        val businessDate = dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(now))
 
         val alreadyConnected = connectionLogPort.existsByUserIdAndCreatedAtBetween(
             userId = command.userId,

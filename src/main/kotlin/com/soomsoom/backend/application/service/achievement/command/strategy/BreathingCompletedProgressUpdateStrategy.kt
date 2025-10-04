@@ -46,8 +46,8 @@ class BreathingCompletedProgressUpdateStrategy(
     private fun handleStreak(payload: ActivityCompletedPayload, type: ConditionType) {
         val lastLog = activityHistoryPort.findLatestCompletionLogBefore(payload.userId, payload.activityType, payload.completedAt.toLocalDate())
         val isStreak = if (lastLog?.createdAt != null) {
-            val lastBusinessDate = dateHelper.getBusinessDate(lastLog.createdAt!!)
-            val currentBusinessDate = dateHelper.getBusinessDate(payload.completedAt)
+            val lastBusinessDate = dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(lastLog.createdAt!!))
+            val currentBusinessDate = dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(payload.completedAt))
             ChronoUnit.DAYS.between(lastBusinessDate, currentBusinessDate) == 1L
         } else {
             false
@@ -59,7 +59,7 @@ class BreathingCompletedProgressUpdateStrategy(
     }
 
     private fun handleMonthlyCount(payload: ActivityCompletedPayload, type: ConditionType) {
-        val currentBusinessDate = dateHelper.getBusinessDate(payload.completedAt)
+        val currentBusinessDate = dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(payload.completedAt))
         val currentYearMonth = YearMonth.from(currentBusinessDate)
         val period = dateHelper.getBusinessPeriod(currentYearMonth)
 

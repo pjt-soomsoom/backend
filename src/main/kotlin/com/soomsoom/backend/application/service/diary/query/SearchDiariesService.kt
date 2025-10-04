@@ -28,6 +28,6 @@ class SearchDiariesService(
             criteria.deletionStatus,
             pageable
         )
-        return diaryPage.map { FindDiaryResult.from(it, dateHelper.getBusinessDate(it.createdAt!!)) }
+        return diaryPage.map { FindDiaryResult.from(it, dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(it.createdAt!!))) }
     }
 }

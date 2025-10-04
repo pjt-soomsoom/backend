@@ -49,7 +49,7 @@ class ConsecutiveAttendanceStrategy(
             val newStreak = if (progressData.lastAttendanceTimestamp == null) {
                 1
             } else {
-                val lastBusinessDate = dateHelper.getBusinessDate(progressData.lastAttendanceTimestamp)
+                val lastBusinessDate = dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(progressData.lastAttendanceTimestamp))
                 if (currentBusinessDate.isEqual(lastBusinessDate.plusDays(1))) {
                     progressData.streak + 1 // 연속된 날짜면 streak 증가
                 } else {

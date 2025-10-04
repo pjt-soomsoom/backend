@@ -62,7 +62,7 @@ class DiaryCreatedProgressUpdateStrategy(
     }
 
     private fun handleMonthlyCountProgress(payload: DiaryCreatedPayload) {
-        val currentBusinessDate = dateHelper.getBusinessDate(payload.createdAt)
+        val currentBusinessDate = dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(payload.createdAt))
         val firstDayOfMonth = currentBusinessDate.withDayOfMonth(1)
         val businessPeriod = dateHelper.getBusinessPeriod(firstDayOfMonth, currentBusinessDate)
 
