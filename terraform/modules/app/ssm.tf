@@ -27,7 +27,7 @@ locals {
 resource "aws_ssm_parameter" "db_url" {
     name  = "/config/soomsoom_${var.environment}/spring.datasource.url"
     type  = "SecureString"
-    value = "jdbc:mysql://${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}"
+    value = "jdbc:mysql://${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}}?serverTimezone=UTC&useSSL=true&requireSSL=true"
 
     tags = {
         Project     = var.project_name
