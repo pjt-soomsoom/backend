@@ -23,6 +23,7 @@ data class ActivityResult(
     val durationInSeconds: Int,
     val audioUrl: String?,
     val timeline: List<TimelineEvent>? = null,
+    val completionEffectTexts: List<String>,
     val isFavorited: Boolean,
 ) {
     /**
@@ -50,6 +51,7 @@ data class ActivityResult(
                     audioUrl = activity.audioUrl,
                     timeline = activity.timeline,
                     category = activity.category,
+                    completionEffectTexts = activity.completionEffectTexts,
                     isFavorited = isFavorited
                 )
                 is MeditationActivity -> ActivityResult(
@@ -63,6 +65,7 @@ data class ActivityResult(
                     durationInSeconds = activity.durationInSeconds,
                     audioUrl = activity.audioUrl,
                     isFavorited = isFavorited,
+                    completionEffectTexts = activity.completionEffectTexts,
                     category = activity.category
                 )
                 is SoundEffectActivity -> ActivityResult(
@@ -76,6 +79,7 @@ data class ActivityResult(
                     durationInSeconds = activity.durationInSeconds,
                     audioUrl = activity.audioUrl,
                     isFavorited = isFavorited,
+                    completionEffectTexts = activity.completionEffectTexts,
                     category = activity.category
                 )
                 else -> throw SoomSoomException(ActivityErrorCode.UNSUPPORTED_ACTIVITY_TYPE)
