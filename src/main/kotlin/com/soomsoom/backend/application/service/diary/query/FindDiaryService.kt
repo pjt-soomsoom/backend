@@ -22,6 +22,6 @@ class FindDiaryService(
     override fun findById(diaryId: Long, deletionStatus: DeletionStatus): FindDiaryResult {
         val diary = diaryPort.findById(diaryId, deletionStatus)
             ?: throw SoomSoomException(DiaryErrorCode.NOT_FOUND)
-        return FindDiaryResult.from(diary, dateHelper.getBusinessDate(diary.createdAt!!))
+        return FindDiaryResult.from(diary, dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(diary.createdAt!!)))
     }
 }

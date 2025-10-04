@@ -52,7 +52,6 @@ class CompleteActivityService(
             val mission = missionPort.findByType(MissionType.DAILY_BREATHING_COUNT)
             if (mission != null) {
                 // '오늘'의 비즈니스 시간 범위를 기준으로, 이 미션을 이미 완료했는지 확인
-                val businessDay = dateHelper.getBusinessDay(now)
                 val isCompletedToday = missionCompletionLogPort.existsByCompletedAtBetween(
                     command.userId,
                     mission.id,

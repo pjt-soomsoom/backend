@@ -28,6 +28,6 @@ class GetDailyDiaryRecordService(
             businessPeriod.end,
             criteria.deletionStatus
         )
-        return dailyRecords.map { GetDailyDiaryRecordResult.from(it, dateHelper.getBusinessDate(it.createdAt)) }
+        return dailyRecords.map { GetDailyDiaryRecordResult.from(it, dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(it.createdAt))) }
     }
 }

@@ -47,6 +47,6 @@ class RegisterDiaryService(
         )
         eventPublisher.publishEvent(event)
 
-        return RegisterDiaryResult.from(savedDiary, dateHelper.getBusinessDate(savedDiary.createdAt!!))
+        return RegisterDiaryResult.from(savedDiary, dateHelper.getBusinessDate(dateHelper.toZonedDateTimeInUtc(savedDiary.createdAt!!)))
     }
 }
