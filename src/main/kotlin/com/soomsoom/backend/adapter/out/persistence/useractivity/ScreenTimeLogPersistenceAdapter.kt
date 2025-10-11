@@ -12,4 +12,8 @@ class ScreenTimeLogPersistenceAdapter(
     override fun save(screenTimeLog: ScreenTimeLog): ScreenTimeLog {
         return screenTimeLogJpaRepository.save(screenTimeLog.toEntity()).toDomain()
     }
+
+    override fun deleteByUserId(userId: Long) {
+        screenTimeLogJpaRepository.deleteAllByUserId(userId)
+    }
 }
