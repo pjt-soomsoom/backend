@@ -21,4 +21,8 @@ class CartPersistenceAdapter(
         val entityToSave = cart.toEntity(existingEntity)
         return cartJpaRepository.save(entityToSave).toDomain()
     }
+
+    override fun deleteByUserId(userId: Long) {
+        cartJpaRepository.deleteAllByUserId(userId)
+    }
 }

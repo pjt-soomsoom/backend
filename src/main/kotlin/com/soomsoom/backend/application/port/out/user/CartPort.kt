@@ -5,4 +5,5 @@ import com.soomsoom.backend.domain.user.model.aggregate.Cart
 interface CartPort {
     fun findByUserId(userId: Long): Cart
     fun save(cart: Cart): Cart
+    fun deleteByUserId(userId: Long)
 }
