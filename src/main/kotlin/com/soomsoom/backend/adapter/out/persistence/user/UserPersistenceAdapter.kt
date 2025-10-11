@@ -20,6 +20,10 @@ class UserPersistenceAdapter(
         return userJpaRepository.grantItemToAllUsers(itemId)
     }
 
+    override fun deleteByUserId(userId: Long) {
+        return userJpaRepository.deleteById(userId)
+    }
+
     override fun findByDeviceId(deviceId: String): User? {
         return userJpaRepository.findByDeviceId(deviceId)?.toDomain()
     }

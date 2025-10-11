@@ -19,4 +19,6 @@ interface UserPort {
     fun findAllUserIds(pageNumber: Int, pageSize: Int): List<Long>
 
     fun grantItemToAllUsers(itemId: Long): Int
+
+    fun deleteByUserId(userId: Long)
 }
