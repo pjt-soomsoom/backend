@@ -31,4 +31,8 @@ class FavoritePersistenceAdapter(
         return favoriteQueryDslRepository.findFavoriteActivities(userId, pageable)
             .map { it.toDomain() }
     }
+
+    override fun deleteByUserId(userId: Long) {
+        favoriteJpaRepository.deleteAllByUserId(userId)
+    }
 }

@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface FavoriteJpaRepository : JpaRepository<FavoriteJpaEntity, Long> {
     fun findByUserIdAndActivityId(userId: Long, activityId: Long): FavoriteJpaEntity?
+    fun deleteAllByUserId(userId: Long)
 }
