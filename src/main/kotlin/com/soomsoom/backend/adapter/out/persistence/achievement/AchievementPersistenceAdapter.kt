@@ -141,6 +141,10 @@ class AchievementPersistenceAdapter(
         return userAchievedJpaRepository.save(achieved.toEntity()).toDomain()
     }
 
+    override fun deleteUserAchievedByUserId(userId: Long) {
+        userAchievedJpaRepository.deleteAllByUserId(userId)
+    }
+
     // UserProgressPort 구현
     override fun findByUserIdAndType(userId: Long, type: ConditionType): UserProgress? {
         return userProgressJpaRepository.findByUserIdAndType(userId, type)?.toDomain()
@@ -155,5 +159,9 @@ class AchievementPersistenceAdapter(
             ?.apply { this.currentValue = progress.currentValue }
             ?: progress.toEntity()
         return userProgressJpaRepository.save(entity).toDomain()
+    }
+
+    override fun deleteUserProgressByUserId(userId: Long) {
+        userProgressJpaRepository.deleteAllByUserId(userId)
     }
 }

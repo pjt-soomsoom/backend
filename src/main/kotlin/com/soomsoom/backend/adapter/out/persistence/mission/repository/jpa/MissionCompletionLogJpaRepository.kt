@@ -19,4 +19,5 @@ interface MissionCompletionLogJpaRepository : JpaRepository<MissionCompletionLog
     ): MissionCompletionLogJpaEntity?
     fun existsByUserIdAndMissionId(userId: Long, missionId: Long): Boolean
     fun existsByUserIdAndMissionIdAndRewardedAtIsNull(userId: Long, missionId: Long): Boolean
+    fun deleteAllByUserId(userId: Long)
 }

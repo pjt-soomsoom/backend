@@ -22,6 +22,7 @@ class UserNotificationPersistenceAdapter(
     private val userNotificationSettingJpaRepository: UserNotificationSettingJpaRepository,
     private val notificationHistoryJpaRepository: NotificationHistoryJpaRepository,
     private val userNotificationQueryDslRepository: UserNotificationQueryDslRepository,
+    private val userDeviceJpaRepository: UserDeviceJpaRepository,
 ) : UserNotificationPort {
     override fun findDeviceByToken(fcmToken: String): UserDevice? {
         return deviceJpaRepository.findByFcmToken(fcmToken)?.toDomain()
@@ -43,6 +44,10 @@ class UserNotificationPersistenceAdapter(
         return userNotificationQueryDslRepository.findDevicesByUserIds(userIds).map { it.toDomain() }
     }
 
+    override fun deleteUserDeviceByUserId(userId: Long) {
+        userDeviceJpaRepository.deleteAllByUserId(userId)
+    }
+
     override fun findSettingsByUserId(userId: Long): UserNotificationSetting? {
         return userNotificationSettingJpaRepository.findByUserId(userId)?.toDomain()
     }
@@ -54,12 +59,20 @@ class UserNotificationPersistenceAdapter(
         return userNotificationSettingJpaRepository.save(entity).toDomain()
     }
 
+    override fun deleteUserNotificationSettingByUserId(userId: Long) {
+        userNotificationSettingJpaRepository.deleteAllByUserId(userId)
+    }
+
     override fun saveHistory(history: NotificationHistory): NotificationHistory {
         return notificationHistoryJpaRepository.save(history.toEntity()).toDomain()
     }
 
     override fun findHistoryById(id: Long): NotificationHistory? {
         return notificationHistoryJpaRepository.findByIdOrNull(id)?.toDomain()
+    }
+
+    override fun deleteNotificationHistoryByUserId(userId: Long) {
+        notificationHistoryJpaRepository.deleteAllByUserId(userId)
     }
 
     override fun findDiaryReminderTargetUserIds(

@@ -21,4 +21,8 @@ class PurchaseLogPersistenceAdapter(
         return purchaseLogQueryDslRepository.search(criteria, criteria.pageable)
             .map { it.toDomain() }
     }
+
+    override fun deleteByUserId(userId: Long) {
+        purchaseLogJpaRepository.deleteAllByUserId(userId)
+    }
 }

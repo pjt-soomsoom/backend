@@ -17,4 +17,7 @@ class AdRewardLogPersistenceAdapter(
     }
 
     override fun save(adRewardLog: AdRewardLog): AdRewardLog = adRewardLogJpaRepository.save(adRewardLog.toEntity()).toDomain()
+    override fun deleteByUserId(userId: Long) {
+        adRewardLogJpaRepository.deleteAllByUserId(userId)
+    }
 }

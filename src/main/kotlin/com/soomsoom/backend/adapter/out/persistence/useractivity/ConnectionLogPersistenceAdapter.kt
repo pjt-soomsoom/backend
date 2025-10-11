@@ -19,4 +19,8 @@ class ConnectionLogPersistenceAdapter(
     override fun save(connectionLog: ConnectionLog): ConnectionLog {
         return connectionLogJpaRepository.save(connectionLog.toEntity()).toDomain()
     }
+
+    override fun deleteByUserId(userId: Long) {
+        connectionLogJpaRepository.deleteAllByUserId(userId)
+    }
 }

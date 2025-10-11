@@ -11,4 +11,6 @@ interface UserAnnouncementJpaRepository : JpaRepository<UserAnnouncementJpaEntit
     @Modifying
     @Query("UPDATE UserAnnouncementJpaEntity ua SET ua.deletedAt = CURRENT_TIMESTAMP WHERE ua.announcementId = :announcementId")
     fun softDeleteAllByAnnouncementId(announcementId: Long)
+
+    fun deleteAllByUserId(userId: Long)
 }

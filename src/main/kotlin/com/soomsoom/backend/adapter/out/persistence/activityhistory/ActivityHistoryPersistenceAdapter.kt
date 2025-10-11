@@ -3,7 +3,7 @@ package com.soomsoom.backend.adapter.out.persistence.activityhistory
 import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.ActivityCompletionLogJpaRepository
 import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.ActivityCompletionLogQueryDslRepository
 import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.ActivityProgressJpaRepository
-import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.entity.UserActivitySummaryJpaRepository
+import com.soomsoom.backend.adapter.out.persistence.activityhistory.repository.jpa.UserActivitySummaryJpaRepository
 import com.soomsoom.backend.application.port.out.activityhistory.ActivityHistoryPort
 import com.soomsoom.backend.domain.activity.model.enums.ActivityType
 import com.soomsoom.backend.domain.activityhistory.model.ActivityCompletionLog
@@ -30,9 +30,17 @@ class ActivityHistoryPersistenceAdapter(
         return activityProgressJpaRepository.save(entity).toDomain()
     }
 
+    override fun deleteActivityProgressByUserId(userId: Long) {
+        activityProgressJpaRepository.deleteAllByUserId(userId)
+    }
+
     override fun saveCompletionLog(log: ActivityCompletionLog): ActivityCompletionLog {
         val entity = log.toEntity()
         return activityCompletionLogJpaRepository.save(entity).toDomain()
+    }
+
+    override fun deleteActivityCompletionLogByUserId(userId: Long) {
+        activityCompletionLogJpaRepository.deleteAllByUserId(userId)
     }
 
     override fun findUserSummary(userId: Long): UserActivitySummary? {
@@ -42,6 +50,10 @@ class ActivityHistoryPersistenceAdapter(
     override fun saveUserSummary(summary: UserActivitySummary): UserActivitySummary {
         val entity = summary.toEntity()
         return userActivitySummaryJpaRepository.save(entity).toDomain()
+    }
+
+    override fun deleteUserActivitySummaryByUserId(userId: Long) {
+        userActivitySummaryJpaRepository.deleteAllByUserId(userId)
     }
 
     override fun countCompletedActivities(userId: Long): Long {

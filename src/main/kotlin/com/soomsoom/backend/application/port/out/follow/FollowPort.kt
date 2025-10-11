@@ -10,4 +10,5 @@ interface FollowPort {
     fun save(follow: Follow): Follow
     fun delete(follow: Follow)
     fun findFollowingInstructors(userId: Long, pageable: Pageable): Page<Instructor>
+    fun deleteByUserId(userId: Long)
 }

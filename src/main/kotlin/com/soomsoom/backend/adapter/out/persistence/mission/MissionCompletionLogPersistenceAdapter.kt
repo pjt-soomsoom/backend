@@ -40,4 +40,8 @@ class MissionCompletionLogPersistenceAdapter(
     override fun existsWithUnrewarded(userId: Long, missionId: Long): Boolean {
         return missionCompletionLogJpaRepository.existsByUserIdAndMissionIdAndRewardedAtIsNull(userId, missionId)
     }
+
+    override fun deleteByUserId(userId: Long) {
+        missionCompletionLogJpaRepository.deleteAllByUserId(userId)
+    }
 }
