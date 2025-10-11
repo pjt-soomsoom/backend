@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional
 
 @Transactional
 class DeleteConnectionLogService(
-    private val connectionLogPort: ConnectionLogPort
-): DeleteConnectionLogUseCase{
+    private val connectionLogPort: ConnectionLogPort,
+) : DeleteConnectionLogUseCase {
 
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #userId")
     override fun deleteByUserId(userId: Long) {

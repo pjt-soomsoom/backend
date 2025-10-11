@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 class DeleteUserService(
     private val eventPublisher: ApplicationEventPublisher,
     private val userPort: UserPort,
-): DeleteUserUseCase {
+) : DeleteUserUseCase {
 
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #userId")
     @Transactional

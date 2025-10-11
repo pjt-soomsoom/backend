@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class DeleteScreenTimeLogService(
-    private val screenTimeLogPort: ScreenTimeLogPort
-) : DeleteScreenTimeLogUseCase{
+    private val screenTimeLogPort: ScreenTimeLogPort,
+) : DeleteScreenTimeLogUseCase {
 
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #userId")
     override fun deleteByUserId(userId: Long) {
