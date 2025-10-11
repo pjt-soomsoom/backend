@@ -207,7 +207,7 @@ class UserController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-        @RequestParam(required = false) userId: Long?
+        @RequestParam(required = false) userId: Long?,
     ) {
         val deleteUserId = userId ?: userDetails.id
         deleteUserUseCase.delete(deleteUserId)
