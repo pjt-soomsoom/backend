@@ -40,4 +40,8 @@ class UserAnnouncementPersistenceAdapter(
     override fun deleteAllByAnnouncementId(announcementId: Long) {
         userAnnouncementJpaRepository.softDeleteAllByAnnouncementId(announcementId)
     }
+
+    override fun deleteByUserId(userId: Long) {
+        userAnnouncementJpaRepository.deleteAllByUserId(userId)
+    }
 }

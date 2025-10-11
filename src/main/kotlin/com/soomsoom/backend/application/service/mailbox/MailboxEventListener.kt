@@ -5,6 +5,7 @@ import com.soomsoom.backend.application.port.`in`.mailbox.usecase.command.Distri
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.payload.AnnouncementCreatedNotificationPayload
 import com.soomsoom.backend.common.event.payload.AnnouncementDeletedPayload
+import com.soomsoom.backend.common.event.payload.UserDeletedPayload
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionPhase
@@ -33,5 +34,18 @@ class MailboxEventListener(
     )
     fun handleAnnouncementDeletedEvent(event: Event<AnnouncementDeletedPayload>) {
         deleteUserAnnouncementsUseCase.command(event.payload.announcementId)
+    }
+
+    /**
+     * 유저 삭제 시 미션 우편함 기록 삭제
+     */
+    @TransactionalEventListener(
+        classes = [Event::class],
+        condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).USER_DELETED",
+        phase = TransactionPhase.BEFORE_COMMIT
+    )
+    fun handleUserDeletedEvent(event: Event<UserDeletedPayload>) {
+        val payload = event.payload
+        deleteUserAnnouncementsUseCase.deleteByUserId(payload.userId)
     }
 }

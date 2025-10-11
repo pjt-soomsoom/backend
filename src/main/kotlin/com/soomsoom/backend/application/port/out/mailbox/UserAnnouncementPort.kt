@@ -16,4 +16,5 @@ interface UserAnnouncementPort {
      * [데이터 정합성] 특정 원본 공지(Announcement) ID와 연결된 모든 UserAnnouncement를 삭제(soft-delete) 처리
      */
     fun deleteAllByAnnouncementId(announcementId: Long)
+    fun deleteByUserId(userId: Long)
 }
