@@ -16,14 +16,17 @@ interface UserNotificationPort {
     fun deleteDeviceByToken(fcmToken: String)
     fun deleteAllByToken(fcmToken: List<String>)
     fun findDevicesByUserIds(userIds: List<Long>): List<UserDevice>
+    fun deleteUserDeviceByUserId(userId: Long)
 
     // UserNotificationSetting
     fun findSettingsByUserId(userId: Long): UserNotificationSetting?
     fun saveSettings(settings: UserNotificationSetting): UserNotificationSetting
+    fun deleteUserNotificationSettingByUserId(userId: Long)
 
     // NotificationHistory
     fun saveHistory(history: NotificationHistory): NotificationHistory
     fun findHistoryById(id: Long): NotificationHistory?
+    fun deleteNotificationHistoryByUserId(userId: Long)
 
     /**
      * '마음일기 알림(인게이지먼트 넛지)' 발송 대상을 조회

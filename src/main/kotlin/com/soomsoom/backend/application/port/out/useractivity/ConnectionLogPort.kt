@@ -14,4 +14,5 @@ interface ConnectionLogPort {
      */
     fun existsByUserIdAndCreatedAtBetween(userId: Long, from: LocalDateTime, to: LocalDateTime): Boolean
     fun save(connectionLog: ConnectionLog): ConnectionLog
+    fun deleteByUserId(userId: Long)
 }

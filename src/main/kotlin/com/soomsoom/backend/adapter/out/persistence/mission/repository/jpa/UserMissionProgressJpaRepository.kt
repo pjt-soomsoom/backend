@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface UserMissionProgressJpaRepository : JpaRepository<UserMissionProgressJpaEntity, Long> {
     fun findByUserIdAndMissionId(userId: Long, missionId: Long): UserMissionProgressJpaEntity?
+    fun deleteAllByUserId(userId: Long)
 }

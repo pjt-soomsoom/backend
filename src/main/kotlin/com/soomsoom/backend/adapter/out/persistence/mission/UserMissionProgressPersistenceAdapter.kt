@@ -28,4 +28,8 @@ class UserMissionProgressPersistenceAdapter(
                 updatedAt = LocalDateTime.now()
             )
     }
+
+    override fun deleteByUserId(userId: Long) {
+        userMissionProgressJpaRepository.deleteAllByUserId(userId)
+    }
 }

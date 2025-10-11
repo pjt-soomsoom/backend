@@ -7,4 +7,5 @@ import org.springframework.data.domain.Page
 interface PurchaseLogPort {
     fun save(purchaseLog: PurchaseLog): PurchaseLog
     fun search(criteria: FindPurchaseHistoryCriteria): Page<PurchaseLog>
+    fun deleteByUserId(userId: Long)
 }

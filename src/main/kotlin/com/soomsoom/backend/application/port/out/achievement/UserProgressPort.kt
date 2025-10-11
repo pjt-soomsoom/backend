@@ -19,4 +19,6 @@ interface UserProgressPort {
      * 사용자의 진행 상황을 저장하거나 갱신
      */
     fun save(progress: UserProgress): UserProgress
+
+    fun deleteUserProgressByUserId(userId: Long)
 }

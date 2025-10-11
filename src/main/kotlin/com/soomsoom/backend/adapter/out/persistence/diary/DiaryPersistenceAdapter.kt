@@ -117,4 +117,8 @@ class DiaryPersistenceAdapter(
     override fun findLatestBefore(userId: Long, dateTime: LocalDateTime): Diary? {
         return diaryJpaRepository.findTopByUserIdAndCreatedAtBeforeAndDeletedAtIsNullOrderByCreatedAtDesc(userId, dateTime)?.toDomain()
     }
+
+    override fun deleteByUserId(userId: Long) {
+        diaryJpaRepository.deleteAllByUserId(userId)
+    }
 }

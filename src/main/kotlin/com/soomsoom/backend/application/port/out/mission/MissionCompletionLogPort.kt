@@ -29,4 +29,5 @@ interface MissionCompletionLogPort {
     fun exists(userId: Long, missionId: Long): Boolean
 
     fun existsWithUnrewarded(userId: Long, missionId: Long): Boolean
+    fun deleteByUserId(userId: Long)
 }

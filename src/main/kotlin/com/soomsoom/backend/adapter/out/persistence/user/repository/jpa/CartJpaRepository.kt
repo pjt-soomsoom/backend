@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface CartJpaRepository : JpaRepository<CartJpaEntity, Long> {
     fun findByUserId(userId: Long): CartJpaEntity?
+    fun deleteAllByUserId(userId: Long)
 }

@@ -12,4 +12,6 @@ interface UserAchievedPort {
      * 사용자의 업적 달성 기록을 저장.
      */
     fun save(achieved: UserAchieved): UserAchieved
+
+    fun deleteUserAchievedByUserId(userId: Long)
 }

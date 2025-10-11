@@ -55,4 +55,7 @@ enum class EventType {
 
     // 미션(이벤트) 완료
     MISSION_COMPLETED,
+
+    // 유저 삭제
+    USER_DELETED,
 }

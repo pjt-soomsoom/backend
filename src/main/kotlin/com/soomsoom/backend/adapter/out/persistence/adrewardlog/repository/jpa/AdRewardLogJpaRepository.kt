@@ -7,4 +7,5 @@ import java.time.LocalDateTime
 interface AdRewardLogJpaRepository : JpaRepository<AdRewardLogJpaEntity, Long> {
     fun existsByTransactionId(transactionId: String): Boolean
     fun existsByUserIdAndAdUnitIdAndCreatedAtBetween(userId: Long, adUnitId: String, start: LocalDateTime, end: LocalDateTime): Boolean
+    fun deleteAllByUserId(userId: Long)
 }

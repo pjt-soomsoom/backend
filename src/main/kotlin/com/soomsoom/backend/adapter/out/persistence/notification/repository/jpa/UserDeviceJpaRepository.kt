@@ -7,4 +7,5 @@ interface UserDeviceJpaRepository : JpaRepository<UserDeviceJpaEntity, Long> {
     fun findByFcmToken(fcmToken: String): UserDeviceJpaEntity?
     fun deleteByFcmToken(fcmToken: String)
     fun deleteAllByFcmTokenIn(fcmToken: List<String>)
+    fun deleteAllByUserId(userId: Long)
 }

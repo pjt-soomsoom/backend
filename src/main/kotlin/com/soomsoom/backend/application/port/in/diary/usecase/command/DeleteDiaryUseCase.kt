@@ -5,4 +5,5 @@ import com.soomsoom.backend.application.port.`in`.diary.command.DeleteDiaryComma
 interface DeleteDiaryUseCase {
     fun softDelete(command: DeleteDiaryCommand)
     fun hardDelete(command: DeleteDiaryCommand)
+    fun deleteByUserId(userId: Long)
 }

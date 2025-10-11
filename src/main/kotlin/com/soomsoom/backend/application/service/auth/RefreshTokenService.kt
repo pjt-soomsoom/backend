@@ -14,6 +14,7 @@ import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.user.UserErrorCode
 import com.soomsoom.backend.domain.user.model.Account
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -65,5 +66,10 @@ class RefreshTokenService(
         )
 
         return TokenInfo(newTokenResult.accessToken, newTokenResult.refreshToken)
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #userId")
+    override fun deleteByUserId(userId: Long) {
+        refreshTokenPort.deleteAllByUserId(userId)
     }
 }

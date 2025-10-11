@@ -3,6 +3,8 @@ package com.soomsoom.backend.application.service.mission
 import com.soomsoom.backend.application.port.`in`.mission.command.ClaimMissionRewardCommand
 import com.soomsoom.backend.application.port.`in`.mission.command.ProcessMissionProgressCommand
 import com.soomsoom.backend.application.port.`in`.mission.usecase.command.ClaimMissionRewardUseCase
+import com.soomsoom.backend.application.port.`in`.mission.usecase.command.DeleteMissionCompletionLogUseCase
+import com.soomsoom.backend.application.port.`in`.mission.usecase.command.DeleteUserMissionProgressUseCase
 import com.soomsoom.backend.application.port.`in`.mission.usecase.command.ProcessMissionProgressUseCase
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.payload.ActivityCompletedPayload
@@ -10,6 +12,7 @@ import com.soomsoom.backend.common.event.payload.DiaryCreatedPayload
 import com.soomsoom.backend.common.event.payload.FirstConnectionPayload
 import com.soomsoom.backend.common.event.payload.MissionCompletedNotificationPayload
 import com.soomsoom.backend.common.event.payload.PageVisitedPayload
+import com.soomsoom.backend.common.event.payload.UserDeletedPayload
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
@@ -21,6 +24,8 @@ import org.springframework.transaction.event.TransactionalEventListener
 class MissionEventListener(
     private val processMissionProgressUseCase: ProcessMissionProgressUseCase,
     private val claimMissionRewardUseCase: ClaimMissionRewardUseCase,
+    private val deleteMissionCompletionLogUseCase: DeleteMissionCompletionLogUseCase,
+    private val deleteUserMissionProgressUseCase: DeleteUserMissionProgressUseCase,
 ) {
 
     /**
@@ -96,5 +101,19 @@ class MissionEventListener(
     fun handleMissionCompletedEvent(event: Event<MissionCompletedNotificationPayload>) {
         val payload = event.payload
         claimMissionRewardUseCase.claimReward(ClaimMissionRewardCommand(payload.userId, payload.missionId))
+    }
+
+    /**
+     * 유저 삭제 시 미션 관련 기록 삭제
+     */
+    @TransactionalEventListener(
+        classes = [Event::class],
+        condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).USER_DELETED",
+        phase = TransactionPhase.BEFORE_COMMIT
+    )
+    fun handleUserDeletedEvent(event: Event<UserDeletedPayload>) {
+        val payload = event.payload
+        deleteMissionCompletionLogUseCase.deleteByUserId(payload.userId)
+        deleteUserMissionProgressUseCase.deleteByUserId(payload.userId)
     }
 }

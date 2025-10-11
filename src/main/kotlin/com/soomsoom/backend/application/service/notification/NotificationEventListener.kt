@@ -2,10 +2,14 @@ package com.soomsoom.backend.application.service.notification
 
 import com.soomsoom.backend.application.port.`in`.notification.command.CreateNotificationSettingCommand
 import com.soomsoom.backend.application.port.`in`.notification.usecase.command.CreateNotificationSettingUseCase
+import com.soomsoom.backend.application.port.`in`.notification.usecase.command.DeleteNotificationHistoryUseCase
+import com.soomsoom.backend.application.port.`in`.notification.usecase.command.DeleteUserDeviceUseCase
+import com.soomsoom.backend.application.port.`in`.notification.usecase.command.DeleteUserNotificationSettingUseCase
 import com.soomsoom.backend.application.service.notification.strategy.NotificationStrategy
 import com.soomsoom.backend.common.event.Event
 import com.soomsoom.backend.common.event.NotificationPayload
 import com.soomsoom.backend.common.event.payload.UserCreatedPayload
+import com.soomsoom.backend.common.event.payload.UserDeletedPayload
 import org.springframework.core.annotation.Order
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
@@ -18,6 +22,9 @@ import org.springframework.transaction.event.TransactionalEventListener
 class NotificationEventListener(
     private val strategies: List<NotificationStrategy<*>>,
     private val createdNotificationSettingUseCase: CreateNotificationSettingUseCase,
+    private val deleteNotificationHistoryUseCase: DeleteNotificationHistoryUseCase,
+    private val deleteUserNotificationSettingUseCase: DeleteUserNotificationSettingUseCase,
+    private val deleteUserDeviceUseCase: DeleteUserDeviceUseCase,
 ) {
     @Async("threadPoolTaskExecutor")
     @TransactionalEventListener(
@@ -51,5 +58,17 @@ class NotificationEventListener(
             reEngagementNotificationEnabled = true
         )
         createdNotificationSettingUseCase.create(command)
+    }
+
+    @TransactionalEventListener(
+        classes = [Event::class],
+        condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).USER_DELETED",
+        phase = TransactionPhase.BEFORE_COMMIT
+    )
+    fun handleUserDeletedEvent(event: Event<UserDeletedPayload>) {
+        val payload = event.payload
+        deleteUserDeviceUseCase.deleteByUserId(payload.userId)
+        deleteUserNotificationSettingUseCase.deleteByUserId(payload.userId)
+        deleteNotificationHistoryUseCase.deleteByUserId(payload.userId)
     }
 }

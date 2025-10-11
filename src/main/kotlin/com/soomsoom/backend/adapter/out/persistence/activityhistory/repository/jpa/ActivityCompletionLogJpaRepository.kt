@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface ActivityCompletionLogJpaRepository : JpaRepository<ActivityCompletionLogJpaEntity, Long> {
     fun countByUserId(userId: Long): Long
+    fun deleteAllByUserId(userId: Long)
 }

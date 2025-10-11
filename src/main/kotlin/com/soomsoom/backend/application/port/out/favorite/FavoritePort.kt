@@ -10,4 +10,5 @@ interface FavoritePort {
     fun save(favorite: Favorite): Favorite
     fun delete(favorite: Favorite)
     fun findFavoriteActivities(userId: Long, pageable: Pageable): Page<Activity>
+    fun deleteByUserId(userId: Long)
 }

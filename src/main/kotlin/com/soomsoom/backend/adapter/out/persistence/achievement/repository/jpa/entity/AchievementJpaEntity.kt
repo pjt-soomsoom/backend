@@ -68,14 +68,12 @@ class AchievementJpaEntity(
 
 ) : BaseTimeEntity() {
     fun update(achievement: Achievement) {
-        // 'id'는 변경되지 않으므로 업데이트 로직에서 제외합니다.
         this.name = achievement.name
         this.phrase = achievement.phrase
         this.grade = achievement.grade
         this.category = achievement.category
         this.deletedAt = achievement.deletedAt
 
-        // Embeddable 객체는 새로운 인스턴스로 교체합니다.
         this.unlockedDisplayInfo = achievement.unlockedDisplayInfo.toEmbeddable()
         this.reward = achievement.reward?.toEmbeddable()
 
