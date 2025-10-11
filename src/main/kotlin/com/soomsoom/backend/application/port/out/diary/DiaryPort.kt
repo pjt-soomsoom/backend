@@ -36,4 +36,6 @@ interface DiaryPort {
      * 특정 날짜 이전에 작성된 가장 최근의 일기를 조회
      */
     fun findLatestBefore(userId: Long, dateTime: LocalDateTime): Diary?
+
+    fun deleteByUserId(userId: Long)
 }

@@ -5,6 +5,7 @@ import com.soomsoom.backend.application.port.`in`.diary.usecase.command.DeleteDi
 import com.soomsoom.backend.application.port.out.diary.DiaryPort
 import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.domain.diary.DiaryErrorCode
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,6 +16,7 @@ class DeleteDiaryService(
     private val diaryPort: DiaryPort,
 ) : DeleteDiaryUseCase {
 
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #command.principalId")
     override fun softDelete(command: DeleteDiaryCommand) {
         val diary = diaryPort.findById(command.diaryId)
             ?.also {
@@ -28,6 +30,11 @@ class DeleteDiaryService(
 
     override fun hardDelete(command: DeleteDiaryCommand) {
         TODO("Not yet implemented")
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #userId")
+    override fun deleteByUserId(userId: Long) {
+        diaryPort.deleteByUserId(userId)
     }
 
     private fun validateOwnership(ownerId: Long, principalId: Long) {

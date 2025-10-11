@@ -13,4 +13,5 @@ interface DiaryJpaRepository : JpaRepository<DiaryJpaEntity, Long> {
      * 감정 기복 최악에서 최고 업적 달성에서 사용
      */
     fun findTopByUserIdAndCreatedAtBeforeAndDeletedAtIsNullOrderByCreatedAtDesc(userId: Long, dateTime: LocalDateTime): DiaryJpaEntity?
+    fun deleteAllByUserId(userId: Long)
 }
