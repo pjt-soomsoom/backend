@@ -25,4 +25,5 @@ interface AdRewardLogPort {
     fun existsByUserIdAndAdUnitIdAndCreatedAtBetween(userId: Long, adUnitId: String, start: LocalDateTime, end: LocalDateTime): Boolean
 
     fun save(adRewardLog: AdRewardLog): AdRewardLog
+    fun deleteByUserId(userId: Long)
 }
