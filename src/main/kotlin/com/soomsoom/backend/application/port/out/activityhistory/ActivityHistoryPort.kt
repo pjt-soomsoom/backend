@@ -11,13 +11,16 @@ interface ActivityHistoryPort {
     // ActivityProgress (이어듣기) 관련
     fun findProgress(userId: Long, activityId: Long): ActivityProgress?
     fun saveProgress(progress: ActivityProgress): ActivityProgress
+    fun deleteActivityProgressByUserId(userId: Long)
 
     // ActivityCompletionLog (완료 기록) 관련
     fun saveCompletionLog(log: ActivityCompletionLog): ActivityCompletionLog
+    fun deleteActivityCompletionLogByUserId(userId: Long)
 
     // UserActivitySummary (누적 통계) 관련
     fun findUserSummary(userId: Long): UserActivitySummary?
     fun saveUserSummary(summary: UserActivitySummary): UserActivitySummary
+    fun deleteUserActivitySummaryByUserId(userId: Long)
 
     // 마이페이지 요약 정보 조회를 위한 카운트 메서드
     fun countCompletedActivities(userId: Long): Long

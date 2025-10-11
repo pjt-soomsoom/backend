@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface UserProgressJpaRepository : JpaRepository<UserProgressJpaEntity, Long> {
     fun findByUserIdAndType(userId: Long, type: ConditionType): UserProgressJpaEntity?
     fun findByUserIdAndTypeIn(userId: Long, types: List<ConditionType>): List<UserProgressJpaEntity>
+    fun deleteAllByUserId(userId: Long)
 }

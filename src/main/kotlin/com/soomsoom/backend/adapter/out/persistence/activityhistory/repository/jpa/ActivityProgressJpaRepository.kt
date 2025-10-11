@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface ActivityProgressJpaRepository : JpaRepository<ActivityProgressJpaEntity, Long> {
     fun findByUserIdAndActivityId(userId: Long, activityId: Long): ActivityProgressJpaEntity?
+    fun deleteAllByUserId(userId: Long)
 }
