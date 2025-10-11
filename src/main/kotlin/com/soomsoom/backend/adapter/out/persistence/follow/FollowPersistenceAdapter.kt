@@ -33,4 +33,8 @@ class FollowPersistenceAdapter(
         return followQueryDslRepository.findFollowingInstructors(userId, pageable)
             .map { it.toDomain() }
     }
+
+    override fun deleteByUserId(userId: Long) {
+        followJpaRepository.deleteAllByFollowerId(userId)
+    }
 }
