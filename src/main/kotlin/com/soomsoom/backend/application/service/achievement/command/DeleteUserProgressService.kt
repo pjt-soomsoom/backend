@@ -11,7 +11,7 @@ class DeleteUserProgressService(
     private val userProgressPort: UserProgressPort,
 ) : DeleteUserProgressUseCase {
 
-    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == userId")
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #userId")
     @Transactional
     override fun deleteByUserId(userId: Long) {
         userProgressPort.deleteUserProgressByUserId(userId)

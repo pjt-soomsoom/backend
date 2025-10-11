@@ -11,7 +11,7 @@ class DeleteUserAchievedService(
     private val userAchievedPort: UserAchievedPort,
 ) : DeleteUserAchievedUseCase {
 
-    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == userId")
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #userId")
     @Transactional
     override fun deleteByUserId(userId: Long) {
         userAchievedPort.deleteUserAchievedByUserId(userId)

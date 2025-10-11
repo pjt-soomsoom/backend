@@ -11,7 +11,7 @@ class DeleteFollowService(
     private val followPort: FollowPort,
 ) : DeleteFollowUseCase {
 
-    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #id")
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id == #userId")
     @Transactional
     override fun deleteByUserId(userId: Long) {
         followPort.deleteByUserId(userId)
