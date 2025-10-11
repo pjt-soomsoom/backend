@@ -71,7 +71,6 @@ class UserEventListener(
         condition = "#event.eventType == T(com.soomsoom.backend.common.event.EventType).USER_DELETED",
         phase = TransactionPhase.BEFORE_COMMIT
     )
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleUserDeletedEvent(event: Event<UserDeletedPayload>) {
         val payload = event.payload
         deleteCartUseCase.deleteByUserId(payload.userId)
