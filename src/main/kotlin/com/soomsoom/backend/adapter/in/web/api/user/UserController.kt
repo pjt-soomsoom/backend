@@ -19,6 +19,7 @@ import com.soomsoom.backend.application.port.`in`.user.dto.UserPoints
 import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedCollectionsCriteria
 import com.soomsoom.backend.application.port.`in`.user.query.FindOwnedItemsCriteria
 import com.soomsoom.backend.application.port.`in`.user.usecase.command.AnswerOnboardingUseCase
+import com.soomsoom.backend.application.port.`in`.user.usecase.command.DeleteUserUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.command.UpdateEquippedItemsUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindEquippedItemsUseCase
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindOwnedCollectionsUseCase
@@ -26,11 +27,13 @@ import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindOwnedIt
 import com.soomsoom.backend.application.port.`in`.user.usecase.query.FindUserPointsUseCase
 import com.soomsoom.backend.domain.common.DeletionStatus
 import com.soomsoom.backend.domain.item.model.enums.ItemType
+import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -53,6 +56,7 @@ class UserController(
     private val findUserPointsUseCase: FindUserPointsUseCase,
     private val findTodayMissionUseCase: FindTodayMissionUseCase,
     private val answerOnboardingUseCase: AnswerOnboardingUseCase,
+    private val deleteUserUseCase: DeleteUserUseCase,
 ) {
 
     /**
@@ -193,5 +197,19 @@ class UserController(
         request: AnswerOnboardingRequest,
     ) {
         answerOnboardingUseCase.answer(request.toCommand(userDetails.id))
+    }
+
+    /**
+     * 회원 탈퇴
+     */
+    @Operation(summary = "회원 탈퇴", description = "유저의 회원 탈퇴 기능입니다. userId를 파라미터로 넘기지 않는 경우 로그인한 유저 본인을 탈퇴 처리합니다.")
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun delete(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+        @RequestParam(required = false) userId: Long?
+    ) {
+        val deleteUserId = userId ?: userDetails.id
+        deleteUserUseCase.delete(deleteUserId)
     }
 }
