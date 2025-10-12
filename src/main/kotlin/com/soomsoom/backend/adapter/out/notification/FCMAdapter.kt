@@ -133,7 +133,7 @@ class FCMAdapter(
                     .setAps(
                         Aps.builder()
                             .setBadge(domainMessage.badgeCount) // iOS의 뱃지 카운트는 여기에 설정
-                            .setSound("default")
+                            .setSound("cat-meow-short-push.wav")
                             .build()
                     ).build()
             )
@@ -155,7 +155,7 @@ class FCMAdapter(
         if (isIos) {
             messageBuilder.setApnsConfig(
                 ApnsConfig.builder()
-                    .setAps(Aps.builder().setBadge(domainMessage.badgeCount).setSound("default").build())
+                    .setAps(Aps.builder().setBadge(domainMessage.badgeCount).setSound("cat-meow-short-push.wav").build())
                     .build()
             )
         }
