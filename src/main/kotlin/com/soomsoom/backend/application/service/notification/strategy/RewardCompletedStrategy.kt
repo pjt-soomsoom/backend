@@ -44,7 +44,6 @@ class RewardCompletedStrategy(
                         put("points", points.toString())
                     }
                 }
-                put("sound", "cat-meow-short-push.wav")
             }
         )
 

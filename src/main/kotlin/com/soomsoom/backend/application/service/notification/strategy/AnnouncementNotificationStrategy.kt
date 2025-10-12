@@ -49,8 +49,7 @@ class AnnouncementNotificationStrategy(
                     payload = mapOf(
                         "notificationType" to NotificationType.NEWS_UPDATE.name,
                         "type" to if (isEnabled) "VISIBLE_ANNOUNCEMENT" else "SILENT_BADGE_UPDATE",
-                        "announcementId" to payload.announcementId.toString(),
-                        "sound" to "cat-meow-short-push.wav"
+                        "announcementId" to payload.announcementId.toString()
                     )
                 )
             }
