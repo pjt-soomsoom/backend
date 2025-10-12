@@ -49,6 +49,7 @@ class AchievementUnlockedStrategy(
                 if (achievement.hasReward) {
                     put("points", achievement.reward!!.points.toString())
                 }
+                put("sound", "cat-meow-short-push.wav")
             }
         )
 

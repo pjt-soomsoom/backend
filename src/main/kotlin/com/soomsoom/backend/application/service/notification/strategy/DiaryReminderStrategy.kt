@@ -65,7 +65,8 @@ class DiaryReminderStrategy(
                     badgeCount = 0,
                     payload = mapOf(
                         "notificationType" to NotificationType.DIARY_REMINDER.name,
-                        "historyId" to savedHistory.id.toString()
+                        "historyId" to savedHistory.id.toString(),
+                        "sound" to "cat-meow-short-push.wav"
                     )
                 )
             }

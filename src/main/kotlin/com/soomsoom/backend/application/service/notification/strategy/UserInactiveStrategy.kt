@@ -86,7 +86,8 @@ class UserInactiveStrategy(
                     badgeCount = 0,
                     payload = mapOf(
                         "notificationType" to NotificationType.RE_ENGAGEMENT.name,
-                        "historyId" to savedHistory.id.toString()
+                        "historyId" to savedHistory.id.toString(),
+                        "sound" to "cat-meow-short-push.wav"
                     )
                 )
             }

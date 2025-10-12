@@ -49,6 +49,7 @@ class MissionCompletedStrategy(
                             ?: throw SoomSoomException(ItemErrorCode.NOT_FOUND)
                     )
                 }
+                put("sound", "cat-meow-short-push.wav")
             }
         )
 
