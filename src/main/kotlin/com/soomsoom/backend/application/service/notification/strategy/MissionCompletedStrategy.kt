@@ -40,7 +40,7 @@ class MissionCompletedStrategy(
             payload = buildMap {
                 put("notificationType", NotificationType.MISSION_COMPLETED.name)
                 put("missionId", payload.missionId.toString())
-                if (payload.reward.points != null) {
+                if (payload.reward.points != null && payload.reward.points > 0) {
                     put("points", payload.reward.points.toString())
                 } else {
                     put(
