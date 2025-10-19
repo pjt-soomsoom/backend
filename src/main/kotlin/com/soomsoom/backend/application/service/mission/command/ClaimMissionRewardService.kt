@@ -14,7 +14,6 @@ import com.soomsoom.backend.common.exception.SoomSoomException
 import com.soomsoom.backend.common.utils.DateHelper
 import com.soomsoom.backend.domain.item.ItemErrorCode
 import com.soomsoom.backend.domain.mission.MissionErrorCode
-import com.soomsoom.backend.domain.mission.model.enums.ClaimType
 import com.soomsoom.backend.domain.reward.model.RewardSource
 import com.soomsoom.backend.domain.reward.model.RewardType
 import org.slf4j.LoggerFactory
