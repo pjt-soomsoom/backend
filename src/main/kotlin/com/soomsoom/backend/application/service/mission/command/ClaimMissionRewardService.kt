@@ -72,9 +72,9 @@ class ClaimMissionRewardService(
                 points = mission.reward.points,
                 itemId = mission.reward.itemId,
                 source = RewardSource.MISSION,
-                sendNotification = mission.claimType == ClaimType.AUTOMATIC,
-                notificationTitle = mission.reward.notification.title,
-                notificationBody = mission.reward.notification.title,
+                sendNotification = false,
+                notificationTitle = mission.completionNotification.title,
+                notificationBody = mission.completionNotification.body,
                 notificationImage = itemImage
             )
         )
