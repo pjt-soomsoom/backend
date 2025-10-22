@@ -113,7 +113,7 @@ enum class ConditionType {
                 descriptionKey = "achievement.condition.HIDDEN_STAY_HOME_SCREEN",
                 progressUnitKey = ACHIEVEMENT_UNIT_HOUR,
                 descriptionDivisor = HOUR_DIVISOR,
-                progressDivisor = MINUTE_DIVISOR
+                progressDivisor = HOUR_DIVISOR
             ),
             HIDDEN_EMOTION_OVERCOME to DisplayProperties(
                 descriptionKey = "achievement.condition.HIDDEN_EMOTION_OVERCOME",
