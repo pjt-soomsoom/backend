@@ -101,7 +101,7 @@ class AdminMailboxController(
     /**
      * 이미지 업데이트 요청
      */
-    @PutMapping("/{announcementId}image")
+    @PutMapping("/{announcementId}/image")
     @Operation(
         summary = "공지 이미지 업데이트 요청 (Presigned URL 생성)",
         description = "기존 공지 이미지를 교체하기 위해, 새로운 이미지를 업로드할 Presigned URL을 발급받습니다."
