@@ -22,10 +22,17 @@ data class CreateAnnouncementRequest(
 
 ) {
     fun toCommand(): CreateAnnouncementCommand {
+        val validatedMetadata: ValidatedFileMetadata? = imageMetadata?.let { meta ->
+            if (meta.filename != null && meta.contentType != null) {
+                ValidatedFileMetadata(meta.filename, meta.contentType)
+            } else {
+                null
+            }
+        }
         return CreateAnnouncementCommand(
             title = this.title!!,
             content = this.content!!,
-            imageMetadata = ValidatedFileMetadata(this.imageMetadata?.filename!!, this.imageMetadata?.contentType!!)
+            imageMetadata = validatedMetadata,
         )
     }
 }
