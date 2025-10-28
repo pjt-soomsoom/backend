@@ -2,8 +2,7 @@ package com.soomsoom.backend.application.port.`in`.mailbox.command
 
 import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
 
-data class CreateAnnouncementCommand(
-    val title: String,
-    val imageMetadata: ValidatedFileMetadata?,
-    val content: String,
+data class UpdateAnnouncementImageCommand(
+    val announcementId: Long,
+    val imageMetadata: ValidatedFileMetadata,
 )
