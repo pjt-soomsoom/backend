@@ -34,8 +34,8 @@ class DateHelper(
     private val cutoffTime: LocalTime = LocalTime.of(cutoffHour, 0)
 
     // 시간대 처리를 위한 ZoneId 상수 선언
-    private val KST_ZONE = ZoneId.of("Asia/Seoul")
-    private val UTC_ZONE = ZoneId.of("UTC")
+    val KST_ZONE: ZoneId = ZoneId.of("Asia/Seoul")
+    val UTC_ZONE: ZoneId = ZoneId.of("UTC")
 
     /**
      *  LocalDateTime을 UTC 기반 ZonedDateTime으로 변환하는 편의 함수

@@ -23,9 +23,14 @@ class AnnouncementJpaEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
     var title: String,
-
     @Lob
     var content: String,
+
+    @Column(name = "image_url")
+    var imageUrl: String?,
+
+    @Column(name = "image_file_key")
+    var imageFileKey: String?,
 
     @Column(name = "sent_at")
     val sentAt: LocalDateTime,

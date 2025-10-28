@@ -6,4 +6,7 @@ enum class FileDomain {
     ITEMS,
     COLLECTIONS,
     BANNERS,
+
+    // 공지 상단의 이미지
+    ANNOUNCEMENT,
 }

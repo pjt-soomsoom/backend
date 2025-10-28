@@ -7,6 +7,8 @@ class Announcement(
     var title: String,
     var content: String,
     val sentAt: LocalDateTime,
+    var imageUrl: String?,
+    var imageFileKey: String?,
 
     val createdAt: LocalDateTime? = null,
     var modifiedAt: LocalDateTime? = null,
@@ -21,5 +23,12 @@ class Announcement(
     fun update(title: String, content: String) {
         this.title = title
         this.content = content
+    }
+
+    fun updateImage(imageUrl: String, imageFileKey: String): String? {
+        val oldFileKey = this.imageFileKey
+        this.imageUrl = imageUrl
+        this.imageFileKey = imageFileKey
+        return if (oldFileKey != imageFileKey) oldFileKey else null
     }
 }
