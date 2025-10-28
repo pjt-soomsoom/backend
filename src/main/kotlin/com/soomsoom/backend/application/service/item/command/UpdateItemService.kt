@@ -48,6 +48,10 @@ class UpdateItemService(
             description = command.description,
             phrase = command.phrase,
             price = Points(command.price),
+            acquisitionType = command.acquisitionType,
+            equipSlot = command.equipSlot,
+            itemType = command.itemType,
+            hasShadow = command.hasShadow,
             newTotalQuantity = command.totalQuantity
         )
 

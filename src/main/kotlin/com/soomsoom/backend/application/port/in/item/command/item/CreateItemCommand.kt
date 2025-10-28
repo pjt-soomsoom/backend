@@ -13,6 +13,7 @@ data class CreateItemCommand(
     val equipSlot: EquipSlot,
     val acquisitionType: AcquisitionType,
     val price: Int,
+    val hasShadow: Boolean,
     val imageMetadata: ValidatedFileMetadata,
     val lottieMetadata: ValidatedFileMetadata?,
     val totalQuantity: Int?, // null이면 무제한

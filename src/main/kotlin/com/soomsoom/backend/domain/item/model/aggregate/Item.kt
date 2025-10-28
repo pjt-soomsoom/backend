@@ -24,6 +24,7 @@ class Item(
     var lottieUrl: String? = null,
     var lottieFileKey: String? = null,
     var stock: Stock,
+    var hasShadow: Boolean,
     val createdAt: LocalDateTime? = null,
     val modifiedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
@@ -64,12 +65,20 @@ class Item(
         phrase: String?,
         price: Points,
         newTotalQuantity: Int?,
+        itemType: ItemType,
+        equipSlot: EquipSlot,
+        acquisitionType: AcquisitionType,
+        hasShadow: Boolean,
     ) {
         this.name = name
         this.description = description
         this.phrase = phrase
         this.price = price
         this.stock = this.stock.adjust(newTotalQuantity)
+        this.hasShadow = hasShadow
+        this.itemType = itemType
+        this.equipSlot = equipSlot
+        this.acquisitionType = acquisitionType
         validate()
     }
 

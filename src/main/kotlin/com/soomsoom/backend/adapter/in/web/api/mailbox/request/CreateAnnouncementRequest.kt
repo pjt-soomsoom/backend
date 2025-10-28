@@ -1,7 +1,10 @@
 package com.soomsoom.backend.adapter.`in`.web.api.mailbox.request
 
+import com.soomsoom.backend.adapter.`in`.web.api.upload.request.FileMetadata
 import com.soomsoom.backend.application.port.`in`.mailbox.command.CreateAnnouncementCommand
+import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 
 @Schema(description = "[관리자] 공지 생성 요청")
@@ -14,11 +17,22 @@ data class CreateAnnouncementRequest(
     @Schema(description = "공지 내용", example = "이제 우편함 기능이 추가되었어요!")
     val content: String?,
 
+    @field:Valid
+    val imageMetadata: FileMetadata?,
+
 ) {
     fun toCommand(): CreateAnnouncementCommand {
+        val validatedMetadata: ValidatedFileMetadata? = imageMetadata?.let { meta ->
+            if (meta.filename != null && meta.contentType != null) {
+                ValidatedFileMetadata(meta.filename, meta.contentType)
+            } else {
+                null
+            }
+        }
         return CreateAnnouncementCommand(
             title = this.title!!,
-            content = this.content!!
+            content = this.content!!,
+            imageMetadata = validatedMetadata
         )
     }
 }

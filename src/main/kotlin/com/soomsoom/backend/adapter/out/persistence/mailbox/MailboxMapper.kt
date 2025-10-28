@@ -9,7 +9,9 @@ fun Announcement.toEntity(): AnnouncementJpaEntity = AnnouncementJpaEntity(
     id = this.id,
     title = this.title,
     content = this.content,
-    sentAt = this.sentAt
+    sentAt = this.sentAt,
+    imageUrl = this.imageUrl,
+    imageFileKey = this.imageFileKey
 ).also {
     it.deletedAt = this.deletedAt
 }
@@ -19,6 +21,8 @@ fun AnnouncementJpaEntity.toDomain(): Announcement = Announcement(
     title = this.title,
     content = this.content,
     sentAt = this.sentAt,
+    imageUrl = this.imageUrl,
+    imageFileKey = this.imageFileKey,
     createdAt = this.createdAt,
     modifiedAt = this.modifiedAt,
     deletedAt = this.deletedAt

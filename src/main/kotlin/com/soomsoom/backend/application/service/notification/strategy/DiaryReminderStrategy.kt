@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 @Component
@@ -28,6 +29,7 @@ class DiaryReminderStrategy(
     private val BATCH_SIZE: Int,
 ) : NotificationStrategy<SchedulerTickNotificationPayload> {
 
+    private val KST_ZONE = ZoneId.of("Asia/Seoul")
     private val log = LoggerFactory.getLogger(javaClass)
 
     override fun supports(event: Event<*>) = event.eventType == EventType.SCHEDULER_TICK
@@ -39,13 +41,16 @@ class DiaryReminderStrategy(
         val variations = activeTemplates.flatMap { it.variations }
         if (variations.isEmpty()) return
 
-        val triggeredAt = event.payload.triggeredAt
-        val currentTime = triggeredAt.toLocalTime().truncatedTo(ChronoUnit.MINUTES)
+        val triggeredAtUtc = event.payload.triggeredAt
+        val currentTimeKst = triggeredAtUtc.atZone(dateHelper.UTC_ZONE)
+            .withZoneSameInstant(KST_ZONE)
+            .toLocalTime()
+            .truncatedTo(ChronoUnit.MINUTES)
         var pageNumber = 0
 
         while (true) {
             // batch-size만큼 데이터를 가져오기
-            val targetUserIds = findTargetUsersInBatch(currentTime, triggeredAt, pageNumber, BATCH_SIZE)
+            val targetUserIds = findTargetUsersInBatch(currentTimeKst, triggeredAtUtc, pageNumber, BATCH_SIZE)
             if (targetUserIds.isEmpty()) break
 
             // Batch-size에 대해서만 메시지를 생성하고 즉시 발송
