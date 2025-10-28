@@ -1,0 +1,2 @@
+ALTER TABLE items
+    ADD COLUMN has_shadow BOOLEAN NOT NULL DEFAULT FALSE COMMENT '아이템 그림자 표시 여부';

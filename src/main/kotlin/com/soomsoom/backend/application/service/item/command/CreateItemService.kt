@@ -47,6 +47,7 @@ class CreateItemService(
             acquisitionType = command.acquisitionType,
             price = Points(command.price),
             stock = Stock(command.totalQuantity, command.totalQuantity ?: 1),
+            hasShadow = command.hasShadow,
             imageUrl = "",
             lottieUrl = null,
             imageFileKey = "",

@@ -21,6 +21,7 @@ data class ItemDto(
     val isSoldOut: Boolean,
     val isOwned: Boolean,
     val isEquipped: Boolean,
+    val hasShadow: Boolean,
     val createdAt: LocalDateTime,
     val modifiedAt: LocalDateTime,
     val deletedAt: LocalDateTime?,
@@ -53,6 +54,7 @@ fun Item.toDto(user: User): ItemDto {
         isSoldOut = this.stock.isSoldOut(),
         isOwned = isOwned,
         isEquipped = isEquipped,
+        hasShadow = this.hasShadow,
         createdAt = this.createdAt!!,
         modifiedAt = this.modifiedAt!!,
         deletedAt = this.deletedAt
@@ -74,6 +76,7 @@ fun Item.toAdminDto(): ItemDto {
         isSoldOut = this.stock.isSoldOut(),
         isOwned = false,
         isEquipped = false,
+        hasShadow = this.hasShadow,
         createdAt = this.createdAt!!,
         modifiedAt = this.modifiedAt!!,
         deletedAt = this.deletedAt
