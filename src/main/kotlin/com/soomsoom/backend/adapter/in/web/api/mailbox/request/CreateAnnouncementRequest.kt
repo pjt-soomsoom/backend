@@ -32,7 +32,7 @@ data class CreateAnnouncementRequest(
         return CreateAnnouncementCommand(
             title = this.title!!,
             content = this.content!!,
-            imageMetadata = validatedMetadata,
+            imageMetadata = validatedMetadata
         )
     }
 }
