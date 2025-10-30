@@ -71,6 +71,9 @@ class ItemJpaEntity(
     @Embedded
     var stock: StockEmbeddable,
 
+    @Column(name = "has_shadow", nullable = false)
+    var hasShadow: Boolean = false,
+
 ) : BaseTimeEntity() {
     fun update(domain: Item) {
         this.name = domain.name
@@ -86,5 +89,6 @@ class ItemJpaEntity(
         this.lottieFileKey = domain.lottieFileKey
         this.stock = StockEmbeddable.from(domain.stock)
         this.deletedAt = domain.deletedAt
+        this.hasShadow = domain.hasShadow
     }
 }

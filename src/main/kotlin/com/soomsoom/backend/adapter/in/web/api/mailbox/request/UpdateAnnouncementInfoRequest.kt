@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
 
 @Schema(description = "[관리자] 공지 수정 요청")
-data class UpdateAnnouncementRequest(
+data class UpdateAnnouncementInfoRequest(
     @field:NotBlank(message = "제목은 비어 있을 수 없습니다.")
     @Schema(description = "공지 제목", example = "숨숨 기능 업데이트 안내 (수정)")
     val title: String?,

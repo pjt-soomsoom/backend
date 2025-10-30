@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 @Component
@@ -31,17 +32,21 @@ class UserInactiveStrategy(
 ) : NotificationStrategy<SchedulerTickNotificationPayload> {
 
     private val log = LoggerFactory.getLogger(javaClass)
+    private val KST_ZONE = ZoneId.of("Asia/Seoul")
 
     override fun supports(event: Event<*>) = event.eventType == EventType.SCHEDULER_TICK
 
     @Transactional
     override fun execute(event: Event<SchedulerTickNotificationPayload>) {
-        val now = event.payload.triggeredAt
+        val triggeredAtUtc = event.payload.triggeredAt
 
-        val currentTimeTruncated = now.toLocalTime().truncatedTo(ChronoUnit.MINUTES)
+        val currentTimeKst = triggeredAtUtc.atZone(dateHelper.UTC_ZONE) // UTC임을 명시
+            .withZoneSameInstant(KST_ZONE) // KST로 변환
+            .toLocalTime()
+            .truncatedTo(ChronoUnit.MINUTES) // 분 단위 절삭
         val defaultTimeTruncated = defaultTime.truncatedTo(ChronoUnit.MINUTES)
 
-        if (currentTimeTruncated != defaultTimeTruncated) {
+        if (currentTimeKst != defaultTimeTruncated) {
             return
         }
 
@@ -49,7 +54,7 @@ class UserInactiveStrategy(
         if (activeTemplates.isEmpty()) return
 
         val inactivityConditions = activeTemplates.associate {
-            val businessDay = dateHelper.getBusinessDay(now.minusDays(it.triggerCondition?.toLong()!! - 1))
+            val businessDay = dateHelper.getBusinessDay(triggeredAtUtc.minusDays(it.triggerCondition?.toLong()!! - 1))
             val inactiveDays = it.triggerCondition!!
             val dateRange = Pair(businessDay.start, businessDay.end)
             inactiveDays to dateRange

@@ -21,7 +21,8 @@ fun Item.toEntity(): ItemJpaEntity {
         lottieUrl = this.lottieUrl,
         imageFileKey = this.imageFileKey,
         lottieFileKey = this.lottieFileKey,
-        stock = StockEmbeddable.from(this.stock)
+        stock = StockEmbeddable.from(this.stock),
+        hasShadow = this.hasShadow
     ).apply {
         this.deletedAt = this@toEntity.deletedAt
     }
@@ -42,6 +43,7 @@ fun ItemJpaEntity.toDomain(): Item {
         imageFileKey = this.imageFileKey,
         lottieFileKey = this.lottieFileKey,
         stock = Stock(this.stock.totalQuantity, this.stock.currentQuantity),
+        hasShadow = this.hasShadow,
         createdAt = this.createdAt,
         modifiedAt = this.modifiedAt,
         deletedAt = this.deletedAt

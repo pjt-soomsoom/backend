@@ -1,14 +1,23 @@
 package com.soomsoom.backend.adapter.`in`.web.api.mailbox
 
+import com.soomsoom.backend.adapter.`in`.web.api.mailbox.request.CompleteAnnouncementImageUpdateRequest
+import com.soomsoom.backend.adapter.`in`.web.api.mailbox.request.CompleteAnnouncementUploadRequest
 import com.soomsoom.backend.adapter.`in`.web.api.mailbox.request.CreateAnnouncementRequest
-import com.soomsoom.backend.adapter.`in`.web.api.mailbox.request.UpdateAnnouncementRequest
+import com.soomsoom.backend.adapter.`in`.web.api.mailbox.request.UpdateAnnouncementInfoRequest
+import com.soomsoom.backend.adapter.`in`.web.api.mailbox.request.toCommand
+import com.soomsoom.backend.adapter.`in`.web.api.upload.request.FileMetadata
+import com.soomsoom.backend.application.port.`in`.mailbox.command.CompleteAnnouncementUploadCommand
+import com.soomsoom.backend.application.port.`in`.mailbox.command.UpdateAnnouncementImageCommand
 import com.soomsoom.backend.application.port.`in`.mailbox.dto.AnnouncementDto
+import com.soomsoom.backend.application.port.`in`.mailbox.dto.CreateAnnouncementResult
+import com.soomsoom.backend.application.port.`in`.mailbox.dto.UpdateAnnouncementFileResult
 import com.soomsoom.backend.application.port.`in`.mailbox.query.FindAnnouncementsCriteria
 import com.soomsoom.backend.application.port.`in`.mailbox.usecase.command.CreateAnnouncementUseCase
 import com.soomsoom.backend.application.port.`in`.mailbox.usecase.command.DeleteAnnouncementUseCase
 import com.soomsoom.backend.application.port.`in`.mailbox.usecase.command.UpdateAnnouncementUseCase
 import com.soomsoom.backend.application.port.`in`.mailbox.usecase.query.FindAnnouncementDetailsUseCase
 import com.soomsoom.backend.application.port.`in`.mailbox.usecase.query.FindAnnouncementsUseCase
+import com.soomsoom.backend.application.port.`in`.upload.command.ValidatedFileMetadata
 import com.soomsoom.backend.domain.common.DeletionStatus
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -43,23 +52,95 @@ class AdminMailboxController(
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "공지 생성", description = "새로운 공지를 생성합니다. 예약 발송이 가능합니다.")
+    @Operation(summary = "공지 생성", description = "새로운 공지를 생성합니다.")
     fun createAnnouncement(
         @Valid @RequestBody
         request: CreateAnnouncementRequest,
-    ): Long {
-        return createAnnouncementUseCase.command(request.toCommand())
+    ): CreateAnnouncementResult {
+        return createAnnouncementUseCase.create(request.toCommand())
     }
 
+    /**
+     * 생성 후 파일 업로드 완료 처리
+     */
+    @PostMapping("/{announcementId}/upload-complete")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(
+        summary = "공지 이미지 업로드 완료 요청",
+        description = "클라이언트가 Presigned URL을 통해 이미지 업로드를 완료한 후, " +
+            "해당 이미지의 파일 키(file key)를 서버에 알려주어 공지사항과 이미지를 최종 연결(확정)합니다."
+    )
+    fun completeAnnouncementUpload(
+        @Parameter(description = "이미지를 연결할 공지 ID", example = "1")
+        @PathVariable
+        announcementId: Long,
+        @Valid @RequestBody
+        request: CompleteAnnouncementUploadRequest,
+    ) {
+        val command = CompleteAnnouncementUploadCommand(
+            announcementId = announcementId,
+            imageFileKey = request.imageFileKey!!
+        )
+        createAnnouncementUseCase.completeUpload(command)
+    }
+
+    /**
+     * 공지 사항 메타 데이터 수정
+     */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "공지 수정", description = "기존 공지의 제목과 내용을 수정합니다.")
+    @Operation(summary = "공지 메타 데이터 수정", description = "기존 공지의 제목과 내용을 수정합니다.")
     fun updateAnnouncement(
         @Parameter(description = "수정할 공지 ID") @PathVariable id: Long,
         @Valid @RequestBody
-        request: UpdateAnnouncementRequest,
+        request: UpdateAnnouncementInfoRequest,
     ) {
-        updateAnnouncementUseCase.command(request.toCommand(id))
+        updateAnnouncementUseCase.updateInfo(request.toCommand(id))
+    }
+
+    /**
+     * 이미지 업데이트 요청
+     */
+    @PutMapping("/{announcementId}/image")
+    @Operation(
+        summary = "공지 이미지 업데이트 요청 (Presigned URL 생성)",
+        description = "기존 공지 이미지를 교체하기 위해, 새로운 이미지를 업로드할 Presigned URL을 발급받습니다."
+    )
+    fun updateAnnouncementImage(
+        @Parameter(description = "이미지를 교체할 공지 ID", example = "1")
+        @PathVariable
+        announcementId: Long,
+
+        @Valid @RequestBody
+        request: FileMetadata,
+    ): UpdateAnnouncementFileResult {
+        val command = UpdateAnnouncementImageCommand(
+            announcementId = announcementId,
+            imageMetadata = ValidatedFileMetadata(request.filename!!, request.contentType!!)
+        )
+        return updateAnnouncementUseCase.updateImage(command)
+    }
+
+    /**
+     * 이미지 업데이트 완료 요청
+     */
+    @PostMapping("/{announcementId}/image/upload-complete")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(
+        summary = "공지 이미지 업데이트 완료 요청",
+        description = "클라이언트가 Presigned URL을 통해 새 이미지 업로드를 완료한 후, " +
+            "해당 이미지의 파일 키(file key)를 서버에 알려주어 공지사항의 이미지를 최종 교체합니다."
+    )
+    fun completeAnnouncementImageUpdate(
+        @Parameter(description = "이미지를 교체할 공지 ID", example = "1")
+        @PathVariable
+        announcementId: Long,
+
+        @Valid @RequestBody
+        request: CompleteAnnouncementImageUpdateRequest,
+    ) {
+        val command = request.toCommand(announcementId)
+        updateAnnouncementUseCase.completeImageUpdate(command)
     }
 
     @DeleteMapping("/{id}")
