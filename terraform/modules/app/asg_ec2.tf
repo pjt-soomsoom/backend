@@ -45,6 +45,15 @@ resource "aws_launch_template" "main" {
               "mem_used_percent"
             ],
             "metrics_collection_interval": 60
+          },
+          "disk": {
+            "measurement": [
+              "disk_used_percent"
+            ],
+            "metrics_collection_interval": 60,
+            "resources": [
+              "/"
+            ]
           }
         },
         "append_dimensions": {
