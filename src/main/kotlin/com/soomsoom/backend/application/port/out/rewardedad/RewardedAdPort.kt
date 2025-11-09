@@ -1,6 +1,7 @@
 package com.soomsoom.backend.application.port.out.rewardedad
 
 import com.soomsoom.backend.application.port.`in`.rewardedad.dto.RewardedAdStatusDto
+import com.soomsoom.backend.common.entity.enums.OSType
 import com.soomsoom.backend.domain.rewardedad.model.RewardedAd
 import java.time.LocalDateTime
 
@@ -9,7 +10,7 @@ interface RewardedAdPort {
     /**
      * [사용자용] 활성화된 모든 광고와 함께, 특정 사용자의 시청 완료 여부를 한 번의 쿼리로 조회합니다.
      */
-    fun findActiveAdsWithWatchedStatus(userId: Long, start: LocalDateTime, end: LocalDateTime): List<RewardedAdStatusDto>
+    fun findActiveAdsWithWatchedStatus(userId: Long, start: LocalDateTime, end: LocalDateTime, platform: OSType): List<RewardedAdStatusDto>
 
     // ======== Admin-facing Queries ========
     /**
