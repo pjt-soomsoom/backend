@@ -11,7 +11,8 @@ fun RewardedAd.toEntity(): RewardedAdJpaEntity {
         title = this.title,
         adUnitId = this.adUnitId,
         rewardAmount = PointsEmbeddable(this.rewardAmount.value),
-        active = this.active
+        active = this.active,
+        platform = this.platform
     )
 }
 
@@ -21,6 +22,7 @@ fun RewardedAdJpaEntity.toDomain(): RewardedAd {
         title = this.title,
         adUnitId = this.adUnitId,
         rewardAmount = Points(this.rewardAmount.value),
-        active = this.active
+        active = this.active,
+        platform = this.platform
     )
 }

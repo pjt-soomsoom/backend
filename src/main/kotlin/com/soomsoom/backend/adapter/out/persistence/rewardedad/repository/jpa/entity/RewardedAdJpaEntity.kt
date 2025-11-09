@@ -2,10 +2,13 @@ package com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa.e
 
 import com.soomsoom.backend.adapter.out.persistence.common.entity.PointsEmbeddable
 import com.soomsoom.backend.common.entity.BaseTimeEntity
+import com.soomsoom.backend.common.entity.enums.OSType
 import jakarta.persistence.AttributeOverride
 import jakarta.persistence.Column
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -16,7 +19,7 @@ import jakarta.persistence.Table
 @Table(
     name = "rewarded_ads",
     indexes = [
-        Index(name = "idx_rewarded_ads_active", columnList = "active")
+        Index(name = "idx_rewarded_ads_active_platform", columnList = "active, platform")
     ]
 )
 class RewardedAdJpaEntity(
@@ -30,4 +33,8 @@ class RewardedAdJpaEntity(
     @AttributeOverride(name = "value", column = Column(name = "reward_amount"))
     var rewardAmount: PointsEmbeddable,
     var active: Boolean,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var platform: OSType,
 ) : BaseTimeEntity()

@@ -3,6 +3,7 @@ package com.soomsoom.backend.application.service.rewardedad.query
 import com.soomsoom.backend.application.port.`in`.rewardedad.dto.RewardedAdStatusDto
 import com.soomsoom.backend.application.port.`in`.rewardedad.usecase.query.FindRewardedAdsUseCase
 import com.soomsoom.backend.application.port.out.rewardedad.RewardedAdPort
+import com.soomsoom.backend.common.entity.enums.OSType
 import com.soomsoom.backend.common.utils.DateHelper
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -17,16 +18,17 @@ class FindRewardedAdsService(
 ) : FindRewardedAdsUseCase {
 
     @PreAuthorize("#userId == authentication.principal.id")
-    override fun findRewardedAds(userId: Long): List<RewardedAdStatusDto> {
+    override fun findRewardedAds(userId: Long, platform: OSType): List<RewardedAdStatusDto> {
         val businessDay = dateHelper.getBusinessDay(LocalDateTime.now())
-        val adsStatus: List<RewardedAdStatusDto> = rewardedAdPort.findActiveAdsWithWatchedStatus(userId, businessDay.start, businessDay.end)
+        val adsStatus: List<RewardedAdStatusDto> = rewardedAdPort.findActiveAdsWithWatchedStatus(userId, businessDay.start, businessDay.end, platform)
         return adsStatus.map { statusDto ->
             RewardedAdStatusDto(
                 id = statusDto.id,
                 title = statusDto.title,
                 adUnitId = statusDto.adUnitId,
                 rewardAmount = statusDto.rewardAmount,
-                watchedToday = statusDto.watchedToday
+                watchedToday = statusDto.watchedToday,
+                platform = statusDto.platform
             )
         }
     }

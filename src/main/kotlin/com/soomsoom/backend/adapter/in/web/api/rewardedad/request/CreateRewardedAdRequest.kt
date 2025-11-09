@@ -1,8 +1,10 @@
 package com.soomsoom.backend.adapter.`in`.web.api.rewardedad.request
 
 import com.soomsoom.backend.application.port.`in`.rewardedad.command.CreateRewardedAdCommand
+import com.soomsoom.backend.common.entity.enums.OSType
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 
 @Schema(description = "보상형 광고 생성 요청")
@@ -18,12 +20,17 @@ data class CreateRewardedAdRequest(
     @Schema(description = "보상 포인트 양", example = "10")
     @field:Positive
     val rewardAmount: Int,
+
+    @Schema(description = "AdMob 플랫폼", example = "ANDROID | IOS")
+    @field:NotNull
+    val platform: OSType,
 ) {
     fun toCommand(): CreateRewardedAdCommand {
         return CreateRewardedAdCommand(
             title = this.title,
             adUnitId = this.adUnitId,
-            rewardAmount = this.rewardAmount
+            rewardAmount = this.rewardAmount,
+            platform = this.platform
         )
     }
 }

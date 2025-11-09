@@ -21,7 +21,8 @@ class FindAllRewardedAdsService(
                 title = ad.title,
                 adUnitId = ad.adUnitId,
                 rewardAmount = ad.rewardAmount.value,
-                active = ad.active
+                active = ad.active,
+                platform = ad.platform
             )
         }
     }

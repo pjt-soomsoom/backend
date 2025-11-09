@@ -25,7 +25,8 @@ class UpdateRewardedAdService(
         rewardedAd.update(
             title = command.title,
             rewardAmount = Points(command.rewardAmount),
-            active = command.active
+            active = command.active,
+            platform = command.platform
         )
 
         val updatedAd = rewardedAdPort.save(rewardedAd)
@@ -34,7 +35,8 @@ class UpdateRewardedAdService(
             title = updatedAd.title,
             adUnitId = updatedAd.adUnitId,
             rewardAmount = updatedAd.rewardAmount.value,
-            active = updatedAd.active
+            active = updatedAd.active,
+            platform = updatedAd.platform
         )
     }
 }
