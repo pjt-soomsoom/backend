@@ -4,6 +4,7 @@ import com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa.Re
 import com.soomsoom.backend.adapter.out.persistence.rewardedad.repository.jpa.RewardedAdQueryDslRepository
 import com.soomsoom.backend.application.port.`in`.rewardedad.dto.RewardedAdStatusDto
 import com.soomsoom.backend.application.port.out.rewardedad.RewardedAdPort
+import com.soomsoom.backend.common.entity.enums.OSType
 import com.soomsoom.backend.domain.rewardedad.model.RewardedAd
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -14,14 +15,20 @@ class RewardedAdPersistenceAdapter(
     private val rewardedAdJpaRepository: RewardedAdJpaRepository,
     private val rewardedAdQueryDslRepository: RewardedAdQueryDslRepository,
 ) : RewardedAdPort {
-    override fun findActiveAdsWithWatchedStatus(userId: Long, start: LocalDateTime, end: LocalDateTime): List<RewardedAdStatusDto> {
-        return rewardedAdQueryDslRepository.findActiveAdsWithWatchedStatus(userId, start, end).map {
+    override fun findActiveAdsWithWatchedStatus(
+        userId: Long,
+        start: LocalDateTime,
+        end: LocalDateTime,
+        platform: OSType,
+    ): List<RewardedAdStatusDto> {
+        return rewardedAdQueryDslRepository.findActiveAdsWithWatchedStatus(userId, start, end, platform).map {
             RewardedAdStatusDto(
                 id = it.id,
                 title = it.title,
                 adUnitId = it.adUnitId,
                 rewardAmount = it.rewardAmount,
-                watchedToday = it.watched
+                watchedToday = it.watched,
+                platform = it.platform
             )
         }
     }

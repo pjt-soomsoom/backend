@@ -31,7 +31,8 @@ class CreateRewardedAdService(
             title = command.title,
             adUnitId = finalAdUnitId,
             rewardAmount = Points(command.rewardAmount),
-            active = true
+            active = true,
+            platform = command.platform
         )
 
         val savedAd = rewardedAdPort.save(newRewardedAd)
@@ -40,7 +41,8 @@ class CreateRewardedAdService(
             title = savedAd.title,
             adUnitId = finalAdUnitId,
             rewardAmount = savedAd.rewardAmount.value,
-            active = savedAd.active
+            active = savedAd.active,
+            platform = savedAd.platform
         )
     }
 }
