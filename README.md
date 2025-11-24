@@ -1,5 +1,7 @@
-# backend
-
+# SoomSoom Backend
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/4e48ff49-d117-4e47-b9f4-f12393618fa4" height="550">
+</div>
 
 ## 💡 기술 스택
 
