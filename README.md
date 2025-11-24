@@ -14,25 +14,25 @@
 <br> <br/>
 ## 💡 기술 스택
 
-### Language & Frameworks
+##### Language & Frameworks
 ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=square&logo=kotlin&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/spring%20boot-%236DB33F.svg?style=square&logo=springboot&logoColor=white)
 ![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?style=square&logo=Spring&logoColor=white)
 ![QueryDSL](https://img.shields.io/badge/QueryDSL-007396?style=square&logo=openjdk&logoColor=white)
 
-### Security & Auth
+##### Security & Auth
 ![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=square&logo=Spring%20Security&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?style=square&logo=JSON%20web%20tokens)
 ![Google OAuth](https://img.shields.io/badge/Google-4285F4?style=square&logo=google&logoColor=white)
 ![Apple OAuth](https://img.shields.io/badge/Apple-%23000000?style=square&logo=apple&logoColor=white)
 
-### Database & Distributed System
+##### Database & Distributed System
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1.svg?style=square&logo=mysql&logoColor=white)
 ![AWS RDS](https://img.shields.io/badge/AWS%20RDS-527fff.svg?style=square&logo=amazonrds&logoColor=white)
 ![Flyway](https://img.shields.io/badge/Flyway-CC0200.svg?style=square&logo=Flyway&logoColor=white)
 ![ShedLock](https://img.shields.io/badge/ShedLock-E65100?style=square&logo=spring&logoColor=white)
 
-### Infrastructure & Cloud
+##### Infrastructure & Cloud
 ![EC2](https://img.shields.io/badge/AWS%20EC2-FF9900.svg?style=square&logo=amazonec2&logoColor=white)
 ![S3](https://img.shields.io/badge/AWS%20S3-569A31.svg?style=square&logo=amazons3&logoColor=white)
 ![ALB](https://img.shields.io/badge/AWS%20ALB-8c4fff.svg?style=square&logo=awselasticloadbalancing&logoColor=white)
@@ -40,7 +40,7 @@
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=square&logo=docker&logoColor=white)
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=square&logo=terraform&logoColor=white)
 
-### Tools & DevOps
+##### Tools & DevOps
 ![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=square&logo=Gradle&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=square&logo=githubactions&logoColor=white)
 ![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=square&logo=swagger&logoColor=white)
