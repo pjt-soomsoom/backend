@@ -7,7 +7,7 @@
 ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/spring%20boot-%236DB33F.svg?style=for-the-badge&logo=springboot&logoColor=white)
 ![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?style=for-the-badge&logo=Spring&logoColor=white)
-![QueryDSL](https://img.shields.io/badge/QueryDSL-007396?style=for-the-badge&logo=Java&logoColor=white)
+![QueryDSL](https://img.shields.io/badge/QueryDSL-007396?style=for-the-badge&logo=openjdk&logoColor=white)
 
 ### 🔒 Security & Auth
 ![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=Spring%20Security&logoColor=white)
