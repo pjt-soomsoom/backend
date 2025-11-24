@@ -72,7 +72,9 @@
 
 ### 👉  &nbsp;인프라 설계도 (Infrastructure Diagram)
 
-<img width="1336" height="867" alt="image" src="https://github.com/user-attachments/assets/7bb26759-c61c-478b-8de9-d19e371ee23f" />
+<img width="1297" height="826" alt="image" src="https://github.com/user-attachments/assets/19f2e8a5-e39a-4c29-91c8-b63b412bafce" />
+
+
 
 
 * AWS Cloud: EC2 (ASG), RDS (MySQL Multi-AZ), S3, ALB, ECR, CodeDeploy 등을 활용하여 가용성과 확장성을 고려한 인프라를 구축.
