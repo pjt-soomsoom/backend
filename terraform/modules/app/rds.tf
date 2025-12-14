@@ -13,7 +13,7 @@ resource "aws_db_instance" "main" {
     engine         = "mysql"
     engine_version = "8.0"
 
-    instance_class = var.environment == "prod" ? "db.t3.small" : "db.t3.micro"
+    instance_class = "db.t3.micro"
 
     allocated_storage = 20
     storage_type      = "gp2"
@@ -26,6 +26,7 @@ resource "aws_db_instance" "main" {
     vpc_security_group_ids = [aws_security_group.rds.id]
 
     skip_final_snapshot = var.environment == "prod" ? true : true
+    apply_immediately = true
     publicly_accessible = false
 
     depends_on = [aws_internet_gateway.main]
