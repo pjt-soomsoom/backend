@@ -25,9 +25,10 @@ locals {
 }
 
 resource "aws_ssm_parameter" "db_url" {
+    count = var.environment == "prod" ? 1 : 0
     name  = "/config/soomsoom_${var.environment}/spring.datasource.url"
     type  = "SecureString"
-    value = "jdbc:mysql://${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=true"
+    value = "jdbc:mysql://${aws_db_instance.main[0].endpoint}/${aws_db_instance.main[0].db_name}?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=true"
 
     tags = {
         Project     = var.project_name
@@ -36,7 +37,7 @@ resource "aws_ssm_parameter" "db_url" {
 }
 
 resource "aws_ssm_parameter" "app_config" {
-    for_each = local.app_parameters
+    for_each = var.environment == "prod" ? local.app_parameters : {}
 
     name  = "/config/soomsoom_${var.environment}/${each.key}"
     type  = each.value.type
