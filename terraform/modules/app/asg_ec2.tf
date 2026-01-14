@@ -82,8 +82,8 @@ resource "aws_autoscaling_group" "prod" {
     count = var.environment == "prod" ? 1 : 0
 
     name                = "${var.project_name}-asg-prod"
-    desired_capacity    = 2
-    min_size            = 2
+    desired_capacity    = 1
+    min_size            = 1
     max_size            = 4
     vpc_zone_identifier = aws_subnet.private[*].id
 
@@ -105,19 +105,19 @@ resource "aws_autoscaling_group" "prod" {
     depends_on = [aws_internet_gateway.main]
 }
 
-resource "aws_instance" "test" {
-    count = var.environment == "test" ? 1 : 0
-
-    launch_template {
-        id      = aws_launch_template.main.id
-        version = "$Latest"
-    }
-
-    subnet_id = aws_subnet.public[0].id
-
-    tags = {
-        Name = "${var.project_name}-ec2-test"
-    }
-
-    depends_on = [aws_internet_gateway.main]
-}
+# resource "aws_instance" "test" {
+#     count = var.environment == "test" ? 1 : 0
+#
+#     launch_template {
+#         id      = aws_launch_template.main.id
+#         version = "$Latest"
+#     }
+#
+#     subnet_id = aws_subnet.public[0].id
+#
+#     tags = {
+#         Name = "${var.project_name}-ec2-test"
+#     }
+#
+#     depends_on = [aws_internet_gateway.main]
+# }

@@ -1,4 +1,5 @@
 resource "aws_codedeploy_app" "app" {
+    count            = var.environment == "prod" ? 1 : 0
     compute_platform = "Server"
     name             = "${var.project_name}-backend-${var.environment}"
 }
@@ -27,7 +28,8 @@ resource "aws_lb_target_group" "green" {
 }
 
 resource "aws_codedeploy_deployment_group" "group" {
-    app_name              = aws_codedeploy_app.app.name
+    count                 = var.environment == "prod" ? 1 : 0
+    app_name              = aws_codedeploy_app.app[0].name
     deployment_group_name = "${var.project_name}-${var.environment}-deploy-group"
     service_role_arn      = aws_iam_role.codedeploy.arn
 

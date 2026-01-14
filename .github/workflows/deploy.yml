@@ -2,7 +2,7 @@ name: Deploy SoomSoom Backend Application
 
 on:
   push:
-    branches: [ "main", "release/**" ]
+    branches: [ "main" ]
     paths-ignore:
       - 'terraform/**'
       - 'README.md'

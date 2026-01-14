@@ -2,7 +2,7 @@ name: Manage Infrastructure with Terraform
 
 on:
     push:
-        branches: [ "main", "release/**" ]
+        branches: [ "main" ]
         # terraform 디렉토리 하위의 파일이 변경되었을 때만 이 워크플로우를 트리거
         paths:
             - 'terraform/**'
