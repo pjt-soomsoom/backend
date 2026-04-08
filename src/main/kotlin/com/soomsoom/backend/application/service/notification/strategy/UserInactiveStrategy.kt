@@ -35,80 +35,67 @@ class UserInactiveStrategy(
     override fun supports(event: Event<*>) = event.eventType == EventType.SCHEDULER_TICK
 
     override fun execute(event: Event<SchedulerTickNotificationPayload>) {
-        val stopWatch = org.springframework.util.StopWatch()
-        stopWatch.start("UserInactiveBatch")
-        log.info("🚀 [UserInactiveBatch] STARTED at {}", LocalDateTime.now())
+        val triggeredAtUtc = event.payload.triggeredAt
+        val activeTemplates = notificationTemplatePort.findActiveTemplatesWithActiveVariationsByType(NotificationType.RE_ENGAGEMENT)
+        if (activeTemplates.isEmpty()) return
 
-        try {
-            val triggeredAtUtc = event.payload.triggeredAt
-            val activeTemplates = notificationTemplatePort.findActiveTemplatesWithActiveVariationsByType(NotificationType.RE_ENGAGEMENT)
-            if (activeTemplates.isEmpty()) return
+        val inactivityConditions = activeTemplates.associate {
+            val businessDay = dateHelper.getBusinessDay(triggeredAtUtc.minusDays(it.triggerCondition?.toLong()!! - 1))
+            val inactiveDays = it.triggerCondition!!
+            val dateRange = Pair(businessDay.start, businessDay.end)
+            inactiveDays to dateRange
+        }
 
-            val inactivityConditions = activeTemplates.associate {
-                val businessDay = dateHelper.getBusinessDay(triggeredAtUtc.minusDays(it.triggerCondition?.toLong()!! - 1))
-                val inactiveDays = it.triggerCondition!!
-                val dateRange = Pair(businessDay.start, businessDay.end)
-                inactiveDays to dateRange
-            }
+        // [Optimized] 1000개 단위 청크 처리
+        var offset = 0
+        val BATCH_SIZE = 1000
 
-            // [Optimized] 1000개 단위 청크 처리
-            var offset = 0
-            val BATCH_SIZE = 1000
+        while (true) {
+            val targetUsers = userNotificationPort.findReEngagementTargets(
+                inactivityConditions,
+                offset,
+                BATCH_SIZE
+            )
+            if (targetUsers.isEmpty()) break
 
-            while (true) {
-                val targetUsers = userNotificationPort.findReEngagementTargets(
-                    inactivityConditions,
-                    offset,
-                    BATCH_SIZE
-                )
-                if (targetUsers.isEmpty()) break
-                log.info("🎯 [UserInactiveBatch] Processing Chunk: offset={}, size={}", offset, targetUsers.size)
+            // 트랜잭션 범위 최소화: Chunk 단위로 실행
+            val messages = transactionTemplate.execute {
+                val chunkHistories = targetUsers.map { user ->
+                    val matchedTemplate = activeTemplates.find { it.triggerCondition == user.inactiveDays }
+                    val selectedVariation = matchedTemplate?.variations?.random()!!
 
-                // 트랜잭션 범위 최소화: Chunk 단위로 실행
-                val messages = transactionTemplate.execute {
-                    val chunkHistories = targetUsers.map { user ->
-                        val matchedTemplate = activeTemplates.find { it.triggerCondition == user.inactiveDays }
-                        val selectedVariation = matchedTemplate?.variations?.random()!!
-
-                        NotificationHistory(
-                            userId = user.userId,
-                            messageVariationId = selectedVariation.id,
-                            sentAt = LocalDateTime.now()
-                        ) to selectedVariation
-                    }
-
-                    // [Bulk Insert]
-                    val savedHistories = userNotificationPort.saveAllHistories(chunkHistories.map { it.first })
-
-                    // 메시지 생성
-                    savedHistories.zip(chunkHistories).map { (history, pair) ->
-                        val variation = pair.second
-                        NotificationMessage(
-                            targetUserId = history.userId,
-                            title = variation.titleTemplate,
-                            body = variation.bodyTemplate,
-                            badgeCount = 0,
-                            payload = mapOf(
-                                "notificationType" to NotificationType.RE_ENGAGEMENT.name,
-                                "historyId" to history.id.toString()
-                            )
-                        )
-                    }
-                } ?: emptyList()
-
-                // FCM 발송
-                if (messages.isNotEmpty()) {
-                    notificationPort.sendAll(messages)
-                    log.info("✉️ [UserInactiveBatch] FCM Sent: {} messages", messages.size)
+                    NotificationHistory(
+                        userId = user.userId,
+                        messageVariationId = selectedVariation.id,
+                        sentAt = LocalDateTime.now()
+                    ) to selectedVariation
                 }
 
-                offset += BATCH_SIZE
+                // [Bulk Insert]
+                val savedHistories = userNotificationPort.saveAllHistories(chunkHistories.map { it.first })
+
+                // 메시지 생성
+                savedHistories.zip(chunkHistories).map { (history, pair) ->
+                    val variation = pair.second
+                    NotificationMessage(
+                        targetUserId = history.userId,
+                        title = variation.titleTemplate,
+                        body = variation.bodyTemplate,
+                        badgeCount = 0,
+                        payload = mapOf(
+                            "notificationType" to NotificationType.RE_ENGAGEMENT.name,
+                            "historyId" to history.id.toString()
+                        )
+                    )
+                }
+            } ?: emptyList()
+
+            // FCM 발송
+            if (messages.isNotEmpty()) {
+                notificationPort.sendAll(messages)
             }
-        } catch (e: Exception) {
-            log.error("❌ [UserInactiveBatch] FAILED", e)
-        } finally {
-            stopWatch.stop()
-            log.info("✅ [UserInactiveBatch] FINISHED! Total Duration: {} ms", stopWatch.totalTimeMillis)
+
+            offset += BATCH_SIZE
         }
     }
 }
