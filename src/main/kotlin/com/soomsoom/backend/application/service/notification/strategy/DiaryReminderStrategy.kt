@@ -13,7 +13,6 @@ import com.soomsoom.backend.domain.notification.model.vo.NotificationMessage
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
@@ -25,16 +24,17 @@ class DiaryReminderStrategy(
     private val userNotificationPort: UserNotificationPort,
     private val notificationPort: NotificationPort,
     private val dateHelper: DateHelper,
+    private val transactionManager: org.springframework.transaction.PlatformTransactionManager,
     @Value("\${alarm.batch-size}")
     private val BATCH_SIZE: Int,
 ) : NotificationStrategy<SchedulerTickNotificationPayload> {
 
     private val KST_ZONE = ZoneId.of("Asia/Seoul")
     private val log = LoggerFactory.getLogger(javaClass)
+    private val transactionTemplate = org.springframework.transaction.support.TransactionTemplate(transactionManager)
 
     override fun supports(event: Event<*>) = event.eventType == EventType.SCHEDULER_TICK
 
-    @Transactional
     override fun execute(event: Event<SchedulerTickNotificationPayload>) {
         // 'DIARY_REMINDER' 타입의 활성화된 템플릿과 Variation들을 미리 조회합니다.
         val activeTemplates = notificationTemplatePort.findActiveTemplatesWithActiveVariationsByType(NotificationType.DIARY_REMINDER)
@@ -49,32 +49,44 @@ class DiaryReminderStrategy(
         var pageNumber = 0
 
         while (true) {
-            // batch-size만큼 데이터를 가져오기
+            // 1. 대상 조회 (트랜잭션 없이 조회)
             val targetUserIds = findTargetUsersInBatch(currentTimeKst, triggeredAtUtc, pageNumber, BATCH_SIZE)
             if (targetUserIds.isEmpty()) break
 
-            // Batch-size에 대해서만 메시지를 생성하고 즉시 발송
-            val messagesInBatch = targetUserIds.map { userId ->
-                val selectedVariation = variations.random()
-                val history = NotificationHistory(
-                    userId = userId,
-                    messageVariationId = selectedVariation.id,
-                    sentAt = LocalDateTime.now()
-                )
-                val savedHistory = userNotificationPort.saveHistory(history)
+            // 2. 트랜잭션 범위: 히스토리 저장 및 메시지 생성
+            val messagesInBatch = transactionTemplate.execute { status ->
+                val histories = targetUserIds.map { userId ->
+                    val selectedVariation = variations.random()
+                    // NotificationHistory 엔티티 생성
+                    NotificationHistory(
+                        userId = userId,
+                        messageVariationId = selectedVariation.id,
+                        sentAt = LocalDateTime.now()
+                    ) to selectedVariation
+                }
 
-                NotificationMessage(
-                    targetUserId = userId,
-                    title = selectedVariation.titleTemplate,
-                    body = selectedVariation.bodyTemplate,
-                    badgeCount = 0,
-                    payload = mapOf(
-                        "notificationType" to NotificationType.DIARY_REMINDER.name,
-                        "historyId" to savedHistory.id.toString()
+                if (histories.isEmpty()) return@execute emptyList<NotificationMessage>()
+
+                // Bulk Insert!
+                val savedHistories = userNotificationPort.saveAllHistories(histories.map { it.first })
+
+                // 메시지 목록 생성
+                savedHistories.mapIndexed { index, savedHistory ->
+                    val selectedVariation = histories[index].second
+                    NotificationMessage(
+                        targetUserId = savedHistory.userId,
+                        title = selectedVariation.titleTemplate,
+                        body = selectedVariation.bodyTemplate,
+                        badgeCount = 0,
+                        payload = mapOf(
+                            "notificationType" to NotificationType.DIARY_REMINDER.name,
+                            "historyId" to savedHistory.id.toString()
+                        )
                     )
-                )
-            }
+                }
+            } ?: emptyList()
 
+            // 3. 메시지 발송 (트랜잭션 외부)
             if (messagesInBatch.isNotEmpty()) {
                 notificationPort.sendAll(messagesInBatch)
             }

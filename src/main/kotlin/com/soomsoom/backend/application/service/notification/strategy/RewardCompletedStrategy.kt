@@ -22,6 +22,7 @@ class RewardCompletedStrategy(
 
     override fun supports(event: Event<*>) = event.eventType == EventType.REWARD_COMPLETED
 
+    @org.springframework.transaction.annotation.Transactional
     override fun execute(event: Event<RewardCompletedNotificationPayload>) {
         val payload = event.payload
 

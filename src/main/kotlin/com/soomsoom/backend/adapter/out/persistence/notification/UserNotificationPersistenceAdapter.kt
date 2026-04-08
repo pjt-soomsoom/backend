@@ -67,6 +67,11 @@ class UserNotificationPersistenceAdapter(
         return notificationHistoryJpaRepository.save(history.toEntity()).toDomain()
     }
 
+    override fun saveAllHistories(histories: List<NotificationHistory>): List<NotificationHistory> {
+        val entities = histories.map { it.toEntity() }
+        return notificationHistoryJpaRepository.saveAll(entities).map { it.toDomain() }
+    }
+
     override fun findHistoryById(id: Long): NotificationHistory? {
         return notificationHistoryJpaRepository.findByIdOrNull(id)?.toDomain()
     }

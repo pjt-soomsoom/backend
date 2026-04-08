@@ -25,6 +25,7 @@ interface UserNotificationPort {
 
     // NotificationHistory
     fun saveHistory(history: NotificationHistory): NotificationHistory
+    fun saveAllHistories(histories: List<NotificationHistory>): List<NotificationHistory>
     fun findHistoryById(id: Long): NotificationHistory?
     fun deleteNotificationHistoryByUserId(userId: Long)
 

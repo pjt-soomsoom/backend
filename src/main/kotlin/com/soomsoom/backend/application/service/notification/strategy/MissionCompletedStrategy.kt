@@ -27,6 +27,7 @@ class MissionCompletedStrategy(
     /**
      * 미션 달성 이벤트를 기반으로 푸시 알림 메시지를 생성
      */
+    @org.springframework.transaction.annotation.Transactional
     override fun execute(event: Event<MissionCompletedNotificationPayload>) {
         val payload = event.payload
 
