@@ -38,7 +38,7 @@ class UserInactiveStrategy(
         val stopWatch = org.springframework.util.StopWatch()
         stopWatch.start("UserInactiveBatch")
         log.info("🚀 [UserInactiveBatch] STARTED at {}", LocalDateTime.now())
-        
+
         try {
             val triggeredAtUtc = event.payload.triggeredAt
             val activeTemplates = notificationTemplatePort.findActiveTemplatesWithActiveVariationsByType(NotificationType.RE_ENGAGEMENT)
@@ -54,7 +54,7 @@ class UserInactiveStrategy(
             // [Optimized] 1000개 단위 청크 처리
             var offset = 0
             val BATCH_SIZE = 1000
-            
+
             while (true) {
                 val targetUsers = userNotificationPort.findReEngagementTargets(
                     inactivityConditions,
@@ -65,11 +65,11 @@ class UserInactiveStrategy(
                 log.info("🎯 [UserInactiveBatch] Processing Chunk: offset={}, size={}", offset, targetUsers.size)
 
                 // 트랜잭션 범위 최소화: Chunk 단위로 실행
-                val messages = transactionTemplate.execute { 
+                val messages = transactionTemplate.execute {
                     val chunkHistories = targetUsers.map { user ->
                         val matchedTemplate = activeTemplates.find { it.triggerCondition == user.inactiveDays }
                         val selectedVariation = matchedTemplate?.variations?.random()!!
-                        
+
                         NotificationHistory(
                             userId = user.userId,
                             messageVariationId = selectedVariation.id,
@@ -77,7 +77,7 @@ class UserInactiveStrategy(
                         ) to selectedVariation
                     }
 
-                    // [Bulk Insert] 
+                    // [Bulk Insert]
                     val savedHistories = userNotificationPort.saveAllHistories(chunkHistories.map { it.first })
 
                     // 메시지 생성
